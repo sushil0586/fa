@@ -10,6 +10,7 @@ from Authentication.models import User
 class unitType(models.Model):
     UnitName =    models.CharField(max_length= 255)
     UnitDesc =    models.TextField()
+    createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True,default=1,blank=True)
 
     class Meta:
         def __str__(self):

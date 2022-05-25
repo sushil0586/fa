@@ -8,6 +8,7 @@ urlpatterns  = [
 
    
     path('entity',views.entityApiView.as_view(),name = 'entity'),
+    path('entitylist',views.entityApiView.as_view(),name = 'entity'),
     path('entity/<int:id>',views.entityApiView.as_view(), name = 'entity1'),
     path('entityDetails', views.entityDetailsApiView.as_view() ,name = 'entityDetails'),
     path('entityDetails/<int:id>',views.entityDetailsApiView.as_view(), name = 'entityDetails1'),

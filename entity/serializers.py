@@ -28,6 +28,18 @@ class entityUserSerializer(serializers.ModelSerializer):
 class entitySerializer(serializers.ModelSerializer):
 
 
+    #entityUser = entityUserSerializer(many=True)
+
+    
+
+    class Meta:
+        model = entity
+        fields = '__all__'
+
+
+class entitySerializer_load(serializers.ModelSerializer):
+
+
     entityUser = entityUserSerializer(many=True)
 
     

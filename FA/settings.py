@@ -84,18 +84,30 @@ TEMPLATES = [
 WSGI_APPLICATION = 'FA.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'accounts',
-        'USER': 'root',
-        'PASSWORD': 'ansh@2026',
-        'HOST': 'localhost',
-        'PORT': '3306',
-    }
+   'default': {
+       'ENGINE': 'django.db.backends.postgresql',
+       'NAME': 'account',
+       'USER': 'postgres',
+       'PASSWORD': 'ansh@1789',
+       'HOST': 'localhost',
+       'PORT': '5432',
+   }
 }
+
+
+# # Database
+# # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'accounts',
+#         'USER': 'root',
+#         'PASSWORD': 'ansh@2026',
+#         'HOST': 'localhost',
+#         'PORT': '3306',
+#     }
+# }
 
 
 
