@@ -34,6 +34,11 @@ class MyUserManager(UserManager):
         user.save(using=self._db)
         return user
 
+    def create(self, username, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', False)
+        extra_fields.setdefault('is_superuser', False)
+        return self._create_user(username, email, password, **extra_fields)
+
     def create_user(self, username, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
@@ -59,9 +64,9 @@ class User(AbstractBaseUser,PermissionsMixin,TrackingModel,UserManager):
     username = models.CharField(
     _('username'),
         max_length=150,
-        unique=True,
+       # unique=True,
         help_text=_('Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.'),
-        validators=[username_validator],
+        #validators=[username_validator],
         error_messages={
             'unique': _("A user with that username already exists."),
         },

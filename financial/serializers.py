@@ -15,9 +15,12 @@ class accountHeadSerializer(serializers.ModelSerializer):
         fields = ('id','name','code','detilsinbs','balanceType','DrcrEffect','accountHeadSr','group','entity',)
 
         def to_representation(self, instance):
-            rep = super().to_representation(instance)
-            rep['accountHeadSr'] = accountHeadSerializer(self).data
+            rep = super(accountHeadSerializer.self).to_representation(instance)
+            #rep['accountHeadSr'] = accountHeadSerializer(instance.accountHead).data
             return rep
+        def get_related_field(self, id):
+            # Handles initializing the `subcategories` field
+            return accountHeadSerializer()
     
 
     
@@ -31,11 +34,11 @@ class accountSerializer(serializers.ModelSerializer):
         model = account
         fields = '__all__'
     
-    def to_representation(self, instance):
-        rep = super().to_representation(instance)
-        rep['country'] = countrySerializer(instance.country).data
-        rep['accountHead'] = accountHeadSerializer(instance.accountHead).data
-        return rep
+    # def to_representation(self, instance):
+    #     rep = super().to_representation(instance)
+    #     rep['country'] = countrySerializer(instance.country).data
+    #     rep['accountHead'] = accountHeadSerializer(instance.accountHead).data
+    #     return rep
 
 
 
