@@ -31,8 +31,8 @@ class entity(TrackingModel):
     panno =        models.CharField(max_length= 255,null= True)
     tds =           models.CharField(max_length= 255,null= True)
     tdsCircle =        models.CharField(max_length= 255,null= True)
-    #userid = models.ManyToManyField(User)
-    createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True,default=1,blank=True)
+    user = models.ManyToManyField(User,related_name='uentity',default=1)
+    #createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True,default=1,blank=True)
     
 
     
@@ -60,16 +60,16 @@ class entity_details(models.Model):
     gstintype =        models.CharField(max_length= 255,null= True)
     esino =        models.CharField(max_length= 255,null= True)
 
-class entity_user(TrackingModel):
-    entity = models.ForeignKey(entity,related_name='entityUser',
-        on_delete=models.CASCADE)
-    user = models.ForeignKey(to= User,related_name='userentity', on_delete= models.CASCADE)
-    createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,related_name='%(class)s_requests_created',default=1)
+# class entity_user(TrackingModel):
+#     entity = models.ForeignKey(entity,related_name='entityUser',
+#         on_delete=models.CASCADE)
+#     user = models.ForeignKey(to= User,related_name='userentity', on_delete= models.CASCADE)
+#     createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,related_name='%(class)s_requests_created',default=1)
 
-    class Meta:
-        constraints = [
-        models.UniqueConstraint(fields=['entity', 'user'], name='unique entity_user')
-    ]
+#     class Meta:
+#         constraints = [
+#         models.UniqueConstraint(fields=['entity', 'user'], name='unique entity_user')
+#     ]
 
 
 

@@ -2,7 +2,7 @@
 from django.shortcuts import render
 from rest_framework import response,status,permissions
 from rest_framework.generics import GenericAPIView
-from Authentication.serializers import Registerserializer,LoginSerializer
+from Authentication.serializers import Registerserializer,LoginSerializer,Userserializer
 from django.contrib.auth import authenticate
 
 
@@ -20,7 +20,7 @@ class AuthApiView(GenericAPIView):
 
         user = request.user
         print(user)
-        serializer = Registerserializer(user)
+        serializer = Userserializer(user)
         return response.Response({'user':serializer.data})
 
 
