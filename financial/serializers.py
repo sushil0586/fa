@@ -7,7 +7,7 @@ from geography.serializers import countrySerializer
 class accountHeadSerializer(serializers.ModelSerializer):
 
     detilsinbs = ChoiceField(choices=accountHead.Details_in_BS)
-    balanceType = ChoiceField(choices=accountHead.BALANCE_TYPE)
+    #balanceType = ChoiceField(choices=accountHead.BALANCE_TYPE)
     
 
     class Meta:
