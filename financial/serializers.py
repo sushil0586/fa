@@ -12,15 +12,21 @@ class accountHeadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = accountHead
-        fields = ('id','name','code','detilsinbs','balanceType','DrcrEffect','accountHeadSr','group','entity',)
+        fields = ('id','name','code','detilsinbs','balanceType','DrcrEffect','Description','accountHeadSr','group','entity',)
 
-        def to_representation(self, instance):
-            rep = super(accountHeadSerializer.self).to_representation(instance)
-            #rep['accountHeadSr'] = accountHeadSerializer(instance.accountHead).data
-            return rep
-        def get_related_field(self, id):
-            # Handles initializing the `subcategories` field
-            return accountHeadSerializer()
+        # def to_representation(self, instance):
+        #     rep = super(accountHeadSerializer.self).to_representation(instance)
+        #     #rep['accountHeadSr'] = accountHeadSerializer(instance.accountHead).data
+        #     return rep
+        # def get_related_field(self, id):
+        #     # Handles initializing the `subcategories` field
+        #     return accountHeadSerializer()
+
+        # def get_fields(self):
+        #     fields = super(accountHeadSerializer, self).get_fields()
+        #     fields['accountHeadSr'] = accountHeadSerializer(many=True)
+        #     return fields
+    
     
 
     
@@ -34,11 +40,11 @@ class accountSerializer(serializers.ModelSerializer):
         model = account
         fields = '__all__'
     
-    # def to_representation(self, instance):
-    #     rep = super().to_representation(instance)
-    #     rep['country'] = countrySerializer(instance.country).data
-    #     rep['accountHead'] = accountHeadSerializer(instance.accountHead).data
-    #     return rep
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['country'] = countrySerializer(instance.country).data
+        rep['accountHead'] = accountHeadSerializer(instance.accountHead).data
+        return rep
 
 
 
