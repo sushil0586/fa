@@ -34,6 +34,7 @@ class accountHead(TrackingModel):
     detilsinbs =  models.CharField(max_length=50, choices = Details_in_BS, null=True,verbose_name=_('Details in Balance Sheet'))
     balanceType =  models.CharField(max_length=50,null=True,verbose_name=_('Balance Type'))
     DrcrEffect =   models.CharField(max_length=20,verbose_name=_('Debit/credit Effect'))
+    Description =   models.CharField(max_length=20,verbose_name=_('Description'),null=True)
     accountHeadSr = models.ForeignKey("self",null=True,on_delete=models.CASCADE,verbose_name=_('Account head Sr'),default=True,blank=True)
     group =  models.CharField(max_length=50, choices = Group, null=True)
     entity = models.ForeignKey(entity,null=True,on_delete=models.CASCADE)
