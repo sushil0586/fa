@@ -12,7 +12,7 @@ class accountHeadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = accountHead
-        fields = ('id','name','code','detilsinbs','balanceType','DrcrEffect','description','accountHeadSr','group','entity',)
+        fields = ('id','name','code','detilsinbs','balanceType','drcreffect','description','accountHeadSr','group','entity',)
 
         # def to_representation(self, instance):
         #     rep = super(accountHeadSerializer.self).to_representation(instance)
