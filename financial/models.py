@@ -38,7 +38,7 @@ class accountHead(TrackingModel):
     accountheadsr = models.ForeignKey("self",null=True,on_delete=models.CASCADE,verbose_name=_('Account head Sr'),default=True,blank=True)
     group =  models.CharField(max_length=50, choices = Group, null=True)
     entity = models.ForeignKey(entity,null=True,on_delete=models.CASCADE)
-    owner = models.ForeignKey(to= User, on_delete= models.CASCADE)
+    owner = models.ForeignKey(to= User,  on_delete= models.CASCADE)
 
     class Meta:
         verbose_name = _('Account head')
