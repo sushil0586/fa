@@ -4,6 +4,7 @@ from helpers.models import TrackingModel
 from Authentication.models import User
 from geography.models import country,state,district,city
 from Authentication.models import User 
+from django.utils.translation import gettext as _
 
 # Create your models here.
 
@@ -13,8 +14,13 @@ class unitType(models.Model):
     createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True,default=1,blank=True)
 
     class Meta:
-        def __str__(self):
-            return self.UnitName
+        verbose_name = _('unitType')
+        verbose_name_plural = _('unitTypes')
+    
+
+    
+    def __str__(self):
+        return f'{self.UnitName} , {self.UnitDesc}'
 
 
 class entity(TrackingModel):
@@ -33,11 +39,19 @@ class entity(TrackingModel):
     tdsCircle =        models.CharField(max_length= 255,null= True)
     user = models.ManyToManyField(User,related_name='uentity',default=1)
     #createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True,default=1,blank=True)
+
+
+    class Meta:
+        verbose_name = _('Entity')
+        verbose_name_plural = _('Entities')
     
 
     
     def __str__(self):
         return f'{self.unitType} , {self.entityName}'
+
+    
+
 
 
 
