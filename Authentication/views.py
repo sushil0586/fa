@@ -1,27 +1,40 @@
 
 from django.shortcuts import render
 from rest_framework import response,status,permissions
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import GenericAPIView,ListAPIView
 from Authentication.serializers import Registerserializer,LoginSerializer,Userserializer
 from django.contrib.auth import authenticate
+from Authentication.models import User
 
 
 
 
 
-class AuthApiView(GenericAPIView):
+class AuthApiView(ListAPIView):
 
     permission_classes = (permissions.IsAuthenticated,)
+
+    serializer_class = Userserializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+   # filter_backends = [DjangoFilterBackend]
+    #filterset_fields = ['id','unitType','entityName']
+
+    # def perform_create(self, serializer):
+    #     return serializer.save(user = [self.request.user])
     
-    def get(self,request):
+    def get_queryset(self):
+        return User.objects.filter(email = self.request.user)
+    
+    # def get(self,request):
 
 
-        print(request)
+    #     print(request)
 
-        user = request.user
-        print(user)
-        serializer = Userserializer(user)
-        return response.Response({'user':serializer.data})
+    #     user = request.user
+    #     print(user)
+    #     serializer = Userserializer(user)
+    #     return response.Response({'user':serializer.data})
 
 
 
