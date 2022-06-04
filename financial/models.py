@@ -25,7 +25,7 @@ class accountHead(TrackingModel):
     ]
 
     Group = [
-        ('Balace_sheet', _('Balance Sheet')),
+        ('Balance_sheet', _('Balance Sheet')),
         ('P/l', _('Profit Loss'))
     ]
 
