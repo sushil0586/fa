@@ -38,6 +38,7 @@ class AuthApiView(ListAPIView):
 
 
 
+
 class RegisterApiView(GenericAPIView):
 
 
