@@ -35,7 +35,7 @@ class accountHead(TrackingModel):
     balanceType =  models.CharField(max_length=50,null=True,verbose_name=_('Balance Type'))
     drcreffect =   models.CharField(max_length=20,verbose_name=_('Debit/credit Effect'))
     description =   models.CharField(max_length=200,verbose_name=_('Description'),null=True)
-    accountheadsr = models.ForeignKey("self",null=True,on_delete=models.CASCADE,verbose_name=_('Account head Sr'),default=True,blank=True)
+    accountheadsr = models.ForeignKey("self",null=True,on_delete=models.CASCADE,verbose_name=_('Account head Sr'),default=0,blank=True)
     group =  models.CharField(max_length=50, choices = Group, null=True)
     entity = models.ForeignKey(entity,null=True,on_delete=models.CASCADE)
     owner = models.ForeignKey(to= User,  on_delete= models.CASCADE)

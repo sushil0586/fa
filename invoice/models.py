@@ -6,6 +6,7 @@ from financial.models import account
 from inventory.models import Product
 from entity.models import entity
 
+
 # Create your models here.
 
 class SalesOderHeader(TrackingModel):
@@ -60,14 +61,18 @@ class purchaseorder(TrackingModel):
     entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity')
     createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
 
+    def __str__(self):
+        return f'{self.account} '
+
 class PurchaseOrderDetails(models.Model):
     purchaseOrder = models.ForeignKey(to = purchaseorder,related_name='PurchaseOrderDetails', on_delete= models.CASCADE,verbose_name= 'Purchase Order Number')
+    product = models.ForeignKey(to = Product, on_delete= models.CASCADE,verbose_name= 'Product',null = True,default = 1)
     Orderqty =  models.DecimalField(max_digits=10, decimal_places=2,verbose_name= 'Order Qty')
     pieces =  models.IntegerField(verbose_name='pieces')
     Rate =  models.DecimalField(max_digits=10, decimal_places=2,verbose_name= 'Rate')
     Amount =  models.DecimalField(max_digits=10, decimal_places=2,verbose_name= 'Amount')
     CSGT =  models.DecimalField(max_digits=10, decimal_places=2,verbose_name= 'CGST')
-    SGST =  models.DecimalField(max_digits=10, decimal_places=2,verbose_name= 'SGST')
+    SGST =  models.DecimalField(max_digits=10,null = True,default = 1, decimal_places=2,verbose_name= 'SGST')
     IGST =  models.DecimalField(max_digits=10, decimal_places=2,verbose_name= 'IGST')
     HSNNo =  models.CharField(max_length= 255,verbose_name= 'HSN No')
     LineTotal =  models.DecimalField(max_digits=10, decimal_places=2,verbose_name= 'Line Total')
