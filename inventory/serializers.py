@@ -1,11 +1,37 @@
 from rest_framework import serializers
-from inventory.models import Product,Album,Track
+from inventory.models import Product,Album,Track,ProductCategory
+
+
+class ProductCategorySerializer(serializers.ModelSerializer):
+
+    maincategoryname = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProductCategory
+        fields = ('id','pcategortyname','maincategory','entity','maincategoryname',)
+
+    def get_maincategoryname(self,obj):
+       # acc =  obj.accountHeadSr.name
+        if obj.maincategory is None:
+            return 'null'   
+        else :
+            return obj.maincategory.pcategortyname
 
 class ProductSerializer(serializers.ModelSerializer):
 
+
+    pcategoryname = serializers.SerializerMethodField()
+
     class Meta:
         model = Product
-        fields = ('id','ProductName','ProductDesc','is_stockable',)
+        fields ='__all__'
+
+    def get_pcategoryname(self,obj):
+       # acc =  obj.accountHeadSr.name
+        if obj.productcategory is None:
+            return 'null'   
+        else :
+            return obj.productcategory.pcategortyname
 
 
 class Trackserializer(serializers.ModelSerializer):

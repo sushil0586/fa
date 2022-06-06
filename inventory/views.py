@@ -2,10 +2,39 @@ from django.http import request
 from django.shortcuts import render
 
 from rest_framework.generics import CreateAPIView,ListAPIView,ListCreateAPIView,RetrieveUpdateDestroyAPIView
-from inventory.models import Album, Product, Track
-from inventory.serializers import ProductSerializer,AlbumSerializer,Trackserializer
+from inventory.models import Album, Product, Track,ProductCategory
+from inventory.serializers import ProductSerializer,AlbumSerializer,Trackserializer,ProductCategorySerializer
 from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
+
+
+
+
+class productcategoryApiView(ListCreateAPIView):
+
+    serializer_class = ProductCategorySerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    filter_backends = [DjangoFilterBackend]
+   # filterset_fields = ['id','ProductName','is_stockable']
+
+    def perform_create(self, serializer):
+        return serializer.save(createdby = self.request.user)
+    
+    def get_queryset(self):
+
+        entity = self.request.query_params.get('entity')
+        return ProductCategory.objects.filter(entity = entity)
+
+class productcategoryupdatedelApiView(RetrieveUpdateDestroyAPIView):
+
+    serializer_class = ProductCategorySerializer
+    permission_classes = (permissions.IsAuthenticated,)
+    lookup_field = "id"
+
+    def get_queryset(self):
+        entity = self.request.query_params.get('entity')
+        return ProductCategory.objects.filter(entity = entity)
 
 
 class CreateTodoApiView(CreateAPIView):
@@ -30,13 +59,14 @@ class productApiView(ListCreateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['id','ProductName','is_stockable']
+    filterset_fields = ['id','productname',]
 
     def perform_create(self, serializer):
-        return serializer.save(owner = self.request.user)
+        return serializer.save(createdby = [self.request.user])
     
     def get_queryset(self):
-        return Product.objects.filter(owner = self.request.user)
+        entity = self.request.query_params.get('entity')
+        return Product.objects.filter(entity = entity)
 
 class productupdatedel(RetrieveUpdateDestroyAPIView):
 
@@ -45,7 +75,8 @@ class productupdatedel(RetrieveUpdateDestroyAPIView):
     lookup_field = "id"
 
     def get_queryset(self):
-        return Product.objects.filter(owner = self.request.user)
+        entity = self.request.query_params.get('entity')
+        return Product.objects.filter(entity = entity)
 
 
 class AlbumApiView(ListCreateAPIView):
