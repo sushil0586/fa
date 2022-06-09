@@ -9,17 +9,17 @@ from django.utils.translation import gettext as _
 
 
 class country(TrackingModel):
-    CountryName =    models.CharField(max_length= 255)
-    CountryCode =    models.CharField(max_length= 25)
+    countryname =    models.CharField(max_length= 255)
+    countrycode =    models.CharField(max_length= 25)
 
     class Meta:
-        verbose_name = _('Country')
-        verbose_name_plural = _('Countries')
+        verbose_name = _('country')
+        verbose_name_plural = _('countries')
 
 
     
     def __str__(self):
-        return f'{self.CountryCode} , {self.CountryName}'
+        return f'{self.countrycode} , {self.countryname}'
 
 
 
@@ -28,9 +28,9 @@ class country(TrackingModel):
 
 
 class state(TrackingModel):
-    StateName =    models.CharField(max_length= 255)
-    StateCode =    models.CharField(max_length= 25)
-    Country = models.ForeignKey(country, related_name='state', on_delete=models.CASCADE)
+    statename =    models.CharField(max_length= 255)
+    statecode =    models.CharField(max_length= 25)
+    country = models.ForeignKey(country, related_name='state', on_delete=models.CASCADE)
 
     
     class Meta:
@@ -40,26 +40,26 @@ class state(TrackingModel):
 
     
     def __str__(self):
-        return f'{self.StateCode} , {self.StateName}'
+        return f'{self.statecode} , {self.statename}'
 
 
 
 
 class district(TrackingModel):
-    districtName =    models.CharField(max_length= 255)
-    districtCode =    models.CharField(max_length= 25)
+    districtname =    models.CharField(max_length= 255)
+    districtcode =    models.CharField(max_length= 25)
     state = models.ForeignKey(state, related_name='district', on_delete=models.CASCADE)
 
     
     def __str__(self):
-        return f'{self.districtCode} , {self.districtName}'
+        return f'{self.districtcode} , {self.districtname}'
 
 
 
 
 class city(TrackingModel):
-    cityName =    models.CharField(max_length= 255)
-    cityCode =    models.CharField(max_length= 25)
+    cityname =    models.CharField(max_length= 255)
+    citycode =    models.CharField(max_length= 25)
     distt = models.ForeignKey(district, related_name='city', on_delete=models.CASCADE)
 
 
@@ -70,4 +70,4 @@ class city(TrackingModel):
 
 
     def __str__(self):
-        return f'{self.cityCode} , {self.cityName}'
+        return f'{self.citycode} , {self.cityname}'

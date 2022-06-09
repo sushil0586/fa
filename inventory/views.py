@@ -62,11 +62,11 @@ class productApiView(ListCreateAPIView):
     filterset_fields = ['id','productname',]
 
     def perform_create(self, serializer):
-        return serializer.save(createdby = [self.request.user])
+        return serializer.save(createdby = self.request.user)
     
     def get_queryset(self):
         entity = self.request.query_params.get('entity')
-        return Product.objects.filter(entity = entity)
+        return Product.objects.filter()
 
 class productupdatedel(RetrieveUpdateDestroyAPIView):
 
@@ -76,7 +76,7 @@ class productupdatedel(RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         entity = self.request.query_params.get('entity')
-        return Product.objects.filter(entity = entity)
+        return Product.objects.filter()
 
 
 class AlbumApiView(ListCreateAPIView):

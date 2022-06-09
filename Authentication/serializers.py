@@ -28,6 +28,11 @@ class Registerserializers(serializers.ModelSerializer):
              user.groups.add(group_data)
         return user
 
+
+
+
+
+    
 class Registerserializer(serializers.ModelSerializer):
 
     password = serializers.CharField(max_length = 128, min_length = 6, write_only = True)
@@ -38,6 +43,8 @@ class Registerserializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username','email','password',)
+
+        
 
     # def create(self, validated_data):
     #     groups_data = validated_data.pop('groups')
@@ -74,6 +81,16 @@ class LoginSerializer(serializers.ModelSerializer):
         fields = ('email','password','token',)
 
         read_only_fields = ['token']
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    model = User
+
+    """
+    Serializer for password change endpoint.
+    """
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
 
 
 

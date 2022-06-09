@@ -8,14 +8,14 @@ class ProductCategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductCategory
-        fields = ('id','pcategortyname','maincategory','entity','maincategoryname',)
+        fields = ('id','pcategoryname','maincategory','entity','maincategoryname',)
 
     def get_maincategoryname(self,obj):
        # acc =  obj.accountHeadSr.name
         if obj.maincategory is None:
             return 'null'   
         else :
-            return obj.maincategory.pcategortyname
+            return obj.maincategory.pcategoryname
 
 class ProductSerializer(serializers.ModelSerializer):
 
@@ -31,7 +31,7 @@ class ProductSerializer(serializers.ModelSerializer):
         if obj.productcategory is None:
             return 'null'   
         else :
-            return obj.productcategory.pcategortyname
+            return obj.productcategory.pcategoryname
 
 
 class Trackserializer(serializers.ModelSerializer):

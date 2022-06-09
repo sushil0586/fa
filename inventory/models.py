@@ -8,7 +8,7 @@ from entity.models import entity
 
 
 class ProductCategory(TrackingModel):
-    pcategortyname = models.CharField(max_length= 255,verbose_name=_('Product Category'))
+    pcategoryname = models.CharField(max_length= 255,verbose_name=_('Product Category'))
     maincategory = models.ForeignKey("self",null=True,on_delete=models.CASCADE,verbose_name=_('Main category'),default=True,blank=True)
     entity = models.ForeignKey(entity,null=True,on_delete=models.CASCADE)
     createdby = models.ForeignKey(to= User, on_delete= models.CASCADE)
