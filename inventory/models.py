@@ -15,7 +15,7 @@ class ProductCategory(TrackingModel):
 
 
     def __str__(self):
-        return f'{self.pcategortyname} '
+        return f'{self.pcategoryname} '
 
 class Product(TrackingModel):
     productname = models.CharField(max_length= 255,verbose_name=_('Product Name'))
