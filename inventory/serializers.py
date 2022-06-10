@@ -24,7 +24,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields ='__all__'
+        fields = ('id','productname','productdesc','purchaserate','salesprice','pcategoryname',)
 
     def get_pcategoryname(self,obj):
        # acc =  obj.accountHeadSr.name

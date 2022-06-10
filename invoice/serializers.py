@@ -70,6 +70,22 @@ class SalesOderHeaderSerializer(serializers.ModelSerializer):
 
 
 
+class POSerializer(serializers.ModelSerializer):
+    #entityUser = entityUserSerializer(many=True)
+  #  id = serializers.IntegerField(required=False)
+
+    Newvoucher = serializers.SerializerMethodField()
+
+    def get_Newvoucher(self, obj):
+        return obj.VoucherNo + 1
+        
+
+    class Meta:
+        model = purchaseorder
+        fields =  ['VoucherNo','Newvoucher']
+
+
+
 
 class PurchaseOrderDetailsSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
@@ -89,7 +105,7 @@ class purchaseorderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = purchaseorder
-        fields = ('VoucherDate','VoucherNo','account','BillNo','BillDate','Terms','TaxType','BillCash','subtotal','Cgst','Sgst','Igst','Expenses','GTotal','entity','PurchaseOrderDetails',)
+        fields = ('id','VoucherDate','VoucherNo','account','BillNo','BillDate','Terms','TaxType','BillCash','subtotal','Cgst','Sgst','Igst','Expenses','GTotal','entity','PurchaseOrderDetails',)
 
     def create(self, validated_data):
         #print(validated_data)

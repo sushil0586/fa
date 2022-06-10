@@ -15,6 +15,9 @@ urlpatterns  = [
     path('purchaseorder/<int:id>',views.purchaseorderupdatedelview.as_view(), name = 'purchaseorder'),
     path('purchaseorderdetails',views.PurchaseOrderDetailsApiView.as_view(),name = 'purchaseorder'),
     path('purchaseorderdetails/<int:id>',views.purchaseorderupdatedelview.as_view(), name = 'purchaseorder'),
+    path('voucherno',views.purchaseordelatestview.as_view(), name = 'purchaseorder'),
+
+    
     # path('account',views.accountApiView.as_view(),name ='account'),
     # path('account/<int:id>',views.accountupdatedelApiView.as_view(),name = 'accountid')
    

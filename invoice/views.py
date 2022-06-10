@@ -3,10 +3,11 @@ from django.shortcuts import render
 
 from rest_framework.generics import CreateAPIView,ListAPIView,ListCreateAPIView,RetrieveUpdateDestroyAPIView,GenericAPIView
 from invoice.models import salesOrderdetails,SalesOderHeader,purchaseorder,PurchaseOrderDetails
-from invoice.serializers import SalesOderHeaderSerializer,salesOrderdetailsSerializer,purchaseorderSerializer,PurchaseOrderDetailsSerializer
+from invoice.serializers import SalesOderHeaderSerializer,salesOrderdetailsSerializer,purchaseorderSerializer,PurchaseOrderDetailsSerializer,POSerializer
 from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db import DatabaseError, transaction
+from rest_framework.response import Response
 
 
 class SalesOderHeaderApiView(ListCreateAPIView):
@@ -95,3 +96,37 @@ class purchaseorderupdatedelview(RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         entity = self.request.query_params.get('entity')
         return purchaseorder.objects.filter()
+
+class purchaseordelatestview(ListCreateAPIView):
+
+    serializer_class = POSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    filter_backends = [DjangoFilterBackend]
+    #filterset_fields = ['id','unitType','entityName']
+
+    # def perform_create(self, serializer):
+    #     return serializer.save(createdby = self.request.user)
+
+    def get(self,request):
+        entity = self.request.query_params.get('entity')
+        id = purchaseorder.objects.filter(entity= entity).last()
+        serializer = POSerializer(id)
+        return Response(serializer.data)
+    
+    # def get_queryset(self):
+    #     entity = self.request.query_params.get('entity')
+    #     po = purchaseorder.objects.get(pk=11)
+    #     serializer = POSerializer(po)
+    #     return Response(serializer.data)
+
+
+# class purchaseordelatestview(RetrieveUpdateDestroyAPIView):
+
+#     serializer_class = purchaseorderSerializer
+#     permission_classes = (permissions.IsAuthenticated,)
+#     # lookup_field = "id"
+
+#     def get_queryset(self):
+#         entity = self.request.query_params.get('entity')
+#         return purchaseorder.objects.latest('VoucherNo')

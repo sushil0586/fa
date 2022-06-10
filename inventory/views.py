@@ -66,7 +66,7 @@ class productApiView(ListCreateAPIView):
     
     def get_queryset(self):
         entity = self.request.query_params.get('entity')
-        return Product.objects.filter()
+        return Product.objects.filter(entity = entity)
 
 class productupdatedel(RetrieveUpdateDestroyAPIView):
 
