@@ -95,13 +95,13 @@ class accountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = account
-        fields = '__all__'
+        fields =  ('id','accountname','address1','address2','emailid','gstno',)
     
-    def to_representation(self, instance):
-        rep = super().to_representation(instance)
-        rep['country'] = countrySerializer(instance.country).data
-        rep['accountHead'] = accountHeadSerializer(instance.accountHead).data
-        return rep
+    # def to_representation(self, instance):
+    #     rep = super().to_representation(instance)
+    #     rep['country'] = countrySerializer(instance.country).data
+    #     rep['accountHead'] = accountHeadSerializer(instance.accountHead).data
+    #     return rep
 
 
 

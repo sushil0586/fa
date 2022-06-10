@@ -53,29 +53,29 @@ class accountHead(TrackingModel):
 
 
 class account(TrackingModel):
-    accountHead = models.ForeignKey(to = accountHead, on_delete= models.CASCADE,null=True,blank=True)
+    accounthead = models.ForeignKey(to = accountHead, on_delete= models.CASCADE,null=True,blank=True)
     gstno       = models.CharField(max_length=50, null=True,verbose_name=_('Gst No'))
-    accountName       = models.CharField(max_length=50, null=True,verbose_name=_('Account Name'))
+    accountname       = models.CharField(max_length=50, null=True,verbose_name=_('Account Name'))
     address1       = models.CharField(max_length=50, null=True,verbose_name=_('Address Line 1'))
     address2       = models.CharField(max_length=50, null=True,verbose_name=_('Address Line 2'))
     country       = models.ForeignKey(country,related_name='country',on_delete=models.CASCADE)
     state       = models.ForeignKey(to=state,on_delete=models.CASCADE)
     district    = models.ForeignKey(to=district,on_delete=models.CASCADE)
     city       = models.ForeignKey(to=city,on_delete=models.CASCADE)
-    openingBcr = models.DecimalField(max_digits=10, decimal_places=2,default=True,blank=True,verbose_name=_('Opening Balance Cr'))
-    openingBdr = models.DecimalField(max_digits=10, decimal_places=2,default=True,blank=True,verbose_name=_('Opening Balance Dr'))
-    contactNo       = models.IntegerField(verbose_name=_('Contact No'))
+    openingbcr = models.DecimalField(max_digits=10, decimal_places=2,default=True,blank=True,verbose_name=_('Opening Balance Cr'))
+    openingndr = models.DecimalField(max_digits=10, decimal_places=2,default=True,blank=True,verbose_name=_('Opening Balance Dr'))
+    contactno       = models.IntegerField(verbose_name=_('Contact No'))
     emailid       = models.CharField(max_length=50, null=True,verbose_name=_('Email id'))
     agent       = models.CharField(max_length=50, null=True,verbose_name=_('Agent/Group'))
     pan       = models.CharField(max_length=50, null=True,verbose_name=_('PAN'))
     tOverlow10       = models.BooleanField(verbose_name=_('Turnover below 10 lac'))
     approved       = models.BooleanField(verbose_name=_('Wheather aproved'))
-    Tdsno       = models.CharField(max_length=50, null=True,verbose_name=_('Tds A/c No'))
+    tdsno       = models.CharField(max_length=50, null=True,verbose_name=_('Tds A/c No'))
     entity = models.ForeignKey(entity,null=True,on_delete=models.CASCADE)
     owner = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True,default=1,blank=True)
 
     def __str__(self):
-        return f'{self.accountName} , {self.gstno}'
+        return f'{self.accountname} , {self.gstno}'
 
     class Meta:
         verbose_name = _('Account')
