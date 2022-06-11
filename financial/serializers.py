@@ -95,7 +95,7 @@ class accountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = account
-        fields =  ('id','accountname','address1','address2','emailid','gstno','city',)
+        fields =  '__all__'
     
     # def to_representation(self, instance):
     #     rep = super().to_representation(instance)
