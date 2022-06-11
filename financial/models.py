@@ -54,6 +54,7 @@ class accountHead(TrackingModel):
 
 class account(TrackingModel):
     accounthead = models.ForeignKey(to = accountHead, on_delete= models.CASCADE,null=True,blank=True)
+    accountcode = models.IntegerField(verbose_name=_('Account Code'),null=True,blank=True,default=1000)
     gstno       = models.CharField(max_length=50, null=True,verbose_name=_('Gst No'))
     accountname       = models.CharField(max_length=50, null=True,verbose_name=_('Account Name'))
     address1       = models.CharField(max_length=50, null=True,verbose_name=_('Address Line 1'))
@@ -64,7 +65,7 @@ class account(TrackingModel):
     city       = models.ForeignKey(to=city,on_delete=models.CASCADE)
     openingbcr = models.DecimalField(max_digits=10, decimal_places=2,default=True,blank=True,verbose_name=_('Opening Balance Cr'))
     openingndr = models.DecimalField(max_digits=10, decimal_places=2,default=True,blank=True,verbose_name=_('Opening Balance Dr'))
-    contactno       = models.IntegerField(verbose_name=_('Contact No'))
+    contactno       =models.CharField(max_length=50, null=True,verbose_name=_('Contact no'))
     emailid       = models.CharField(max_length=50, null=True,verbose_name=_('Email id'))
     agent       = models.CharField(max_length=50, null=True,verbose_name=_('Agent/Group'))
     pan       = models.CharField(max_length=50, null=True,verbose_name=_('PAN'))

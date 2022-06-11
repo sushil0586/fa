@@ -19,6 +19,7 @@ class ProductCategory(TrackingModel):
 
 class Product(TrackingModel):
     productname = models.CharField(max_length= 255,verbose_name=_('Product Name'))
+    productcode = models.IntegerField(default=1001,blank=True,verbose_name=_('Product Code'))
     productdesc = models.TextField(verbose_name=_('Product Desc'))
     openingstockqty = models.DecimalField(max_digits=10, decimal_places=2,default=True,blank=True,verbose_name=_('Opening Stock Qty'))
     openingstockboxqty = models.IntegerField(default=True,blank=True,verbose_name=_('Box/Pcs'))

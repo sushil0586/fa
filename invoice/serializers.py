@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 import imp
 from rest_framework import serializers
 from invoice.models import SalesOderHeader,salesOrderdetails,purchaseorder,PurchaseOrderDetails
@@ -74,15 +75,18 @@ class POSerializer(serializers.ModelSerializer):
     #entityUser = entityUserSerializer(many=True)
   #  id = serializers.IntegerField(required=False)
 
-    Newvoucher = serializers.SerializerMethodField()
+    newvoucher = serializers.SerializerMethodField()
 
-    def get_Newvoucher(self, obj):
-        return obj.VoucherNo + 1
+    def get_newvoucher(self, obj):
+        if obj.VoucherNo is None:
+            return '1'
+        else:
+            return obj.VoucherNo + 1
         
 
     class Meta:
         model = purchaseorder
-        fields =  ['VoucherNo','Newvoucher']
+        fields =  ['newvoucher']
 
 
 
