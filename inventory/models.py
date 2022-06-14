@@ -35,6 +35,8 @@ class Product(TrackingModel):
     cgstcess = models.DecimalField(max_digits=10, decimal_places=2,default=True,blank=True,verbose_name=_('Cess Qty'))
     sgst = models.DecimalField(max_digits=10, decimal_places=2,default=True,blank=True,verbose_name=_('S GST @'))
     sgstcess = models.DecimalField(max_digits=10, decimal_places=2,default=True,blank=True,verbose_name=_('Cess Qty'))
+    igst = models.DecimalField(max_digits=10, decimal_places=2,default=True,blank=True,verbose_name=_('I GST @'))
+    igstcess = models.DecimalField(max_digits=10, decimal_places=2,default=True,blank=True,verbose_name=_('Cess Qty'))
     is_pieces = models.BooleanField(default=True)
     is_stockable = models.BooleanField(default=True)
     entity = models.ForeignKey(entity,on_delete=models.CASCADE)

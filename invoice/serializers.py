@@ -78,10 +78,10 @@ class POSerializer(serializers.ModelSerializer):
     newvoucher = serializers.SerializerMethodField()
 
     def get_newvoucher(self, obj):
-        if obj.VoucherNo is None:
+        if obj.voucherno is None:
             return '1'
         else:
-            return obj.VoucherNo + 1
+            return obj.voucherno + 1
         
 
     class Meta:
@@ -97,7 +97,7 @@ class PurchaseOrderDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PurchaseOrderDetails
-        fields = ('id','product','Orderqty','pieces','Rate','Amount','CSGT','SGST','IGST','HSNNo','LineTotal','entity',)
+        fields = ('id','product','orderqty','pieces','rate','amount','cgst','sgst','igst','linetotal','entity',)
 
     
 
@@ -105,15 +105,15 @@ class PurchaseOrderDetailsSerializer(serializers.ModelSerializer):
 
 
 class purchaseorderSerializer(serializers.ModelSerializer):
-    PurchaseOrderDetails = PurchaseOrderDetailsSerializer(many=True)
+    purchaseorderdetails = PurchaseOrderDetailsSerializer(many=True)
 
     class Meta:
         model = purchaseorder
-        fields = ('id','VoucherDate','VoucherNo','account','BillNo','BillDate','Terms','TaxType','BillCash','subtotal','Cgst','Sgst','Igst','Expenses','GTotal','entity','PurchaseOrderDetails',)
+        fields = ('id','voucherdate','voucherno','account','billno','billdate','terms','taxtype','billcash','subtotal','cgst','sgst','igst','expenses','gtotal','entity','purchaseorderdetails',)
 
     def create(self, validated_data):
         #print(validated_data)
-        PurchaseOrderDetails_data = validated_data.pop('PurchaseOrderDetails')
+        PurchaseOrderDetails_data = validated_data.pop('purchaseorderdetails')
         order = purchaseorder.objects.create(**validated_data)
         #print(tracks_data)
         for PurchaseOrderDetail_data in PurchaseOrderDetails_data:
@@ -121,7 +121,7 @@ class purchaseorderSerializer(serializers.ModelSerializer):
         return order
 
     def update(self, instance, validated_data):  
-        fields = ['VoucherDate','VoucherNo','account','BillNo','BillDate','Terms','TaxType','BillCash','subtotal','Cgst','Sgst','Igst','Expenses','GTotal','entity']
+        fields = ['voucherdate','voucherno','account','billno','billdate','terms','taxtype','billcash','subtotal','cgst','sgst','igst','expenses','gtotal','entity']
         for field in fields:
             try:
                 setattr(instance, field, validated_data[field])
@@ -129,7 +129,7 @@ class purchaseorderSerializer(serializers.ModelSerializer):
                 pass
         instance.save()
 
-        items = validated_data.get('PurchaseOrderDetails')
+        items = validated_data.get('purchaseorderdetails')
 
         product_items_dict = dict((i.id, i) for i in instance.PurchaseOrderDetails.all())
         print(product_items_dict)
@@ -141,15 +141,14 @@ class purchaseorderSerializer(serializers.ModelSerializer):
                 product_items_dict.pop(item_id)
                 inv_item = PurchaseOrderDetails.objects.get(id=item_id, purchaseOrder=instance)
                 inv_item.product = item.get('product', inv_item.product)
-                inv_item.Orderqty = item.get('Orderqty', inv_item.Orderqty)
+                inv_item.orderqty = item.get('orderqty', inv_item.orderqty)
                 inv_item.pieces = item.get('pieces', inv_item.pieces)
-                inv_item.Rate = item.get('Rate', inv_item.Rate)
-                inv_item.Amount = item.get('Amount', inv_item.Amount)
-                inv_item.CSGT = item.get('CSGT', inv_item.CSGT)
-                inv_item.SGST = item.get('SGST', inv_item.SGST)
-                inv_item.IGST = item.get('IGST', inv_item.IGST)
-                inv_item.HSNNo = item.get('HSNNo', inv_item.HSNNo)
-                inv_item.LineTotal = item.get('LineTotal', inv_item.LineTotal)
+                inv_item.rate = item.get('rate', inv_item.rate)
+                inv_item.amount = item.get('Amount', inv_item.amount)
+                inv_item.cgst = item.get('cgst', inv_item.cgst)
+                inv_item.sgst = item.get('sgst', inv_item.sgst)
+                inv_item.igst = item.get('igst', inv_item.igst)
+                inv_item.linetotal = item.get('linetotal', inv_item.linetotal)
                 inv_item.entity = item.get('entity', inv_item.entity)
                 inv_item.save()
             else:
