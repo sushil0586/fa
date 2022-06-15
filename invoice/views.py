@@ -69,7 +69,7 @@ class purchaseorderApiView(ListCreateAPIView):
     
     def get_queryset(self):
         entity = self.request.query_params.get('entity')
-        return purchaseorder.objects.filter()
+        return purchaseorder.objects.filter(entity = entity)
 
 
 class PurchaseOrderDetailsApiView(ListCreateAPIView):

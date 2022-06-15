@@ -20,18 +20,18 @@ class ProductCategorySerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
 
 
-    pcategoryname = serializers.SerializerMethodField()
+   # pcategoryname = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
         fields ='__all__'
 
-    def get_pcategoryname(self,obj):
-       # acc =  obj.accountHeadSr.name
-        if obj.productcategory is None:
-            return 'null'   
-        else :
-            return obj.productcategory.pcategoryname
+    # def get_pcategoryname(self,obj):
+    #    # acc =  obj.accountHeadSr.name
+    #     if obj.productcategory is None:
+    #         return 'null'   
+    #     else :
+    #         return obj.productcategory.pcategoryname
 
 
 class Trackserializer(serializers.ModelSerializer):

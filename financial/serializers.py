@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework.fields import ChoiceField
-from financial.models import accountHead,account,account_detials1,account_detials2
+from financial.models import accountHead,account
 
 from geography.serializers import countrySerializer
 
@@ -105,14 +105,3 @@ class accountSerializer(serializers.ModelSerializer):
 
 
 
-class accountDetails1Serializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = account_detials1
-        fields = '__all__'
-
-class accountDetails2Serializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = account_detials2
-        fields = '__all__'

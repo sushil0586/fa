@@ -3,7 +3,7 @@ from django.shortcuts import render
 
 from rest_framework.generics import CreateAPIView,ListAPIView,ListCreateAPIView,RetrieveUpdateDestroyAPIView
 from financial.models import account, accountHead
-from financial.serializers import accountHeadSerializer,accountSerializer,accountDetails1Serializer,accountDetails2Serializer
+from financial.serializers import accountHeadSerializer,accountSerializer
 from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
 
