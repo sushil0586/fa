@@ -117,7 +117,7 @@ class purchaseorderSerializer(serializers.ModelSerializer):
         order = purchaseorder.objects.create(**validated_data)
         #print(tracks_data)
         for PurchaseOrderDetail_data in PurchaseOrderDetails_data:
-            PurchaseOrderDetails.objects.create(purchaseOrder = order, **PurchaseOrderDetail_data)
+            PurchaseOrderDetails.objects.create(purchaseorder = order, **PurchaseOrderDetail_data)
         return order
 
     def update(self, instance, validated_data):  
@@ -131,7 +131,7 @@ class purchaseorderSerializer(serializers.ModelSerializer):
 
         items = validated_data.get('purchaseorderdetails')
 
-        product_items_dict = dict((i.id, i) for i in instance.PurchaseOrderDetails.all())
+        product_items_dict = dict((i.id, i) for i in instance.purchaseorderdetails.all())
         print(product_items_dict)
 
         for item in items:
@@ -139,12 +139,12 @@ class purchaseorderSerializer(serializers.ModelSerializer):
             if item_id:
 
                 product_items_dict.pop(item_id)
-                inv_item = PurchaseOrderDetails.objects.get(id=item_id, purchaseOrder=instance)
+                inv_item = PurchaseOrderDetails.objects.get(id=item_id, purchaseorder=instance)
                 inv_item.product = item.get('product', inv_item.product)
                 inv_item.orderqty = item.get('orderqty', inv_item.orderqty)
                 inv_item.pieces = item.get('pieces', inv_item.pieces)
                 inv_item.rate = item.get('rate', inv_item.rate)
-                inv_item.amount = item.get('Amount', inv_item.amount)
+                inv_item.amount = item.get('amount', inv_item.amount)
                 inv_item.cgst = item.get('cgst', inv_item.cgst)
                 inv_item.sgst = item.get('sgst', inv_item.sgst)
                 inv_item.igst = item.get('igst', inv_item.igst)
@@ -152,7 +152,7 @@ class purchaseorderSerializer(serializers.ModelSerializer):
                 inv_item.entity = item.get('entity', inv_item.entity)
                 inv_item.save()
             else:
-                PurchaseOrderDetails.objects.create(purchaseOrder=instance, **item)
+                PurchaseOrderDetails.objects.create(purchaseorder=instance, **item)
 
         
         if len(product_items_dict) > 0:
