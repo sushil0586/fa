@@ -49,7 +49,7 @@ class purchaseorder(TrackingModel):
     account = models.ForeignKey(to = account, on_delete= models.CASCADE,null=True,blank=True)
     billno = models.IntegerField(verbose_name='Bill No')
     billdate = models.DateField(verbose_name='Bill Date',auto_now_add=True)
-    terms = models.BooleanField(verbose_name='Terms')
+    terms = models.IntegerField(verbose_name='Terms')
     taxtype = models.IntegerField(verbose_name='TaxType')
     billcash = models.IntegerField(verbose_name='Bill/Cash')
     subtotal = models.DecimalField(max_digits=10, decimal_places=2,verbose_name= 'Sub Total')
