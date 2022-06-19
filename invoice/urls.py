@@ -16,6 +16,11 @@ urlpatterns  = [
     path('purchaseorderdetails',views.PurchaseOrderDetailsApiView.as_view(),name = 'purchaseorder'),
     path('purchaseorderdetails/<int:id>',views.purchaseorderupdatedelview.as_view(), name = 'purchaseorder'),
     path('voucherno',views.purchaseordelatestview.as_view(), name = 'purchaseorder'),
+    path('billno',views.salesorderlatestview.as_view(), name = 'purchaseorder'),
+    path('journal',views.JournalApiView.as_view(), name = 'journal'),
+    path('srvoucherno',views.salesreturnlatestview.as_view(), name = 'journal'),
+    path('salesreturn',views.salesreturnApiView.as_view(), name = 'journal'),
+    path('salesreturn/<int:id>',views.salesreturnupdatedelview.as_view(), name = 'journal'),
 
     
     # path('account',views.accountApiView.as_view(),name ='account'),
