@@ -35,10 +35,10 @@ class accountHead(TrackingModel):
     balanceType =  models.CharField(max_length=50,null=True,verbose_name=_('Balance Type'))
     drcreffect =   models.CharField(max_length=20,verbose_name=_('Debit/credit Effect'))
     description =   models.CharField(max_length=200,verbose_name=_('Description'),null=True)
-    accountheadsr = models.ForeignKey("self",null=True,on_delete=models.CASCADE,verbose_name=_('Account head Sr'),default=0,blank=True)
+    accountheadsr = models.ForeignKey("self",null=True,on_delete=models.CASCADE,verbose_name=_('Account head Sr'),blank=True)
     group =  models.CharField(max_length=50, choices = Group, null=True)
-    entity = models.ForeignKey(entity,null=True,on_delete=models.CASCADE)
-    owner = models.ForeignKey(to= User,  on_delete= models.CASCADE)
+    entity = models.ForeignKey(entity,related_name='entity_accountheads',null=True,on_delete=models.CASCADE)
+    owner = models.ForeignKey(to= User,  on_delete= models.CASCADE,null= True)
 
     class Meta:
         verbose_name = _('Account head')
@@ -53,7 +53,7 @@ class accountHead(TrackingModel):
 
 
 class account(TrackingModel):
-    accounthead = models.ForeignKey(to = accountHead, on_delete= models.CASCADE,null=True,blank=True)
+    accounthead = models.ForeignKey(to = accountHead,related_name='accounthead_accounts', on_delete= models.CASCADE)
     accountcode = models.IntegerField(verbose_name=_('Account Code'),null=True,blank=True,default=1000)
     gstno       = models.CharField(max_length=50, null=True,verbose_name=_('Gst No'))
     accountname       = models.CharField(max_length=50, null=True,verbose_name=_('Account Name'))
@@ -64,15 +64,16 @@ class account(TrackingModel):
     district    = models.ForeignKey(to=district,on_delete=models.CASCADE)
     city       = models.ForeignKey(to=city,on_delete=models.CASCADE)
     openingbcr = models.DecimalField(max_digits=10, decimal_places=2,default=True,blank=True,verbose_name=_('Opening Balance Cr'))
-    openingndr = models.DecimalField(max_digits=10, decimal_places=2,default=True,blank=True,verbose_name=_('Opening Balance Dr'))
+    openingbdr = models.DecimalField(max_digits=10, decimal_places=2,default=True,blank=True,verbose_name=_('Opening Balance Dr'))
     contactno       =models.CharField(max_length=50, null=True,verbose_name=_('Contact no'))
+    pincode       =models.CharField(max_length=50, null=True,verbose_name=_('Pincode'))
     emailid       = models.CharField(max_length=50, null=True,verbose_name=_('Email id'))
     agent       = models.CharField(max_length=50, null=True,verbose_name=_('Agent/Group'))
     pan       = models.CharField(max_length=50, null=True,verbose_name=_('PAN'))
-    tOverlow10       = models.BooleanField(verbose_name=_('Turnover below 10 lac'))
+    tobel10cr       = models.BooleanField(verbose_name=_('Turnover below 10 lac'))
     approved       = models.BooleanField(verbose_name=_('Wheather aproved'))
     tdsno       = models.CharField(max_length=50, null=True,verbose_name=_('Tds A/c No'))
-    entity = models.ForeignKey(entity,null=True,on_delete=models.CASCADE)
+    entity = models.ForeignKey(entity,null=True,on_delete=models.CASCADE,)
     accountno       = models.CharField(max_length=50, null=True,verbose_name=_('Account no'))
     rtgsno          = models.CharField(max_length=50, null=True,verbose_name=_('Rtgs no'))
     bankname          = models.CharField(max_length=50, null=True,verbose_name=_('Bank Name'))
