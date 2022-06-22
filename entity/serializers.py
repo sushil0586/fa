@@ -1,7 +1,12 @@
+from struct import pack
 from rest_framework import serializers
 from entity.models import entity,entity_details,unitType
 from Authentication.models import User
 from Authentication.serializers import Registerserializers
+from financial.models import accountHead,account
+from financial.serializers import accountHeadSerializer,accountSerializer
+import os
+import json
 
 #from Authentication.serializers import userserializer
 
@@ -15,9 +20,55 @@ class unitTypeSerializer(serializers.ModelSerializer):
 
 class entityAddSerializer(serializers.ModelSerializer):
 
+   # entity_accountheads = accountHeadSerializer(many=True)
+
+    serializer = accountHeadSerializer
+    def create(self, validated_data):
+
+        users = validated_data.pop("user")
+        newentity = entity.objects.create(**validated_data)
+        for user in users:
+            newentity.user.add(user)
+
+        file_path = os.path.join(os.getcwd(), "account.json")
+        with open(file_path, 'r') as jsonfile:
+            json_data = json.load(jsonfile)
+            for key in json_data:
+                data = json_data[key]
+                for key1 in range(len(data)):
+                    serializer2 = self.serializer(data =data[key1])
+                    serializer2.is_valid(raise_exception=True)
+                    serializer2.save(entity = newentity)
+
+
+        
+
+        
+        
+        
+
+        # # pk = (salereturn.objects.last()).voucherno
+        # # print(pk)
+        # #print(order)
+        # for accounthead_data in accountheads_data:
+           
+        #     accounts = accounthead_data.pop('accounthead_accounts')
+           
+        #     accountheadid = accountHead.objects.create(entity = newentity,**accounthead_data,owner =users[0])
+            
+        #     for account1 in accounts:
+                
+        #         account.objects.create(entity = newentity,accounthead = accountheadid,**account1,owner = users[0])
+
+        return newentity
+
+
+
+
     class Meta:
         model = entity
         fields = '__all__'
+
 
 
 # class entityUserSerializer(serializers.ModelSerializer):
@@ -66,11 +117,15 @@ class entitySerializer(serializers.ModelSerializer):
 
     user = Registerserializers(many=True)
 
+
+    serializer = Registerserializers
+
     
 
     class Meta:
         model = entity
-        fields = ['id','unitType','entityName','address','ownerName','user',]
+        fields = ['id','user',]
+        depth =1
 
   
 
@@ -98,16 +153,23 @@ class entitySerializer(serializers.ModelSerializer):
         return order
 
     def update(self, instance, validated_data):
+        print(validated_data)
         package = validated_data.pop('user', [])
-        instance.user.set(self.create_or_update_packages(package))
-        fields = ['id','unitType','entityName','address','ownerName']
-        for field in fields:
-            try:
-                setattr(instance, field, validated_data[field])
-            except KeyError:  # validated_data may not contain all fields during HTTP PATCH
-                pass
-        print(list[instance])
-        instance.save()
+        for key in range(len(package)):
+            print(key)
+            u = User.objects.create(**package[key])
+            instance.user.add(u)
+           # print(package[key])
+        
+        # #instance.user.set(self.create_or_update_packages(package))
+        # fields = ['id','unitType','entityName','address','ownerName']
+        # for field in fields:
+        #     try:
+        #         setattr(instance, field, validated_data[field])
+        #     except KeyError:  # validated_data may not contain all fields during HTTP PATCH
+        #         pass
+        # print(instance)
+        # instance.save()
         return instance
 
 

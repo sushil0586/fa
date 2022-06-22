@@ -1,9 +1,20 @@
+from sys import implementation
 from rest_framework import serializers
 from rest_framework.fields import ChoiceField
 from financial.models import accountHead,account
 
 from geography.serializers import countrySerializer
+import os
 
+
+class accountSerializer(serializers.ModelSerializer):
+
+    
+
+    class Meta:
+        model = account
+        fields =  '__all__'
+    
 
 
 
@@ -14,6 +25,8 @@ class accountHeadMainSerializer(serializers.ModelSerializer):
     #accountHeadName = serializers.SerializerMethodField()
   
     #balanceType = ChoiceField(choices=accountHead.BALANCE_TYPE)
+
+   
     
 
     class Meta:
@@ -33,12 +46,14 @@ class accountHeadSerializer(serializers.ModelSerializer):
     accountHeadName = serializers.SerializerMethodField()
   
     #balanceType = ChoiceField(choices=accountHead.BALANCE_TYPE)
+
+    accounthead_accounts = accountSerializer(many= True)
     
 
     class Meta:
         model = accountHead
-        fields = ('id','name','code','detilsinbs','balanceType','drcreffect','description','accountheadsr','group','entity','accountHeadName',)
-        #   depth = 1
+        fields = ('id','name','code','detilsinbs','balanceType','drcreffect','description','accountheadsr','group','entity','accountHeadName','accounthead_accounts',)
+        depth = 1
 
 
     def get_accountHeadName(self,obj):
@@ -47,6 +62,27 @@ class accountHeadSerializer(serializers.ModelSerializer):
             return 'null'   
         else :
             return obj.accountheadsr.name
+
+    def create(self, validated_data):
+        print(validated_data)
+        entity1 = validated_data.get('entity')
+        PrchaseOrderDetails_data = validated_data.pop('accounthead_accounts')
+        order = accountHead.objects.create(**validated_data)
+       # print(tracks_data)
+        for PurchaseOrderDetail_data in PrchaseOrderDetails_data:
+             account.objects.create(accounthead = order,entity=entity1, **PurchaseOrderDetail_data)
+            
+        return order
+
+
+        print(validated_data)
+        return 1
+        # PurchaseOrderDetails_data = validated_data.pop('purchaseorderdetails')
+        # order = purchaseorder.objects.create(**validated_data)
+        # #print(tracks_data)
+        # for PurchaseOrderDetail_data in PurchaseOrderDetails_data:
+        #     PurchaseOrderDetails.objects.create(purchaseorder = order, **PurchaseOrderDetail_data)
+        # return order
 
 
     # def to_representation(self, instance):
@@ -89,14 +125,7 @@ class accountHeadSerializer(serializers.ModelSerializer):
     
 
 
-class accountSerializer(serializers.ModelSerializer):
 
-    
-
-    class Meta:
-        model = account
-        fields =  '__all__'
-    
     # def to_representation(self, instance):
     #     rep = super().to_representation(instance)
     #     rep['country'] = countrySerializer(instance.country).data
