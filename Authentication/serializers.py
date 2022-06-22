@@ -42,7 +42,7 @@ class Registerserializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username','email','password',)
+        fields = ('first_name','last_name','email','password',)
 
         
 
@@ -65,7 +65,7 @@ class Userserializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username','email','password','groups','uentity',)
+        fields = ('first_name','last_name','email','password','uentity',)
         depth = 1
 
     
