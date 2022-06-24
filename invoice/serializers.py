@@ -226,6 +226,24 @@ class journalSerializer(serializers.ModelSerializer):
         fields = ('id','account','drcr','amount','entrydate','entity',)
 
 
+
+class JournalVSerializer(serializers.ModelSerializer):
+    #entityUser = entityUserSerializer(many=True)
+  #  id = serializers.IntegerField(required=False)
+
+    newvoucher = serializers.SerializerMethodField()
+
+    def get_newvoucher(self, obj):
+        if not obj.voucherno:
+            return 1
+        else:
+            return obj.voucherno + 1
+
+    class Meta:
+        model = journal
+        fields =  ['newvoucher']
+
+
 class SRSerializer(serializers.ModelSerializer):
     #entityUser = entityUserSerializer(many=True)
   #  id = serializers.IntegerField(required=False)
@@ -260,7 +278,7 @@ class salesreturnDetailsSerializer(serializers.ModelSerializer):
 
 
 class salesreturnSerializer(serializers.ModelSerializer):
-    salereturndetails = PurchaseOrderDetailsSerializer(many=True)
+    salereturndetails = salesreturnDetailsSerializer(many=True)
 
     class Meta:
         model = salereturn
@@ -269,10 +287,15 @@ class salesreturnSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         #print(validated_data)
         PurchaseOrderDetails_data = validated_data.pop('salereturndetails')
+
+        print(validated_data.get('account'))
         order = salereturn.objects.create(**validated_data)
-        #print(tracks_data)
+        # pk = (salereturn.objects.last()).voucherno
+        # print(pk)
+        #print(order)
         for PurchaseOrderDetail_data in PurchaseOrderDetails_data:
-            salereturnDetails.objects.create(salereturn = order, **PurchaseOrderDetail_data)
+            #salereturnDetails.objects.create(salereturn = order, test = pk, **PurchaseOrderDetail_data)
+            salereturnDetails.objects.create(salereturn = order,**PurchaseOrderDetail_data)
         return order
 
     def update(self, instance, validated_data):  

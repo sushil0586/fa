@@ -136,13 +136,17 @@ class salereturnDetails(models.Model):
     sgst =  models.DecimalField(max_digits=10,null = True,default = 1, decimal_places=2,verbose_name= 'SGST')
     igst =  models.DecimalField(max_digits=10, decimal_places=2,verbose_name= 'IGST')
     linetotal =  models.DecimalField(max_digits=10, decimal_places=2,verbose_name= 'Line Total')
+    #test =  models.IntegerField(null=True)
     entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity')
     createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
 
 
 
 class journal(TrackingModel):
+    voucherdate = models.DateField(verbose_name='Vocucher Date',auto_now_add=True)
+    voucherno = models.IntegerField(verbose_name='Voucher No')
     account = models.ForeignKey(to = account, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Account Name')
+    desc = models.CharField(max_length=500, null=True,verbose_name='Description')
     drcr = models.BooleanField(verbose_name='Debit/Credit')
     amount =  models.DecimalField(max_digits=10, decimal_places=2,verbose_name= 'Amount')
     entrydate = models.DateField(verbose_name='Entry Date')
