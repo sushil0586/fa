@@ -31,7 +31,7 @@ class entity(TrackingModel):
     panno =        models.CharField(max_length= 255,null= True)
     tds =           models.CharField(max_length= 255,null= True)
     tdsCircle =        models.CharField(max_length= 255,null= True)
-    user = models.ManyToManyField(User,related_name='uentity')
+    user = models.ManyToManyField(User,related_name='uentity',null=True,default=[1])
     #createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True,default=1,blank=True)
     
 
