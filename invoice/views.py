@@ -3,7 +3,7 @@ from django.shortcuts import render
 
 from rest_framework.generics import CreateAPIView,ListAPIView,ListCreateAPIView,RetrieveUpdateDestroyAPIView,GenericAPIView
 from invoice.models import salesOrderdetails,SalesOderHeader,purchaseorder,PurchaseOrderDetails,journal,salereturn,salereturnDetails
-from invoice.serializers import SalesOderHeaderSerializer,salesOrderdetailsSerializer,purchaseorderSerializer,PurchaseOrderDetailsSerializer,POSerializer,SOSerializer,journalSerializer,SRSerializer,salesreturnSerializer,salesreturnDetailsSerializer
+from invoice.serializers import SalesOderHeaderSerializer,salesOrderdetailsSerializer,purchaseorderSerializer,PurchaseOrderDetailsSerializer,POSerializer,SOSerializer,journalSerializer,SRSerializer,salesreturnSerializer,salesreturnDetailsSerializer,JournalVSerializer
 from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db import DatabaseError, transaction
@@ -125,6 +125,18 @@ class purchaseordelatestview(ListCreateAPIView):
         entity = self.request.query_params.get('entity')
         id = purchaseorder.objects.filter(entity= entity).last()
         serializer = POSerializer(id)
+        return Response(serializer.data)
+
+class journalordelatestview(ListCreateAPIView):
+
+    serializer_class = JournalVSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    filter_backends = [DjangoFilterBackend]
+    def get(self,request):
+        entity = self.request.query_params.get('entity')
+        id = journal.objects.filter(entity= entity).last()
+        serializer = JournalVSerializer(id)
         return Response(serializer.data)
 
 
