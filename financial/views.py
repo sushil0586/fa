@@ -12,7 +12,7 @@ import json
 
 class accountHeadApiView(ListCreateAPIView):
 
-    serializer_class = accountHeadSerializer
+    serializer_class = accountHeadSerializer2
     permission_classes = (permissions.IsAuthenticated,)
 
     filter_backends = [DjangoFilterBackend]
