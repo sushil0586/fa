@@ -14,6 +14,16 @@ class accountSerializer(serializers.ModelSerializer):
     class Meta:
         model = account
         fields =  '__all__'
+
+
+
+class accountSerializer2(serializers.ModelSerializer):
+
+    
+
+    class Meta:
+        model = account
+        fields =  ('id','accountname','accountcode',)
     
 
 
@@ -53,7 +63,7 @@ class accountHeadSerializer(serializers.ModelSerializer):
     class Meta:
         model = accountHead
         fields = ('id','name','code','detilsinbs','balanceType','drcreffect','description','accountheadsr','group','entity','accountHeadName','accounthead_accounts',)
-        depth = 1
+        #depth = 1
 
 
     def get_accountHeadName(self,obj):
@@ -66,6 +76,8 @@ class accountHeadSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         print(validated_data)
         entity1 = validated_data.get('entity')
+        #user = validated_data.get('user')
+
         PrchaseOrderDetails_data = validated_data.pop('accounthead_accounts')
         order = accountHead.objects.create(**validated_data)
        # print(tracks_data)
