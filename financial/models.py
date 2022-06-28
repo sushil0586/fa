@@ -87,7 +87,7 @@ class account(TrackingModel):
     quanity2            = models.IntegerField(verbose_name=_('Quanity 2'))
     BanKAcno            = models.IntegerField(verbose_name=_('Bank A/c No'))
     composition         = models.BooleanField(verbose_name=_('Bank A/c No'))
-    owner = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True,default=1,blank=True)
+    owner = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True,)
 
     def __str__(self):
         return f'{self.accountname} , {self.gstno}'
