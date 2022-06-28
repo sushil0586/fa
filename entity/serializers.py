@@ -25,6 +25,9 @@ class entityAddSerializer(serializers.ModelSerializer):
     serializer = accountHeadSerializer
     def create(self, validated_data):
 
+
+        #print(validated_data)
+
         users = validated_data.pop("user")
         newentity = entity.objects.create(**validated_data)
         for user in users:
@@ -38,7 +41,7 @@ class entityAddSerializer(serializers.ModelSerializer):
                 for key1 in range(len(data)):
                     serializer2 = self.serializer(data =data[key1])
                     serializer2.is_valid(raise_exception=True)
-                    serializer2.save(entity = newentity)
+                    serializer2.save(entity = newentity,owner = users[0])
 
 
         

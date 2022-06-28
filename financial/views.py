@@ -3,7 +3,7 @@ from django.shortcuts import render
 
 from rest_framework.generics import CreateAPIView,ListAPIView,ListCreateAPIView,RetrieveUpdateDestroyAPIView
 from financial.models import account, accountHead
-from financial.serializers import accountHeadSerializer,accountSerializer,accountSerializer2
+from financial.serializers import accountHeadSerializer,accountSerializer,accountSerializer2,accountHeadSerializer2
 from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
 import os
@@ -37,12 +37,15 @@ class accountHeadApiView(ListCreateAPIView):
 
 class accountHeadupdatedelApiView(RetrieveUpdateDestroyAPIView):
 
-    serializer_class = accountHeadSerializer
+    serializer_class = accountHeadSerializer2
     permission_classes = (permissions.IsAuthenticated,)
     lookup_field = "id"
 
     def get_queryset(self):
         return accountHead.objects.filter(owner = self.request.user)
+
+
+
 
 
 
