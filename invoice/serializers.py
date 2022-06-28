@@ -132,9 +132,13 @@ class purchaseorderSerializer(serializers.ModelSerializer):
         fields = ('id','voucherdate','voucherno','account','billno','billdate','terms','taxtype','billcash','subtotal','cgst','sgst','igst','expenses','gtotal','entity','purchaseorderdetails',)
 
     def create(self, validated_data):
-        #print(validated_data)
+        print(validated_data)
         PurchaseOrderDetails_data = validated_data.pop('purchaseorderdetails')
         order = purchaseorder.objects.create(**validated_data)
+
+        print(order.voucherno)
+
+        #print(order.objects.get("id"))
         #print(tracks_data)
         for PurchaseOrderDetail_data in PurchaseOrderDetails_data:
             PurchaseOrderDetails.objects.create(purchaseorder = order, **PurchaseOrderDetail_data)
@@ -223,7 +227,7 @@ class journalSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = journal
-        fields = ('id','account','drcr','amount','entrydate','entity',)
+        fields = '__all__'
 
 
 
