@@ -45,6 +45,13 @@ class accountHeadMainSerializer(serializers.ModelSerializer):
         #depth = 1
 
 
+class accountHeadSerializeraccounts(serializers.ModelSerializer):
+    accounthead_accounts = accountSerializer2(many= True)
+    class Meta:
+        model = accountHead
+        fields = ('code','accounthead_accounts')
+        #depth = 1
+
 
 
 

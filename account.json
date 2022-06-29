@@ -5,7 +5,7 @@
             {
                
                 "name": "Sundry creditors",
-                "code": 123434,
+                "code": 1000,
                 "detilsinbs": "Yes",
                 "balanceType": "Credit",
                 "drcreffect": "1",
@@ -53,10 +53,115 @@
                 ]
 
             },
+			{
+               
+                "name": "BanK",
+                "code": 2000,
+                "detilsinbs": "Yes",
+                "balanceType": "Credit",
+                "drcreffect": "1",
+                "description": "desc",
+                "accountheadsr": null,
+                "group": "Balance_sheet",
+               
+                "accountHeadName": "null",
+                "accounthead_accounts":[
+                                                {
+                                    
+                                        "accountcode": 2000,
+                                        "gstno": "1",
+                                        "accountname": "HDFC BanK",
+                                        "address1": "4369 GT Road",
+                                        "address2": "sirhind",
+                                        "openingbcr": "1.00",
+                                        "openingndr": "1.00",
+                                        "contactno": "1",
+                                        "emailid": "sushiljyotibansal@gmail.com",
+                                        "agent": "1",
+                                        "pan": "1",
+                                        "tobel10cr": true,
+                                        "approved": true,
+                                        "tdsno": "1",
+                                        "accountno": null,
+                                        "rtgsno": null,
+                                        "bankname": null,
+                                        "Adhaarno": null,
+                                        "saccode": null,
+                                        "contactperson": null,
+                                        "deprate": "1.00",
+                                        "tdsrate": "1.00",
+                                        "gstshare": "1.00",
+                                        "quanity1": 1,
+                                        "quanity2": 1,
+                                        "BanKAcno": 1,
+                                        "composition": true,
+                                        "country": 1,
+                                        "state": 1,
+                                        "district": 1,
+                                        "city": 1
+       
+                                 }
+                ]
+
+            },
+			{
+               
+                "name": "Cash",
+                "code": 4000,
+                "detilsinbs": "Yes",
+                "balanceType": "Credit",
+                "drcreffect": "1",
+                "description": "desc",
+                "accountheadsr": null,
+                "group": "Balance_sheet",
+               
+                "accountHeadName": "null",
+                "accounthead_accounts":[
+                                                {
+                                    
+                                        "accountcode": 4000,
+                                        "gstno": "1",
+                                        "accountname": "HDFC BanK",
+                                        "address1": "4369 GT Road",
+                                        "address2": "sirhind",
+                                        "openingbcr": "1.00",
+                                        "openingndr": "1.00",
+                                        "contactno": "1",
+                                        "emailid": "sushiljyotibansal@gmail.com",
+                                        "agent": "1",
+                                        "pan": "1",
+                                        "tobel10cr": true,
+                                        "approved": true,
+                                        "tdsno": "1",
+                                        "accountno": null,
+                                        "rtgsno": null,
+                                        "bankname": null,
+                                        "Adhaarno": null,
+                                        "saccode": null,
+                                        "contactperson": null,
+                                        "deprate": "1.00",
+                                        "tdsrate": "1.00",
+                                        "gstshare": "1.00",
+                                        "quanity1": 1,
+                                        "quanity2": 1,
+                                        "BanKAcno": 1,
+                                        "composition": true,
+                                        "country": 1,
+                                        "state": 1,
+                                        "district": 1,
+                                        "city": 1
+       
+                                 }
+                ]
+
+            }
+			
+			
+			,
 			  {
                
                 "name": "Sundry debtor",
-                "code": 12345,
+                "code": 3000,
                 "detilsinbs": "Yes",
                 "balanceType": "Credit",
                 "drcreffect": "1",
@@ -68,7 +173,7 @@
                 "accounthead_accounts":[
                    {
      
-        "accountcode": 1001,
+        "accountcode": 3000,
         "gstno": "1",
         "accountname": "Aditi Bansal",
         "address1": "4369 GT Road",
