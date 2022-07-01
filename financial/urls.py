@@ -11,7 +11,7 @@ urlpatterns  = [
     path('accounthead/<int:id>',views.accountHeadupdatedelApiView.as_view(), name = 'accountheadid'),
     path('account',views.accountApiView.as_view(),name ='account'),
     path('account/<int:id>',views.accountupdatedelApiView.as_view(),name = 'accountid'),
-    path('accountbind',views.accountApiView2.as_view(),name ='account'),
+    path('accountcash',views.accountApiView2.as_view(),name ='account'),
     path('customaccounts',views.customApiView2.as_view(),name ='account')
 
 
