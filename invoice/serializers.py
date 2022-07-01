@@ -1,7 +1,8 @@
 
 import imp
 from rest_framework import serializers
-from invoice.models import SalesOderHeader,salesOrderdetails,purchaseorder,PurchaseOrderDetails,journal,salereturn,salereturnDetails
+from invoice.models import SalesOderHeader,salesOrderdetails,purchaseorder,PurchaseOrderDetails,journal,salereturn,salereturnDetails,Transactions
+from financial.models import account
 
 
 
@@ -131,17 +132,42 @@ class purchaseorderSerializer(serializers.ModelSerializer):
         model = purchaseorder
         fields = ('id','voucherdate','voucherno','account','billno','billdate','terms','taxtype','billcash','subtotal','cgst','sgst','igst','expenses','gtotal','entity','purchaseorderdetails',)
 
+    
+    def createtransaction(self,order):
+        id = order.id
+        subtotal = order.subtotal
+        cgst = order.cgst
+        sgst = order.sgst
+        igst = order.igst
+        gtotal = order.gtotal
+        pentity = order.entity
+        purchaseid = account.objects.get(entity =pentity,accountcode = 1000)
+        cgstid = account.objects.get(entity =pentity,accountcode = 6001)
+        sgstid = account.objects.get(entity =pentity,accountcode = 6002)
+        igstid = account.objects.get(entity =pentity,accountcode = 6003)
+        Transactions.objects.create(account= purchaseid,transactiontype = 'P',transactionid = id,desc = 'Purchase from',drcr=1,amount=subtotal,entity=pentity)
+        Transactions.objects.create(account= cgstid,transactiontype = 'P',transactionid = id,desc = 'Purchase',drcr=1,amount=cgst,entity=pentity)
+        Transactions.objects.create(account= sgstid,transactiontype = 'P',transactionid = id,desc = 'Purchase',drcr=1,amount=sgst,entity=pentity)
+        Transactions.objects.create(account= order.account,transactiontype = 'P',transactionid = id,desc = 'PurchaseBy',drcr=0,amount=gtotal,entity=pentity)
+        return id
+
+
     def create(self, validated_data):
-        print(validated_data)
+       # print(validated_data)
         PurchaseOrderDetails_data = validated_data.pop('purchaseorderdetails')
         order = purchaseorder.objects.create(**validated_data)
 
-        print(order.voucherno)
+
+        
+
+
 
         #print(order.objects.get("id"))
         #print(tracks_data)
         for PurchaseOrderDetail_data in PurchaseOrderDetails_data:
             PurchaseOrderDetails.objects.create(purchaseorder = order, **PurchaseOrderDetail_data)
+
+        self.createtransaction(order)
         return order
 
     def update(self, instance, validated_data):  

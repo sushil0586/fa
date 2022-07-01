@@ -12,9 +12,14 @@ class unitType(models.Model):
     UnitDesc =    models.TextField()
     createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True,default=1,blank=True)
 
-    class Meta:
-        def __str__(self):
-            return self.UnitName
+
+    def __str__(self):
+        return f'{self.UnitName}'
+
+
+
+
+        
 
 
 class entity(TrackingModel):

@@ -153,6 +153,17 @@ class journal(TrackingModel):
     entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity')
     createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
 
+class Transactions(TrackingModel):
+    account = models.ForeignKey(to = account, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Account Name')
+    transactiontype = models.CharField(max_length=50, null=True,verbose_name='TransactionType')
+    transactionid = models.IntegerField(verbose_name='Transaction id')
+    desc = models.CharField(max_length=500, null=True,verbose_name='Description')
+    drcr = models.BooleanField(verbose_name='Debit/Credit')
+    amount =  models.DecimalField(max_digits=10, decimal_places=2,verbose_name= 'Amount')
+    entrydate = models.DateField(verbose_name='Entry Date',auto_now_add=True)
+    entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity')
+    createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
+
 
 
 
