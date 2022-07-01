@@ -51,7 +51,8 @@ class ListproductApiView(ListAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
-        return Product.objects.filter(owner = self.request.user)
+        entity = self.request.query_params.get('entity')
+        return Product.objects.filter(entity = entity)
 
 class productApiView(ListCreateAPIView):
 
