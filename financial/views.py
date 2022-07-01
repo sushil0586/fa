@@ -83,7 +83,7 @@ class accountApiView2(ListAPIView):
     
     def get_queryset(self):
         entity = self.request.query_params.get('entity')
-        return account.objects.filter(entity = entity)
+        return account.objects.filter(entity = entity, accountcode = 4000)
 
 
 
