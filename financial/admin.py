@@ -3,12 +3,17 @@ from django.contrib import admin
 from financial.models import accountHead,account
 # Register your models here.
 
-class AccountheadAdmin(admin.ModelAdmin):
-    readonly_fields = ('id',)
 
-admin.site.register(accountHead, AccountheadAdmin)
+class accountheadAdmin(admin.ModelAdmin):
+    list_display = ['name','code','detilsinbs','accountheadsr','entity','owner']
+    
+class accountAdmin(admin.ModelAdmin):
+    list_display = ['accountname','accounthead','accountcode','gstno','entity','owner']
 
 
-admin.site.register(account)
+admin.site.register(accountHead, accountheadAdmin)
+
+
+admin.site.register(account,accountAdmin)
 # admin.site.register(account_detials1)
 # admin.site.register(account_detials2)

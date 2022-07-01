@@ -87,6 +87,23 @@ class accountApiView2(ListAPIView):
 
 
 
+class accountApiView3(ListAPIView):
+
+    serializer_class = accountSerializer2
+    permission_classes = (permissions.IsAuthenticated,)
+
+    filter_backends = [DjangoFilterBackend]
+    #filterset_fields = ['gstno']
+
+    # def perform_create(self, serializer):
+    #     return serializer.save(owner = self.request.user)
+    
+    def get_queryset(self):
+        entity = self.request.query_params.get('entity')
+        return account.objects.filter(entity = entity)
+
+
+
 class accountApiView(ListCreateAPIView):
 
     serializer_class = accountSerializer
