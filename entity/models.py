@@ -3,14 +3,14 @@ from django.db.models.fields import NullBooleanField
 from helpers.models import TrackingModel
 from Authentication.models import User
 from geography.models import country,state,district,city
-from Authentication.models import User 
+#from Authentication.models import User 
 
 # Create your models here.
 
 class unitType(models.Model):
     UnitName =    models.CharField(max_length= 255)
     UnitDesc =    models.TextField()
-    createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True,default=1,blank=True)
+    createdby = models.ForeignKey(to= 'Authentication.User', on_delete= models.CASCADE,null=True,default=1,blank=True)
 
 
     def __str__(self):
@@ -36,7 +36,7 @@ class entity(TrackingModel):
     panno =        models.CharField(max_length= 255,null= True)
     tds =           models.CharField(max_length= 255,null= True)
     tdsCircle =        models.CharField(max_length= 255,null= True)
-    user = models.ManyToManyField(User,related_name='uentity',null=True,default=[1])
+    user = models.ManyToManyField(to = 'Authentication.User',related_name='uentity',null=True,default=[1])
     #createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True,default=1,blank=True)
     
 

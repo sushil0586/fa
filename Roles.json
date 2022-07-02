@@ -1,0 +1,42 @@
+
+    {
+
+        "Roles": [
+
+            
+            {
+               
+                "rolename": "Admin",
+                "roledesc": "Admin"
+                
+            },
+            {
+               
+                "rolename": "Manager",
+                "roledesc": "Manager"
+                
+            },
+            {
+               
+                "rolename": "Accountant",
+                "roledesc": "Accountant"
+                
+            },
+            {
+               
+                "rolename": "HR",
+                "roledesc": "HR"
+                
+            }
+			
+			
+			
+			
+        ]
+
+        }
+       
+
+    
+
+        

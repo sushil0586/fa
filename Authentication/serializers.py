@@ -1,7 +1,7 @@
 import imp
 from django.db import models
 from rest_framework import serializers
-from Authentication.models import User
+from Authentication.models import User,Role
 #from entity.models import enti
 #from entity.serializers import entityUserSerializer
 
@@ -15,7 +15,7 @@ class Registerserializers(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id','username','email','password','groups',)
+        fields = ('id','username','first_name','last_name','email','role','password',)
         extra_kwargs = {'id': {'read_only': False},
          'username': {'validators': []},
          'email': {'validators': []}}
@@ -42,7 +42,7 @@ class Registerserializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username','first_name','last_name','email','password',)
+        fields = ('username','first_name','last_name','role','email','password',)
 
         
 
@@ -62,11 +62,22 @@ class Userserializer(serializers.ModelSerializer):
 
     #userentity = entityUserSerializer(many=True)
 
+    rolename = serializers.SerializerMethodField()
+
 
     class Meta:
         model = User
-        fields = ('first_name','last_name','email','password','uentity',)
+        fields = ('first_name','last_name','email','role','password','uentity','rolename',)
         depth = 1
+
+    
+    def get_rolename(self,obj):
+        acc =  obj.role.rolename
+        return acc
+        # if obj.role is None:
+        #     return 'null'   
+        # else :
+        #     return obj.maincategory.pcategoryname
 
     
        
@@ -91,6 +102,19 @@ class ChangePasswordSerializer(serializers.Serializer):
     """
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True)
+
+
+
+
+class RoleSerializer(serializers.ModelSerializer):
+
+    #password = serializers.CharField(max_length = 128, min_length = 6, write_only = True)
+
+
+    class Meta:
+        model = Role
+        fields = ('id','rolename','roledesc','entity')
+
 
 
 
