@@ -2,7 +2,7 @@ from struct import pack
 from rest_framework import serializers
 from entity.models import entity,entity_details,unitType
 from Authentication.models import User
-from Authentication.serializers import Registerserializers
+from Authentication.serializers import Registerserializers,RoleSerializer
 from financial.models import accountHead,account
 from financial.serializers import accountHeadSerializer,accountSerializer
 import os
@@ -23,6 +23,7 @@ class entityAddSerializer(serializers.ModelSerializer):
    # entity_accountheads = accountHeadSerializer(many=True)
 
     serializer = accountHeadSerializer
+    roleserializer = RoleSerializer
     def create(self, validated_data):
 
 
@@ -38,10 +39,24 @@ class entityAddSerializer(serializers.ModelSerializer):
             json_data = json.load(jsonfile)
             for key in json_data:
                 data = json_data[key]
+                #print(data)
                 for key1 in range(len(data)):
                     serializer2 = self.serializer(data =data[key1])
                     serializer2.is_valid(raise_exception=True)
                     serializer2.save(entity = newentity,owner = users[0])
+
+        
+
+        file_path = os.path.join(os.getcwd(), "Roles.json")
+        with open(file_path, 'r') as jsonfile:
+            json_data = json.load(jsonfile)
+            for key in json_data:
+                data = json_data[key]
+                print(data)
+                for key1 in range(len(data)):
+                    serializer2 = self.roleserializer(data =data[key1])
+                    serializer2.is_valid(raise_exception=True)
+                    serializer2.save(entity = newentity)
 
 
         
@@ -127,7 +142,7 @@ class entitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = entity
-        fields = ['id','user',]
+        fields = ['user',]
         depth =1
 
   

@@ -9,6 +9,7 @@ from django.contrib.auth.hashers import make_password
 import jwt;
 from django.conf import Settings, settings
 from datetime import datetime, timedelta
+#from entity.models import entity
 
 
 # Create your models here.
@@ -57,6 +58,16 @@ class MyUserManager(UserManager):
 
 
 
+class Role(TrackingModel):
+    rolename = models.CharField(max_length=150)
+    roledesc = models.CharField(max_length=150)
+    entity = models.ForeignKey(to='entity.entity', on_delete=models.CASCADE,null= True)
+
+
+
+
+
+
 
 class User(AbstractBaseUser,PermissionsMixin,TrackingModel,UserManager):
     username_validator = UnicodeUsernameValidator()
@@ -74,6 +85,7 @@ class User(AbstractBaseUser,PermissionsMixin,TrackingModel,UserManager):
     first_name = models.CharField(_('first name'), max_length=100, blank=True)
     last_name = models.CharField(_('last name'), max_length=100, blank=True)
     email = models.EmailField(_('email address'), blank=False,unique = True)
+    role = models.ForeignKey(Role, on_delete=models.CASCADE,default=1)
     is_staff = models.BooleanField(
         _('staff status'),
         default=False,

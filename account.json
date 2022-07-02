@@ -2,9 +2,11 @@
     {
 
         "entity_accountheads": [
+
+            
             {
                
-                "name": "Sundry creditors",
+                "name": "Purchase",
                 "code": 1000,
                 "detilsinbs": "Yes",
                 "balanceType": "Credit",
@@ -19,7 +21,7 @@
                                     
                                         "accountcode": 1000,
                                         "gstno": "1",
-                                        "accountname": "Suhsil Bansal",
+                                        "accountname": "Purchase",
                                         "address1": "4369 GT Road",
                                         "address2": "sirhind",
                                         "openingbcr": "1.00",
@@ -121,7 +123,7 @@
                                     
                                         "accountcode": 4000,
                                         "gstno": "1",
-                                        "accountname": "HDFC BanK",
+                                        "accountname": "Cash",
                                         "address1": "4369 GT Road",
                                         "address2": "sirhind",
                                         "openingbcr": "1.00",
@@ -160,7 +162,7 @@
 			,
 			  {
                
-                "name": "Sundry debtor",
+                "name": "Sale",
                 "code": 3000,
                 "detilsinbs": "Yes",
                 "balanceType": "Credit",
@@ -175,7 +177,7 @@
      
         "accountcode": 3000,
         "gstno": "1",
-        "accountname": "Aditi Bansal",
+        "accountname": "Sale",
         "address1": "4369 GT Road",
         "address2": "sirhind",
         "openingbcr": "1.00",
