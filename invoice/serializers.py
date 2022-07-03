@@ -1,7 +1,7 @@
 
 import imp
 from rest_framework import serializers
-from invoice.models import SalesOderHeader,salesOrderdetails,purchaseorder,PurchaseOrderDetails,journal,salereturn,salereturnDetails,Transactions,StockTransactions
+from invoice.models import SalesOderHeader,salesOrderdetails,purchaseorder,PurchaseOrderDetails,journal,salereturn,salereturnDetails,Transactions,StockTransactions,PurchaseReturn,Purchasereturndetails
 from financial.models import account
 
 
@@ -110,6 +110,113 @@ class SOSerializer(serializers.ModelSerializer):
     class Meta:
         model = SalesOderHeader
         fields =  ['newbillno']
+
+
+class purchasereturndetailsSerializer(serializers.ModelSerializer):
+    #entityUser = entityUserSerializer(many=True)
+    id = serializers.IntegerField(required=False)
+
+    class Meta:
+        model = Purchasereturndetails
+        fields =  ('id','product','orderqty','pieces','rate','amount','cgst','sgst','igst','linetotal','entity',)
+
+
+class PurchasereturnSerializer(serializers.ModelSerializer):
+    purchasereturndetails = purchasereturndetailsSerializer(many=True)
+
+    class Meta:
+        model = PurchaseReturn
+        fields = ('id','sorderdate','billno','accountid','latepaymentalert','grno','vehicle','taxtype','billcash','supply','shippedto','remarks','transport','broker','tds194q','tcs206c1ch1','tcs206c1ch2','tcs206c1ch3','tcs206C1','tcs206C2','duedate','subtotal','subtotal','cgst','sgst','igst','expenses','gtotal','entity','owner','purchasereturndetails',)
+
+
+    def createtransaction(self,order):
+        id = order.id
+        subtotal = order.subtotal
+        cgst = order.cgst
+        sgst = order.sgst
+        igst = order.igst
+        gtotal = order.gtotal
+        pentity = order.entity
+        purchaseid = account.objects.get(entity =pentity,accountcode = 3000)
+        cgstid = account.objects.get(entity =pentity,accountcode = 6001)
+        sgstid = account.objects.get(entity =pentity,accountcode = 6002)
+        igstid = account.objects.get(entity =pentity,accountcode = 6003)
+        Transactions.objects.create(account= purchaseid,transactiontype = 'PR',transactionid = id,desc = 'Purchase from',drcr=0,amount=subtotal,entity=pentity,createdby = order.owner )
+        Transactions.objects.create(account= cgstid,transactiontype = 'PR',transactionid = id,desc = 'Purchase',drcr=0,amount=cgst,entity=pentity,createdby= order.owner)
+        Transactions.objects.create(account= sgstid,transactiontype = 'PR',transactionid = id,desc = 'Purchase',drcr=0,amount=sgst,entity=pentity,createdby= order.owner)
+        Transactions.objects.create(account= order.accountid,transactiontype = 'PR',transactionid = id,desc = 'PurchaseBy',drcr=1,amount=gtotal,entity=pentity,createdby= order.owner)
+        return id
+
+    def create(self, validated_data):
+        #print(validated_data)
+        salesOrderdetails_data = validated_data.pop('purchasereturndetails')
+        order = PurchaseReturn.objects.create(**validated_data)
+        #print(tracks_data)
+        for PurchaseOrderDetail_data in salesOrderdetails_data:
+            Purchasereturndetails.objects.create(purchasereturn = order, **PurchaseOrderDetail_data)
+
+        self.createtransaction(order)
+        return order
+
+    def update(self, instance, validated_data):
+        fields = ['sorderdate','billno','accountid','latepaymentalert','grno','vehicle','taxtype','billcash','supply','shippedto','remarks','transport','broker','tds194q','tcs206c1ch1','tcs206c1ch2','tcs206c1ch3','tcs206C1','tcs206C2','duedate','subtotal','subtotal','cgst','sgst','igst','expenses','gtotal','entity','owner',]
+        for field in fields:
+            try:
+                setattr(instance, field, validated_data[field])
+            except KeyError:  # validated_data may not contain all fields during HTTP PATCH
+                pass
+        instance.save()
+
+        items = validated_data.get('purchasereturndetails')
+
+        product_items_dict = dict((i.id, i) for i in instance.purchasereturndetails.all())
+        print(product_items_dict)
+
+        for item in items:
+            item_id = item.get('id', None)
+            if item_id:
+
+
+
+                product_items_dict.pop(item_id)
+                inv_item = Purchasereturndetails.objects.get(id=item_id, purchasereturn=instance)
+                inv_item.product = item.get('product', inv_item.product)
+                inv_item.orderqty = item.get('orderqty', inv_item.orderqty)
+                inv_item.pieces = item.get('pieces', inv_item.pieces)
+                inv_item.rate = item.get('rate', inv_item.rate)
+                inv_item.amount = item.get('amount', inv_item.amount)
+                inv_item.cgst = item.get('cgst', inv_item.cgst)
+                inv_item.sgst = item.get('sgst', inv_item.sgst)
+                inv_item.igst = item.get('igst', inv_item.igst)
+                inv_item.linetotal = item.get('linetotal', inv_item.linetotal)
+                inv_item.entity = item.get('entity', inv_item.entity)
+                inv_item.save()
+            else:
+                Purchasereturndetails.objects.create(purchasereturn=instance, **item)
+
+
+        if len(product_items_dict) > 0:
+            for item in product_items_dict.values():
+                item.delete()
+        return instance
+
+class PRSerializer(serializers.ModelSerializer):
+    #entityUser = entityUserSerializer(many=True)
+  #  id = serializers.IntegerField(required=False)
+
+    newbillno = serializers.SerializerMethodField()
+
+    def get_newbillno(self, obj):
+        if not obj.billno :
+            return 1
+        else:
+            return obj.billno + 1
+
+
+    class Meta:
+        model = PurchaseReturn
+        fields =  ['newbillno']
+
 
 
 

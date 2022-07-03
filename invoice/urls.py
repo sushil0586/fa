@@ -22,6 +22,11 @@ urlpatterns  = [
     path('salesreturn',views.salesreturnApiView.as_view(), name = 'journal'),
     path('salesreturn/<int:id>',views.salesreturnupdatedelview.as_view(), name = 'journal'),
     path('jvouccherno',views.journalordelatestview.as_view(), name = 'purchaseorder'),
+    path('purchasereturn',views.PurchaseReturnApiView.as_view(),name = 'salesorder'),
+    path('purchasereturn/<int:id>',views.PurchaseReturnupdatedelview.as_view(), name = 'salesorder'),
+    path('purchasereturndetails',views.PurchaseOrderDetailsApiView.as_view(),name = 'salesorder'),
+    path('purchasereturndetails/<int:id>',views.PurchaseOrderDetailsApiView.as_view(), name = 'salesorder'),
+    path('srvoucherno',views.PurchaseReturnlatestview.as_view(), name = 'journal'),
 
     
     # path('account',views.accountApiView.as_view(),name ='account'),
