@@ -2,8 +2,8 @@ from django.http import request
 from django.shortcuts import render
 
 from rest_framework.generics import CreateAPIView,ListAPIView,ListCreateAPIView,RetrieveUpdateDestroyAPIView,GenericAPIView
-from invoice.models import salesOrderdetails,SalesOderHeader,purchaseorder,PurchaseOrderDetails,journal,salereturn,salereturnDetails
-from invoice.serializers import SalesOderHeaderSerializer,salesOrderdetailsSerializer,purchaseorderSerializer,PurchaseOrderDetailsSerializer,POSerializer,SOSerializer,journalSerializer,SRSerializer,salesreturnSerializer,salesreturnDetailsSerializer,JournalVSerializer
+from invoice.models import salesOrderdetails,SalesOderHeader,purchaseorder,PurchaseOrderDetails,journal,salereturn,salereturnDetails,PurchaseReturn,Purchasereturndetails
+from invoice.serializers import SalesOderHeaderSerializer,salesOrderdetailsSerializer,purchaseorderSerializer,PurchaseOrderDetailsSerializer,POSerializer,SOSerializer,journalSerializer,SRSerializer,salesreturnSerializer,salesreturnDetailsSerializer,JournalVSerializer,PurchasereturnSerializer,purchasereturndetailsSerializer,PRSerializer
 from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db import DatabaseError, transaction
@@ -68,6 +68,53 @@ class salesorderlatestview(ListCreateAPIView):
         id = SalesOderHeader.objects.filter(entity= entity).last()
         serializer = SOSerializer(id)
         return Response(serializer.data)
+
+
+class PurchaseReturnApiView(ListCreateAPIView):
+
+    serializer_class = PurchasereturnSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    filter_backends = [DjangoFilterBackend]
+    #filterset_fields = ['id','unitType','entityName']
+
+    def perform_create(self, serializer):
+        return serializer.save(owner = self.request.user)
+    
+    def get_queryset(self):
+        entity = self.request.query_params.get('entity')
+        return PurchaseReturn.objects.filter(entity = entity)
+
+
+class PurchaseReturnupdatedelview(RetrieveUpdateDestroyAPIView):
+
+    serializer_class = PurchasereturnSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+    lookup_field = "id"
+
+    def get_queryset(self):
+        entity = self.request.query_params.get('entity')
+        return PurchaseReturn.objects.filter(entity = entity)
+
+class PurchaseReturnlatestview(ListCreateAPIView):
+
+    serializer_class = PRSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    filter_backends = [DjangoFilterBackend]
+    #filterset_fields = ['id','unitType','entityName']
+
+    # def perform_create(self, serializer):
+    #     return serializer.save(createdby = self.request.user)
+
+    def get(self,request):
+        entity = self.request.query_params.get('entity')
+        id = PurchaseReturn.objects.filter(entity= entity).last()
+        serializer = PRSerializer(id)
+        return Response(serializer.data)
+
+
+
 
 
 

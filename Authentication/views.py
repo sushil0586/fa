@@ -18,24 +18,10 @@ class AuthApiView(ListAPIView):
     serializer_class = Userserializer
     permission_classes = (permissions.IsAuthenticated,)
 
-   # filter_backends = [DjangoFilterBackend]
-    #filterset_fields = ['id','unitType','entityName']
-
-    # def perform_create(self, serializer):
-    #     return serializer.save(user = [self.request.user])
-    
     def get_queryset(self):
         return User.objects.filter(email = self.request.user)
     
-    # def get(self,request):
-
-
-    #     print(request)
-
-    #     user = request.user
-    #     print(user)
-    #     serializer = Userserializer(user)
-    #     return response.Response({'user':serializer.data})
+  
 
 
 

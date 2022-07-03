@@ -15,7 +15,8 @@ class Registerserializers(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id','username','first_name','last_name','email','role','password',)
+        
+        fields = ('id','username','first_name','last_name','email','role','password','is_active',)
         extra_kwargs = {'id': {'read_only': False},
          'username': {'validators': []},
          'email': {'validators': []}}
@@ -42,6 +43,7 @@ class Registerserializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
+        queryset = User.objects.filter(is_active = 1)
         fields = ('username','first_name','last_name','role','email','password',)
 
         
