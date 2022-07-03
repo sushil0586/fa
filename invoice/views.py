@@ -202,7 +202,8 @@ class JournalApiView(ListCreateAPIView):
         serializer.is_valid(raise_exception=True)  
   
         try:  
-            self.perform_create(serializer)  
+            serializer.save(createdby = self.request.user)
+           # self.perform_create(serializer)  
             return Response(serializer.data)  
         except:  
             return Response(serializer.errors)  

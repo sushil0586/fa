@@ -1,11 +1,11 @@
 from django.contrib import admin
-from invoice.models import SalesOderHeader,salesOrderdetails,purchaseorder,PurchaseOrderDetails,journal,salereturn,salereturnDetails,Transactions
-
-
+from invoice.models import SalesOderHeader,salesOrderdetails,purchaseorder,PurchaseOrderDetails,journal,salereturn,salereturnDetails,Transactions,StockTransactions
 
 class TransactionsAdmin(admin.ModelAdmin):
     list_display = ['account','transactiontype','desc','drcr','amount','entity','createdby']
 
+class StockTransactionAdmin(admin.ModelAdmin):
+    list_display = ['stock','transactiontype','desc','stocktransaction','quantity','entity','createdby']
 
 # Register your models here.
 
@@ -18,3 +18,4 @@ admin.site.register(salereturn)
 admin.site.register(salereturnDetails)
 admin.site.register(journal)
 admin.site.register(Transactions,TransactionsAdmin)
+admin.site.register(StockTransactions,StockTransactionAdmin)

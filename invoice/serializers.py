@@ -1,7 +1,7 @@
 
 import imp
 from rest_framework import serializers
-from invoice.models import SalesOderHeader,salesOrderdetails,purchaseorder,PurchaseOrderDetails,journal,salereturn,salereturnDetails,Transactions
+from invoice.models import SalesOderHeader,salesOrderdetails,purchaseorder,PurchaseOrderDetails,journal,salereturn,salereturnDetails,Transactions,StockTransactions
 from financial.models import account
 
 
@@ -22,6 +22,25 @@ class SalesOderHeaderSerializer(serializers.ModelSerializer):
         model = SalesOderHeader
         fields = ('id','sorderdate','billno','accountid','latepaymentalert','grno','vehicle','taxtype','billcash','supply','shippedto','remarks','transport','broker','tds194q','tcs206c1ch1','tcs206c1ch2','tcs206c1ch3','tcs206C1','tcs206C2','duedate','subtotal','subtotal','cgst','sgst','igst','expenses','gtotal','entity','owner','salesorderdetails',)
 
+
+    def createtransaction(self,order):
+        id = order.id
+        subtotal = order.subtotal
+        cgst = order.cgst
+        sgst = order.sgst
+        igst = order.igst
+        gtotal = order.gtotal
+        pentity = order.entity
+        purchaseid = account.objects.get(entity =pentity,accountcode = 3000)
+        cgstid = account.objects.get(entity =pentity,accountcode = 6001)
+        sgstid = account.objects.get(entity =pentity,accountcode = 6002)
+        igstid = account.objects.get(entity =pentity,accountcode = 6003)
+        Transactions.objects.create(account= purchaseid,transactiontype = 'S',transactionid = id,desc = 'Purchase from',drcr=0,amount=subtotal,entity=pentity,createdby = order.owner )
+        Transactions.objects.create(account= cgstid,transactiontype = 'S',transactionid = id,desc = 'Purchase',drcr=0,amount=cgst,entity=pentity,createdby= order.owner)
+        Transactions.objects.create(account= sgstid,transactiontype = 'S',transactionid = id,desc = 'Purchase',drcr=0,amount=sgst,entity=pentity,createdby= order.owner)
+        Transactions.objects.create(account= order.accountid,transactiontype = 'S',transactionid = id,desc = 'PurchaseBy',drcr=1,amount=gtotal,entity=pentity,createdby= order.owner)
+        return id
+
     def create(self, validated_data):
         #print(validated_data)
         salesOrderdetails_data = validated_data.pop('salesorderdetails')
@@ -29,9 +48,11 @@ class SalesOderHeaderSerializer(serializers.ModelSerializer):
         #print(tracks_data)
         for PurchaseOrderDetail_data in salesOrderdetails_data:
             salesOrderdetails.objects.create(salesorderheader = order, **PurchaseOrderDetail_data)
+
+        self.createtransaction(order)
         return order
 
-    def update(self, instance, validated_data):  
+    def update(self, instance, validated_data):
         fields = ['sorderdate','billno','accountid','latepaymentalert','grno','vehicle','taxtype','billcash','supply','shippedto','remarks','transport','broker','tds194q','tcs206c1ch1','tcs206c1ch2','tcs206c1ch3','tcs206C1','tcs206C2','duedate','subtotal','subtotal','cgst','sgst','igst','expenses','gtotal','entity','owner',]
         for field in fields:
             try:
@@ -67,7 +88,7 @@ class SalesOderHeaderSerializer(serializers.ModelSerializer):
             else:
                 salesOrderdetails.objects.create(salesorderheader=instance, **item)
 
-        
+
         if len(product_items_dict) > 0:
             for item in product_items_dict.values():
                 item.delete()
@@ -84,7 +105,7 @@ class SOSerializer(serializers.ModelSerializer):
             return 1
         else:
             return obj.billno + 1
-        
+
 
     class Meta:
         model = SalesOderHeader
@@ -103,7 +124,7 @@ class POSerializer(serializers.ModelSerializer):
             return 1
         else:
             return obj.voucherno + 1
-        
+
 
     class Meta:
         model = purchaseorder
@@ -120,9 +141,9 @@ class PurchaseOrderDetailsSerializer(serializers.ModelSerializer):
         model = PurchaseOrderDetails
         fields = ('id','product', 'purchasedesc','orderqty','pieces','rate','amount','cgst','sgst','igst','linetotal','entity',)
 
-    
 
-    
+
+
 
 
 class purchaseorderSerializer(serializers.ModelSerializer):
@@ -132,7 +153,7 @@ class purchaseorderSerializer(serializers.ModelSerializer):
         model = purchaseorder
         fields = ('id','voucherdate','voucherno','account','billno','billdate','terms','taxtype','billcash','subtotal','cgst','sgst','igst','expenses','gtotal','entity','purchaseorderdetails',)
 
-    
+
     def createtransaction(self,order):
         id = order.id
         subtotal = order.subtotal
@@ -145,10 +166,10 @@ class purchaseorderSerializer(serializers.ModelSerializer):
         cgstid = account.objects.get(entity =pentity,accountcode = 6001)
         sgstid = account.objects.get(entity =pentity,accountcode = 6002)
         igstid = account.objects.get(entity =pentity,accountcode = 6003)
-        Transactions.objects.create(account= purchaseid,transactiontype = 'P',transactionid = id,desc = 'Purchase from',drcr=1,amount=subtotal,entity=pentity)
-        Transactions.objects.create(account= cgstid,transactiontype = 'P',transactionid = id,desc = 'Purchase',drcr=1,amount=cgst,entity=pentity)
-        Transactions.objects.create(account= sgstid,transactiontype = 'P',transactionid = id,desc = 'Purchase',drcr=1,amount=sgst,entity=pentity)
-        Transactions.objects.create(account= order.account,transactiontype = 'P',transactionid = id,desc = 'PurchaseBy',drcr=0,amount=gtotal,entity=pentity)
+        Transactions.objects.create(account= purchaseid,transactiontype = 'P',transactionid = id,desc = 'Purchase from',drcr=1,amount=subtotal,entity=pentity,createdby = order.createdby )
+        Transactions.objects.create(account= cgstid,transactiontype = 'P',transactionid = id,desc = 'Purchase',drcr=1,amount=cgst,entity=pentity,createdby= order.createdby)
+        Transactions.objects.create(account= sgstid,transactiontype = 'P',transactionid = id,desc = 'Purchase',drcr=1,amount=sgst,entity=pentity,createdby= order.createdby)
+        Transactions.objects.create(account= order.account,transactiontype = 'P',transactionid = id,desc = 'PurchaseBy',drcr=0,amount=gtotal,entity=pentity,createdby= order.createdby)
         return id
 
 
@@ -158,19 +179,28 @@ class purchaseorderSerializer(serializers.ModelSerializer):
         order = purchaseorder.objects.create(**validated_data)
 
 
-        
+
 
 
 
         #print(order.objects.get("id"))
         #print(tracks_data)
         for PurchaseOrderDetail_data in PurchaseOrderDetails_data:
-            PurchaseOrderDetails.objects.create(purchaseorder = order, **PurchaseOrderDetail_data)
+            detail = PurchaseOrderDetails.objects.create(purchaseorder = order, **PurchaseOrderDetail_data)
+            print(detail)
+            if(detail.orderqty ==0.00):
+                qty = detail.pieces
+            else:
+                qty = detail.orderqty
+
+
+
+            StockTransactions.objects.create(stock = detail.product,transactiontype = 'P',transactionid = detail.id,desc = 'Purchase By V.No' + str(order.voucherno),stocktransaction = 'P',quantity = qty,entrydate = order.billdate,entity = order.entity,createdby = order.createdby )
 
         self.createtransaction(order)
         return order
 
-    def update(self, instance, validated_data):  
+    def update(self, instance, validated_data):
         fields = ['voucherdate','voucherno','account','billno','billdate','terms','taxtype','billcash','subtotal','cgst','sgst','igst','expenses','gtotal','entity']
         for field in fields:
             try:
@@ -205,7 +235,7 @@ class purchaseorderSerializer(serializers.ModelSerializer):
             else:
                 PurchaseOrderDetails.objects.create(purchaseorder=instance, **item)
 
-        
+
         if len(product_items_dict) > 0:
             for item in product_items_dict.values():
                 item.delete()
@@ -255,6 +285,33 @@ class journalSerializer(serializers.ModelSerializer):
         model = journal
         fields = '__all__'
 
+    def create(self, validated_data):
+
+        # print(validated_data.get('amount'))
+        # print('hello')
+        Jv = journal.objects.create(**validated_data)
+        Transactions.objects.create(account= Jv.account,transactiontype = 'J',transactionid = Jv.id,desc = 'Journal',drcr=Jv.drcr,amount=Jv.amount,entity=Jv.entity,createdby= Jv.createdby)
+
+
+
+        # print(jv.id)
+       # print(validated_data)
+       # PurchaseOrderDetails_data = validated_data.pop('purchaseorderdetails')
+       # order = purchaseorder.objects.create(**validated_data)
+
+
+
+
+
+
+        # #print(order.objects.get("id"))
+        # #print(tracks_data)
+        # for PurchaseOrderDetail_data in PurchaseOrderDetails_data:
+        #     PurchaseOrderDetails.objects.create(purchaseorder = order, **PurchaseOrderDetail_data)
+
+       # self.createtransaction(order)
+        return 1
+
 
 
 class JournalVSerializer(serializers.ModelSerializer):
@@ -285,7 +342,7 @@ class SRSerializer(serializers.ModelSerializer):
             return 1
         else:
             return obj.voucherno + 1
-        
+
 
     class Meta:
         model = salereturn
@@ -302,9 +359,9 @@ class salesreturnDetailsSerializer(serializers.ModelSerializer):
         model = salereturnDetails
         fields = ('id','product', 'purchasedesc','orderqty','pieces','rate','amount','cgst','sgst','igst','linetotal','entity',)
 
-    
 
-    
+
+
 
 
 class salesreturnSerializer(serializers.ModelSerializer):
@@ -328,7 +385,7 @@ class salesreturnSerializer(serializers.ModelSerializer):
             salereturnDetails.objects.create(salereturn = order,**PurchaseOrderDetail_data)
         return order
 
-    def update(self, instance, validated_data):  
+    def update(self, instance, validated_data):
         fields = ['voucherdate','voucherno','account','billno','billdate','terms','taxtype','billcash','subtotal','cgst','sgst','igst','expenses','gtotal','entity']
         for field in fields:
             try:
@@ -363,7 +420,7 @@ class salesreturnSerializer(serializers.ModelSerializer):
             else:
                 salereturnDetails.objects.create(salereturn=instance, **item)
 
-        
+
         if len(product_items_dict) > 0:
             for item in product_items_dict.values():
                 item.delete()
@@ -408,7 +465,7 @@ class salesreturnSerializer(serializers.ModelSerializer):
 
 
 
-    
+
 
 
 

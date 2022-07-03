@@ -6,6 +6,7 @@ from Authentication.models import User
 from financial.models import account
 from inventory.models import Product
 from entity.models import entity
+from inventory.models import Product
 
 
 # Create your models here.
@@ -14,7 +15,7 @@ class SalesOderHeader(TrackingModel):
     #RevisonNumber =models.IntegerFieldverbose_name=_('Main category'))
     sorderdate = models.DateField(verbose_name='Sales Order date',auto_now_add=True)
     billno = models.IntegerField(verbose_name='Bill No',default= 1)
-    accountid = models.IntegerField(verbose_name='accountid',default= 1)
+    accountid = models.ForeignKey(to = account, on_delete= models.CASCADE,null=True,blank=True)
     latepaymentalert = models.IntegerField(verbose_name='Late Payment Alert',default= 1)
     grno = models.CharField(max_length=50, null=True,verbose_name='GR No')
     terms = models.IntegerField(verbose_name='Terms',default= 1)
@@ -163,6 +164,19 @@ class Transactions(TrackingModel):
     entrydate = models.DateField(verbose_name='Entry Date',auto_now_add=True)
     entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity')
     createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
+
+class StockTransactions(TrackingModel):
+    stock = models.ForeignKey(to = Product, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Product Name')
+    transactiontype = models.CharField(max_length=50, null=True,verbose_name='TransactionType')
+    transactionid = models.IntegerField(verbose_name='Transaction id')
+    desc = models.CharField(max_length=500, null=True,verbose_name='Description')
+    stocktransaction = models.CharField(verbose_name='Stock Transaction',max_length=50)
+    quantity =  models.DecimalField(max_digits=10, decimal_places=2,verbose_name= 'quantity')
+    entrydate = models.DateField(verbose_name='Entry Date',auto_now_add=True)
+    entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity')
+    createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
+
+
 
 
 

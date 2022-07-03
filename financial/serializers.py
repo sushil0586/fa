@@ -23,7 +23,7 @@ class accountSerializer2(serializers.ModelSerializer):
 
     class Meta:
         model = account
-        fields =  ('id','accountname','accountcode',)
+        fields =  ('id','accountname','accountcode','city','gstno',)
     
 
 
