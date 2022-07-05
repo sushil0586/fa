@@ -229,7 +229,7 @@ class StockTransactions(TrackingModel):
     transactiontype = models.CharField(max_length=50, null=True,verbose_name='TransactionType')
     transactionid = models.IntegerField(verbose_name='Transaction id')
     desc = models.CharField(max_length=500, null=True,verbose_name='Description')
-    stockttype = models.CharField(verbose_name='Stock Transaction',max_length=10)
+    stockttype = models.CharField(verbose_name='Stock Transaction',max_length=10,null=True)
     salequantity =  models.DecimalField(max_digits=10,null = True, decimal_places=2,verbose_name= 'Sale quantity')
     purchasequantity =  models.DecimalField(max_digits=10,null = True, decimal_places=2,verbose_name= 'Purchase quantity')
     issuedquantity =  models.DecimalField(max_digits=10,null = True, decimal_places=2,verbose_name= 'Issued quantity')
