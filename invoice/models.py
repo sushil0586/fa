@@ -3,7 +3,7 @@ from sre_parse import Verbose
 from django.db import models
 from helpers.models import TrackingModel
 from Authentication.models import User
-from financial.models import account
+from financial.models import account,accountHead
 from inventory.models import Product
 from entity.models import entity
 from inventory.models import Product
@@ -223,12 +223,26 @@ class Transactions(TrackingModel):
     createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
 
 class StockTransactions(TrackingModel):
+    accounthead = models.ForeignKey(to = accountHead, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Account Head')
+    account = models.ForeignKey(to = account, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Account Name')
     stock = models.ForeignKey(to = Product, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Product Name')
     transactiontype = models.CharField(max_length=50, null=True,verbose_name='TransactionType')
     transactionid = models.IntegerField(verbose_name='Transaction id')
     desc = models.CharField(max_length=500, null=True,verbose_name='Description')
-    stocktransaction = models.CharField(verbose_name='Stock Transaction',max_length=50)
-    quantity =  models.DecimalField(max_digits=10, decimal_places=2,verbose_name= 'quantity')
+    stockttype = models.CharField(verbose_name='Stock Transaction',max_length=10)
+    salequantity =  models.DecimalField(max_digits=10,null = True, decimal_places=2,verbose_name= 'Sale quantity')
+    purchasequantity =  models.DecimalField(max_digits=10,null = True, decimal_places=2,verbose_name= 'Purchase quantity')
+    issuedquantity =  models.DecimalField(max_digits=10,null = True, decimal_places=2,verbose_name= 'Issued quantity')
+    Recivedquantity =  models.DecimalField(max_digits=10,null = True, decimal_places=2,verbose_name= 'Received quantity')
+    drcr = models.BooleanField(verbose_name='Debit/Credit',null = True)
+    debitamount =  models.DecimalField(max_digits=10,null = True,decimal_places=3,verbose_name= 'Debit Amount')
+    creditamount =  models.DecimalField(max_digits=10,null = True, decimal_places=3,verbose_name= 'Credit Amount')
+    cgstdr =  models.DecimalField(max_digits=10,null = True, decimal_places=2,verbose_name= 'CGST Debit')
+    sgstdr =  models.DecimalField(max_digits=10,null = True, decimal_places=2,verbose_name= 'SGST Debit')
+    igstdr =  models.DecimalField(max_digits=10, null = True,decimal_places=2,verbose_name= 'IGST Debit')
+    cgstcr =  models.DecimalField(max_digits=10,null = True, decimal_places=2,verbose_name= 'CGST Credit')
+    sgstcr =  models.DecimalField(max_digits=10,null = True,decimal_places=2,verbose_name= 'SGST Credit')
+    igstcr =  models.DecimalField(max_digits=10, null = True,decimal_places=2,verbose_name= 'IGST Credit')
     entrydate = models.DateField(verbose_name='Entry Date',auto_now_add=True)
     entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity')
     createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)

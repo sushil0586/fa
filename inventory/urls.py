@@ -17,6 +17,10 @@ urlpatterns  = [
     path('album/<int:id>',views.Albumupdatedel.as_view(), name = 'Album2'),
     path('track',views.TrackApiView.as_view(), name = 'Track'),
     path('<int:id>',views.TrackApiView.as_view(), name = 'track2'),
+    path('tog',views.togApiView.as_view(), name = 'tog'),
+    path('gst',views.gstApiView.as_view(), name = 'tog'),
+    path('ratecalculator',views.rateApiView.as_view(), name = 'ratecalculator'),
+    path('uom',views.uomApiView.as_view(), name = 'uom'),
     
    
 ] 

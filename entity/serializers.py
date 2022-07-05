@@ -1,3 +1,4 @@
+import imp
 from struct import pack
 from rest_framework import serializers
 from entity.models import entity,entity_details,unitType
@@ -5,6 +6,7 @@ from Authentication.models import User
 from Authentication.serializers import Registerserializers,RoleSerializer
 from financial.models import accountHead,account
 from financial.serializers import accountHeadSerializer,accountSerializer
+from inventory.serializers import Ratecalculateserializer,UOMserializer,TOGserializer,GSTserializer
 import os
 import json
 
@@ -24,6 +26,10 @@ class entityAddSerializer(serializers.ModelSerializer):
 
     serializer = accountHeadSerializer
     roleserializer = RoleSerializer
+    rateerializer = Ratecalculateserializer
+    uomser = UOMserializer
+    TOGSR = TOGserializer
+    GSTSR = GSTserializer
     def create(self, validated_data):
 
 
@@ -37,26 +43,47 @@ class entityAddSerializer(serializers.ModelSerializer):
         file_path = os.path.join(os.getcwd(), "account.json")
         with open(file_path, 'r') as jsonfile:
             json_data = json.load(jsonfile)
-            for key in json_data:
-                data = json_data[key]
-                #print(data)
-                for key1 in range(len(data)):
-                    serializer2 = self.serializer(data =data[key1])
-                    serializer2.is_valid(raise_exception=True)
-                    serializer2.save(entity = newentity,owner = users[0])
+            for key in json_data["entity_accountheads"]:
+                serializer2 = self.serializer(data =key)
+                serializer2.is_valid(raise_exception=True)
+                serializer2.save(entity = newentity,owner = users[0])
+
+            for key in json_data["Roles"]:
+                serializer2 = self.roleserializer(data =key)
+                serializer2.is_valid(raise_exception=True)
+                serializer2.save(entity = newentity)
+                #print(key)
+
+            for key in json_data["Ratecalc"]:
+                serializer2 = self.rateerializer(data =key)
+                serializer2.is_valid(raise_exception=True)
+                serializer2.save(entity = newentity,createdby = users[0])
+
+            for key in json_data["UOM"]:
+                serializer2 = self.uomser(data =key)
+                serializer2.is_valid(raise_exception=True)
+                serializer2.save(entity = newentity,createdby = users[0])
+
+            for key in json_data["TOG"]:
+                serializer2 = self.TOGSR(data =key)
+                serializer2.is_valid(raise_exception=True)
+                serializer2.save(entity = newentity,createdby = users[0])
+
+            for key in json_data["GSTTYPE"]:
+                serializer2 = self.GSTSR(data =key)
+                serializer2.is_valid(raise_exception=True)
+                serializer2.save(entity = newentity,createdby = users[0])
+                
+                    
 
         
 
-        file_path = os.path.join(os.getcwd(), "Roles.json")
-        with open(file_path, 'r') as jsonfile:
-            json_data = json.load(jsonfile)
-            for key in json_data:
-                data = json_data[key]
-                print(data)
-                for key1 in range(len(data)):
-                    serializer2 = self.roleserializer(data =data[key1])
-                    serializer2.is_valid(raise_exception=True)
-                    serializer2.save(entity = newentity)
+        # file_path = os.path.join(os.getcwd(), "Roles.json")
+        # with open(file_path, 'r') as jsonfile:
+        #     json_data = json.load(jsonfile)
+        #     print(json_data["Roles"])
+            
+             
 
 
         

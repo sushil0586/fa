@@ -2,8 +2,8 @@ from django.http import request
 from django.shortcuts import render
 
 from rest_framework.generics import CreateAPIView,ListAPIView,ListCreateAPIView,RetrieveUpdateDestroyAPIView
-from inventory.models import Album, Product, Track,ProductCategory
-from inventory.serializers import ProductSerializer,AlbumSerializer,Trackserializer,ProductCategorySerializer
+from inventory.models import Album, Product, Track,ProductCategory,gsttype,typeofgoods,Ratecalculate,UnitofMeasurement
+from inventory.serializers import ProductSerializer,AlbumSerializer,Trackserializer,ProductCategorySerializer,GSTserializer,TOGserializer,UOMserializer,Ratecalculateserializer
 from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -118,6 +118,73 @@ class TrackApiView(ListCreateAPIView):
     
     def get_queryset(self):
         return Track.objects.filter(owner = self.request.user)
+
+class uomApiView(ListCreateAPIView):
+
+    serializer_class = UOMserializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    filter_backends = [DjangoFilterBackend]
+   # filterset_fields = ['id','ProductName','is_stockable']
+
+    def perform_create(self, serializer):
+        return serializer.save(createdby = self.request.user)
+    
+    def get_queryset(self):
+
+        entity = self.request.query_params.get('entity')
+        return UnitofMeasurement.objects.filter(entity = entity)
+
+
+
+class gstApiView(ListCreateAPIView):
+
+    serializer_class = GSTserializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    filter_backends = [DjangoFilterBackend]
+   # filterset_fields = ['id','ProductName','is_stockable']
+
+    def perform_create(self, serializer):
+        return serializer.save(createdby = self.request.user)
+    
+    def get_queryset(self):
+
+        entity = self.request.query_params.get('entity')
+        return gsttype.objects.filter(entity = entity)
+
+class togApiView(ListCreateAPIView):
+
+    serializer_class = TOGserializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    filter_backends = [DjangoFilterBackend]
+   # filterset_fields = ['id','ProductName','is_stockable']
+
+    def perform_create(self, serializer):
+        return serializer.save(createdby = self.request.user)
+    
+    def get_queryset(self):
+
+        entity = self.request.query_params.get('entity')
+        return typeofgoods.objects.filter(entity = entity)
+
+
+class rateApiView(ListCreateAPIView):
+
+    serializer_class = Ratecalculateserializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    filter_backends = [DjangoFilterBackend]
+   # filterset_fields = ['id','ProductName','is_stockable']
+
+    def perform_create(self, serializer):
+        return serializer.save(createdby = self.request.user)
+    
+    def get_queryset(self):
+
+        entity = self.request.query_params.get('entity')
+        return Ratecalculate.objects.filter(entity = entity)
 
 
 

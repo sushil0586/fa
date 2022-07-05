@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from inventory.models import Product,Album,Track,ProductCategory
+from inventory.models import Product,Album,Track,ProductCategory,Ratecalculate,UnitofMeasurement,stkcalculateby,typeofgoods,stkvaluationby,gsttype
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
@@ -39,6 +39,31 @@ class Trackserializer(serializers.ModelSerializer):
     class Meta:
         model = Track
         fields = ('id','order','title','duration',)
+
+class Ratecalculateserializer(serializers.ModelSerializer):
+    #id = serializers.IntegerField()
+    class Meta:
+        model = Ratecalculate
+        fields = ('id','rname','rcode',)
+
+class UOMserializer(serializers.ModelSerializer):
+    #id = serializers.IntegerField()
+    class Meta:
+        model = UnitofMeasurement
+        fields = ('id','unitname','unitcode',)
+
+class TOGserializer(serializers.ModelSerializer):
+    #id = serializers.IntegerField()
+    class Meta:
+        model = typeofgoods
+        fields = ('id','goodstype','goodscode',)
+
+class GSTserializer(serializers.ModelSerializer):
+    #id = serializers.IntegerField()
+    class Meta:
+        model = gsttype
+        fields = ('id','gsttypename','gsttypecode',)
+
 
         
         

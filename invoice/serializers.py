@@ -1,8 +1,10 @@
 
 import imp
+from itertools import product
 from rest_framework import serializers
 from invoice.models import SalesOderHeader,salesOrderdetails,purchaseorder,PurchaseOrderDetails,journal,salereturn,salereturnDetails,Transactions,StockTransactions,PurchaseReturn,Purchasereturndetails
 from financial.models import account
+from inventory.models import Product
 
 
 
@@ -273,7 +275,7 @@ class purchaseorderSerializer(serializers.ModelSerializer):
         cgstid = account.objects.get(entity =pentity,accountcode = 6001)
         sgstid = account.objects.get(entity =pentity,accountcode = 6002)
         igstid = account.objects.get(entity =pentity,accountcode = 6003)
-        Transactions.objects.create(account= purchaseid,transactiontype = 'P',transactionid = id,desc = 'Purchase from',drcr=1,amount=subtotal,entity=pentity,createdby = order.createdby )
+        #Transactions.objects.create(account= purchaseid,transactiontype = 'P',transactionid = id,desc = 'Purchase from',drcr=1,amount=subtotal,entity=pentity,createdby = order.createdby )
         Transactions.objects.create(account= cgstid,transactiontype = 'P',transactionid = id,desc = 'Purchase',drcr=1,amount=cgst,entity=pentity,createdby= order.createdby)
         Transactions.objects.create(account= sgstid,transactiontype = 'P',transactionid = id,desc = 'Purchase',drcr=1,amount=sgst,entity=pentity,createdby= order.createdby)
         Transactions.objects.create(account= order.account,transactiontype = 'P',transactionid = id,desc = 'PurchaseBy',drcr=0,amount=gtotal,entity=pentity,createdby= order.createdby)
@@ -284,6 +286,7 @@ class purchaseorderSerializer(serializers.ModelSerializer):
        # print(validated_data)
         PurchaseOrderDetails_data = validated_data.pop('purchaseorderdetails')
         order = purchaseorder.objects.create(**validated_data)
+        pentity = order.entity
 
 
 
@@ -299,10 +302,29 @@ class purchaseorderSerializer(serializers.ModelSerializer):
                 qty = detail.pieces
             else:
                 qty = detail.orderqty
+            
+            # print(detail.product.purchaseaccount.accounthead.id)
+
+        
+
+            # # cgstid = account.objects.get(entity =pentity,accountcode = 6001)
+            # # sgstid = account.objects.get(entity =pentity,accountcode = 6002)
+            # # igstid = account.objects.get(entity =pentity,accountcode = 6003)
+            # account1 = Product.objects.get(id = detail.product.id)   
+            # print(account1)
+          #  accounthead1 = account.objects.get(id = account1.id)
+
+            StockTransactions.objects.create(accounthead = detail.product.purchaseaccount.accounthead,account= detail.product.purchaseaccount,stock=detail.product,transactiontype = 'P',transactionid = detail.id,desc = 'Purchase By V.No' + str(order.voucherno),stockttype = 'P',purchasequantity = qty,drcr = 1,debitamount = detail.amount,cgstdr = detail.cgst,sgstdr= detail.sgst,igstdr = detail.igst,entrydate = order.billdate,entity = order.entity,createdby = order.createdby)
+            
+            
+
+
+            
 
 
 
-            StockTransactions.objects.create(stock = detail.product,transactiontype = 'P',transactionid = detail.id,desc = 'Purchase By V.No' + str(order.voucherno),stocktransaction = 'P',quantity = qty,entrydate = order.billdate,entity = order.entity,createdby = order.createdby )
+
+          #  StockTransactions.objects.create(stock = detail.product,transactiontype = 'P',transactionid = detail.id,desc = 'Purchase By V.No' + str(order.voucherno),stocktransaction = 'P',quantity = qty,entrydate = order.billdate,entity = order.entity,createdby = order.createdby )
 
         self.createtransaction(order)
         return order
