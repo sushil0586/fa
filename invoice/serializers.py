@@ -276,9 +276,9 @@ class purchaseorderSerializer(serializers.ModelSerializer):
         sgstid = account.objects.get(entity =pentity,accountcode = 6002)
         igstid = account.objects.get(entity =pentity,accountcode = 6003)
         #Transactions.objects.create(account= purchaseid,transactiontype = 'P',transactionid = id,desc = 'Purchase from',drcr=1,amount=subtotal,entity=pentity,createdby = order.createdby )
-        Transactions.objects.create(account= cgstid,transactiontype = 'P',transactionid = id,desc = 'Purchase',drcr=1,amount=cgst,entity=pentity,createdby= order.createdby)
-        Transactions.objects.create(account= sgstid,transactiontype = 'P',transactionid = id,desc = 'Purchase',drcr=1,amount=sgst,entity=pentity,createdby= order.createdby)
-        Transactions.objects.create(account= order.account,transactiontype = 'P',transactionid = id,desc = 'PurchaseBy',drcr=0,amount=gtotal,entity=pentity,createdby= order.createdby)
+        StockTransactions.objects.create(accounthead = cgstid.accounthead, account= cgstid,transactiontype = 'P',transactionid = id,desc = 'Purchase',drcr=1,debitamount=cgst,entity=pentity,createdby= order.createdby)
+        StockTransactions.objects.create(accounthead = sgstid.accounthead,account= sgstid,transactiontype = 'P',transactionid = id,desc = 'Purchase',drcr=1,debitamount=sgst,entity=pentity,createdby= order.createdby)
+        StockTransactions.objects.create(accounthead= order.account.accounthead,account= order.account,transactiontype = 'P',transactionid = id,desc = 'PurchaseBy',drcr=0,creditamount=gtotal,entity=pentity,createdby= order.createdby)
         return id
 
 
