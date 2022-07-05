@@ -29,6 +29,8 @@ class entityAddApiView(ListCreateAPIView):
 
 
 
+
+
 class entityApiView(ListCreateAPIView):
 
     serializer_class = entitySerializer

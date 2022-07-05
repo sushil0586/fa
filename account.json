@@ -485,6 +485,199 @@
                 ]
 
             }
+        ],
+
+        "Roles": [
+
+            
+            {
+               
+                "rolename": "Admin",
+                "roledesc": "Admin"
+                
+            },
+            {
+               
+                "rolename": "Manager",
+                "roledesc": "Manager"
+                
+            },
+            {
+               
+                "rolename": "Accountant",
+                "roledesc": "Accountant"
+                
+            },
+            {
+               
+                "rolename": "HR",
+                "roledesc": "HR"
+                
+            }
+			
+			
+			
+			
+        ],
+        "Ratecalc": [
+
+            
+            {
+               
+                "rname": "Default",
+                "rcode": "Default"
+                
+            },
+            {
+               
+                "rname": "Wt/qty",
+                "rcode": "Wt/qty"
+                
+            },
+            {
+               
+                "rname": "Pc/Packages",
+                "rcode": "Pc/Packages"
+                
+            },
+            {
+               
+                "rname": "Specific",
+                "rcode": "Specific"
+                
+            }
+
+        ],
+
+        "UOM": [
+
+            
+            {
+               
+                "unitname": "Metric Ton ",
+                "unitcode": "M.ton"
+                
+            },
+            {
+               
+                "unitname": "Quintal",
+                "unitcode": "Quintal"
+                
+            },
+            {
+               
+                "unitname": "kg",
+                "unitcode": "kg"
+                
+            },
+            {
+               
+                "unitname": "Litres",
+                "unitcode": "Litres"
+                
+            },
+            {
+               
+                "unitname": "Case",
+                "unitcode": "Case"
+                
+            },
+            {
+               
+                "unitname": "Box",
+                "unitcode": "Box"
+                
+            },
+            {
+               
+                "unitname": "Packet",
+                "unitcode": "Packet"
+                
+            }
+
+
+
+
+        ],
+        "TOG": [
+
+            
+            {
+               
+                "goodstype": "Raw Material ",
+                "goodscode": "10001"
+                
+            },
+            {
+               
+                "goodstype": "Finished Goods",
+                "goodscode": "1002"
+                
+            },
+            {
+               
+                "goodstype": "Semi finished goods",
+                "goodscode": "1003"
+                
+            },
+            {
+               
+                "goodstype": "Bye Product",
+                "goodscode": "1004"
+                
+            },
+            {
+               
+                "goodstype": "Wastage",
+                "goodscode": "1005"
+                
+            },
+            {
+               
+                "goodstype": "Consumable",
+                "goodscode": "1006"
+                
+            },
+            {
+               
+                "goodstype": "Others",
+                "goodscode": "1007"
+                
+            }
+        ],
+        "GSTTYPE": [
+
+            
+            {
+               
+                "gsttypename": "Taxable ",
+                "gsttypecode": "10001"
+                
+            },
+            {
+               
+                "gsttypename": "Free GST",
+                "gsttypecode": "1002"
+                
+            },
+            {
+               
+                "gsttypename": "NON GST",
+                "gsttypecode": "1003"
+                
+            },
+            {
+               
+                "gsttypename": "Services",
+                "gsttypecode": "1004"
+                
+            },
+            {
+               
+                "gsttypename": "Exempted",
+                "gsttypecode": "1005"
+                
+            }
         ]
 
         }

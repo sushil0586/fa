@@ -5,7 +5,7 @@ class TransactionsAdmin(admin.ModelAdmin):
     list_display = ['account','transactiontype','desc','drcr','amount','entity','createdby']
 
 class StockTransactionAdmin(admin.ModelAdmin):
-    list_display = ['stock','transactiontype','desc','stocktransaction','quantity','entity','createdby']
+    list_display = ['accounthead','account','stock','transactiontype','desc','quantity','entity','createdby']
 
 # Register your models here.
 
@@ -20,4 +20,4 @@ admin.site.register(salereturn)
 admin.site.register(salereturnDetails)
 admin.site.register(journal)
 admin.site.register(Transactions,TransactionsAdmin)
-admin.site.register(StockTransactions,StockTransactionAdmin)
+admin.site.register(StockTransactions)
