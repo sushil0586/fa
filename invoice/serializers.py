@@ -2,9 +2,11 @@
 import imp
 from itertools import product
 from rest_framework import serializers
-from invoice.models import SalesOderHeader,salesOrderdetails,purchaseorder,PurchaseOrderDetails,journal,salereturn,salereturnDetails,Transactions,StockTransactions,PurchaseReturn,Purchasereturndetails
-from financial.models import account
+from invoice.models import SalesOderHeader,salesOrderdetails,purchaseorder,PurchaseOrderDetails,\
+    journal,salereturn,salereturnDetails,Transactions,StockTransactions,PurchaseReturn,Purchasereturndetails
+from financial.models import account,accountHead
 from inventory.models import Product
+from django.db.models import Sum,Count
 
 
 
@@ -421,26 +423,188 @@ class journalSerializer(serializers.ModelSerializer):
         Jv = journal.objects.create(**validated_data)
         Transactions.objects.create(account= Jv.account,transactiontype = 'J',transactionid = Jv.id,desc = 'Journal',drcr=Jv.drcr,amount=Jv.amount,entity=Jv.entity,createdby= Jv.createdby)
 
-
-
-        # print(jv.id)
-       # print(validated_data)
-       # PurchaseOrderDetails_data = validated_data.pop('purchaseorderdetails')
-       # order = purchaseorder.objects.create(**validated_data)
+        return Jv
 
 
 
+class TrialbalanceSerializer(serializers.ModelSerializer):
+
+
+  #  purchasequantity1 = serializers.DecimalField(max_digits=10,decimal_places=2)
+
+    accounthead = serializers.IntegerField()
+    accounthead__name = serializers.CharField(max_length=500)
+    debit = serializers.DecimalField(max_digits=10,decimal_places=2)
+    credit = serializers.DecimalField(max_digits=10,decimal_places=2)
+   
+
+    class Meta:
+        model = StockTransactions
+        fields = ['accounthead','accounthead__name','debit','credit']
 
 
 
-        # #print(order.objects.get("id"))
-        # #print(tracks_data)
-        # for PurchaseOrderDetail_data in PurchaseOrderDetails_data:
-        #     PurchaseOrderDetails.objects.create(purchaseorder = order, **PurchaseOrderDetail_data)
+class TrialbalanceSerializerbyaccounthead(serializers.ModelSerializer):
 
-       # self.createtransaction(order)
-        return 1
 
+  #  purchasequantity1 = serializers.DecimalField(max_digits=10,decimal_places=2)
+
+    account = serializers.IntegerField()
+    account__accountname = serializers.CharField(max_length=500)
+    debit = serializers.DecimalField(max_digits=10,decimal_places=2)
+    credit = serializers.DecimalField(max_digits=10,decimal_places=2)
+   
+
+    class Meta:
+        model = StockTransactions
+        fields = ['account','account__accountname','debit','credit']
+
+
+class stocktranserilaizer(serializers.ModelSerializer):
+
+    # # debit  = serializers.SerializerMethodField()
+    # sum_amount = serializers.SerializerMethodField()
+
+    # def get_debit(self, obj):
+    #     return obj.debitamount.Count()
+
+
+    class Meta:
+        model = StockTransactions
+        fields = ['accounthead','account','transactiontype','debitamount','creditamount']
+
+
+
+
+
+class accountheadserializer(serializers.ModelSerializer):
+    headtrans = stocktranserilaizer(source = 'accounthead_transactions', many=True, read_only=True)
+
+    debit  = serializers.SerializerMethodField()
+    credit = serializers.SerializerMethodField()
+
+    class Meta:
+        model = accountHead
+        fields = ['id','name','debit','credit','headtrans']
+
+    def get_debit(self, obj):
+        # fromDate = parse_datetime(self.context['request'].query_params.get(
+        #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        # toDate = parse_datetime(self.context['request'].query_params.get(
+        #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        return obj.headtrans.aggregate(Sum('debitamount'))['debitamount__sum']
+
+    def get_credit(self, obj):
+        # fromDate = parse_datetime(self.context['request'].query_params.get(
+        #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        # toDate = parse_datetime(self.context['request'].query_params.get(
+        #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        return obj.headtrans.aggregate(Sum('creditamount'))['creditamount__sum']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+       # print(representation['accounttrans'])
+        return representation
+        # if representation['is_active'] == True:
+            
+
+
+
+class accountserializer(serializers.ModelSerializer):
+    accounttrans = stocktranserilaizer(source = 'account_transactions', many=True, read_only=True)
+
+    debit  = serializers.SerializerMethodField()
+    credit = serializers.SerializerMethodField()
+
+    class Meta:
+        model = account
+        fields = ['id','accountname','debit','credit', 'accounttrans']
+
+    def get_debit(self, obj):
+        # fromDate = parse_datetime(self.context['request'].query_params.get(
+        #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        # toDate = parse_datetime(self.context['request'].query_params.get(
+        #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        return obj.accounttrans.aggregate(Sum('debitamount'))['debitamount__sum']
+
+    def get_credit(self, obj):
+        # fromDate = parse_datetime(self.context['request'].query_params.get(
+        #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        # toDate = parse_datetime(self.context['request'].query_params.get(
+        #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        return obj.accounttrans.aggregate(Sum('creditamount'))['creditamount__sum']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        print(representation)
+        if not representation['accounttrans']:
+            return None
+        return representation
+
+        # print(representation)
+        # return representation
+
+
+class accounthserializer(serializers.ModelSerializer):
+    #headtrans = accountserializer(source = 'account_transactions2',many=True, read_only=True)
+    #headtrans1 = stocktranserilaizer(source = 'account_transactions',many=True, read_only=True)
+
+    # debit  = serializers.SerializerMethodField()
+    # credit = serializers.SerializerMethodField()
+
+    class Meta:
+        model = accountHead
+        fields = ['name']
+
+    # def get_debit(self, obj):
+    #     # fromDate = parse_datetime(self.context['request'].query_params.get(
+    #     #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+    #     # toDate = parse_datetime(self.context['request'].query_params.get(
+    #     #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+    #     return obj.headtrans.aggregate(Sum('debitamount'))['debitamount__sum']
+
+    # def get_credit(self, obj):
+    #     # fromDate = parse_datetime(self.context['request'].query_params.get(
+    #     #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+    #     # toDate = parse_datetime(self.context['request'].query_params.get(
+    #     #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+    #     return obj.headtrans.aggregate(Sum('creditamount'))['creditamount__sum']
+    
+     
+
+
+class TrialbalanceSerializerbyaccount(serializers.ModelSerializer):
+
+
+  #  purchasequantity1 = serializers.DecimalField(max_digits=10,decimal_places=2)
+
+   # account = serializers.IntegerField()
+    accountname = serializers.CharField(max_length=500,source='account__accountname')
+    debit = serializers.DecimalField(max_digits=10,decimal_places=2)
+    credit = serializers.DecimalField(max_digits=10,decimal_places=2)
+    transactiontype = serializers.CharField(max_length=50)
+    transactionid = serializers.IntegerField()
+   
+
+    class Meta:
+        model = StockTransactions
+        fields = ['accountname','transactiontype','transactionid','debit','credit']
+
+        def to_representation(self, instance):
+            original_representation = super().to_representation(instance)
+
+            representation = {
+                
+                'detail': original_representation,
+            }
+
+            return representation
+
+
+
+
+
+    
 
 
 class JournalVSerializer(serializers.ModelSerializer):

@@ -27,6 +27,15 @@ urlpatterns  = [
     path('purchasereturndetails',views.PurchaseOrderDetailsApiView.as_view(),name = 'salesorder'),
     path('purchasereturndetails/<int:id>',views.PurchaseOrderDetailsApiView.as_view(), name = 'salesorder'),
     path('prvoucherno',views.PurchaseReturnlatestview.as_view(), name = 'journal'),
+    path('trialbalance',views.TrialbalanceApiView.as_view(), name = 'Trialbalance'),
+    path('trialbalancebyaccounthead',views.TrialbalancebyaccountheadApiView.as_view(), name = 'Trialbalance'),
+    path('trialbalancebyaccount',views.TrialbalancebyaccountApiView.as_view(), name = 'Trialbalance'),
+    path('Trialview',views.Trialview.as_view(), name = 'Trialbalance'),
+    path('trialviewaccount',views.Trialviewaccount.as_view(), name = 'Trialbalance'),
+
+    
+
+    
 
     
     # path('account',views.accountApiView.as_view(),name ='account'),
