@@ -21,6 +21,14 @@ class Registerserializers(serializers.ModelSerializer):
          'username': {'validators': []},
          'email': {'validators': []}}
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        print(representation)
+        if representation['is_active'] == True:
+            return representation
+        
+        
+
     def create(self, validated_data):
         groups_data = validated_data.pop('groups')
         user = User.objects.create_user(**validated_data)

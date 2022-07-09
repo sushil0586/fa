@@ -204,6 +204,7 @@ class salereturnDetails(models.Model):
 class journal(TrackingModel):
     voucherdate = models.DateField(verbose_name='Vocucher Date',auto_now_add=True)
     voucherno = models.IntegerField(verbose_name='Voucher No')
+    vouchertype = models.CharField(max_length=50, null=True,verbose_name='Voucher Type',default='J')
     account = models.ForeignKey(to = account, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Account Name')
     desc = models.CharField(max_length=500, null=True,verbose_name='Description')
     drcr = models.BooleanField(verbose_name='Debit/Credit')
@@ -244,7 +245,7 @@ class StockTransactions(TrackingModel):
     cgstcr =  models.DecimalField(max_digits=10,null = True, decimal_places=2,verbose_name= 'CGST Credit')
     sgstcr =  models.DecimalField(max_digits=10,null = True,decimal_places=2,verbose_name= 'SGST Credit')
     igstcr =  models.DecimalField(max_digits=10, null = True,decimal_places=2,verbose_name= 'IGST Credit')
-    entrydate = models.DateField(verbose_name='Entry Date',auto_now_add=True)
+    entrydate = models.DateField(verbose_name='Entry Date')
     entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity')
     createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
 
