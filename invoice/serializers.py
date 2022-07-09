@@ -433,14 +433,14 @@ class TrialbalanceSerializer(serializers.ModelSerializer):
   #  purchasequantity1 = serializers.DecimalField(max_digits=10,decimal_places=2)
 
     accounthead = serializers.IntegerField()
-    accounthead__name = serializers.CharField(max_length=500)
+    accountheadname = serializers.CharField(max_length=500,source = 'accounthead__name')
     debit = serializers.DecimalField(max_digits=10,decimal_places=2)
     credit = serializers.DecimalField(max_digits=10,decimal_places=2)
    
 
     class Meta:
         model = StockTransactions
-        fields = ['accounthead','accounthead__name','debit','credit']
+        fields = ['accounthead','accountheadname','debit','credit']
 
 
 
@@ -450,14 +450,14 @@ class TrialbalanceSerializerbyaccounthead(serializers.ModelSerializer):
   #  purchasequantity1 = serializers.DecimalField(max_digits=10,decimal_places=2)
 
     account = serializers.IntegerField()
-    account__accountname = serializers.CharField(max_length=500)
+    accountname = serializers.CharField(max_length=500,source = 'account__accountname')
     debit = serializers.DecimalField(max_digits=10,decimal_places=2)
     credit = serializers.DecimalField(max_digits=10,decimal_places=2)
    
 
     class Meta:
         model = StockTransactions
-        fields = ['account','account__accountname','debit','credit']
+        fields = ['account','accountname','debit','credit']
 
 
 class stocktranserilaizer(serializers.ModelSerializer):
@@ -532,6 +532,8 @@ class accountserializer(serializers.ModelSerializer):
         #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
         # toDate = parse_datetime(self.context['request'].query_params.get(
         #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        if not obj.accounttrans.aggregate(Sum('creditamount'))['creditamount__sum']:
+            return ''
         return obj.accounttrans.aggregate(Sum('creditamount'))['creditamount__sum']
 
     def to_representation(self, instance):
@@ -584,14 +586,17 @@ class TrialbalanceSerializerbyaccount(serializers.ModelSerializer):
     credit = serializers.DecimalField(max_digits=10,decimal_places=2)
     transactiontype = serializers.CharField(max_length=50)
     transactionid = serializers.IntegerField()
+    entrydate = serializers.DateField()
    
 
     class Meta:
         model = StockTransactions
-        fields = ['accountname','transactiontype','transactionid','debit','credit']
+        fields = ['accountname','transactiontype','transactionid','debit','credit','entrydate']
 
         def to_representation(self, instance):
             original_representation = super().to_representation(instance)
+
+            print(original_representation)
 
             representation = {
                 
