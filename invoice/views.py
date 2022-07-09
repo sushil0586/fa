@@ -313,7 +313,7 @@ class TrialbalancebyaccountApiView(ListAPIView):
         #entity = self.request.query_params.get('entity')
         entity = self.request.query_params.get('entity')
         account = self.request.query_params.get('account')
-        stk =StockTransactions.objects.filter(entity = entity,account = account).values('account__accountname','transactiontype','transactionid','entrydate').annotate(debit = Sum('debitamount'),credit = Sum('creditamount') )
+        stk =StockTransactions.objects.filter(entity = entity,account = account).values('account__accountname','transactiontype','transactionid','entrydate','desc').annotate(debit = Sum('debitamount'),credit = Sum('creditamount') )
         #print(stk)
         return stk
 

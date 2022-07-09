@@ -595,11 +595,12 @@ class TrialbalanceSerializerbyaccount(serializers.ModelSerializer):
     transactiontype = serializers.CharField(max_length=50)
     transactionid = serializers.IntegerField()
     entrydate = serializers.DateField()
+    desc = serializers.CharField(max_length=500)
    
 
     class Meta:
         model = StockTransactions
-        fields = ['accountname','transactiontype','transactionid','debit','credit','entrydate']
+        fields = ['accountname','transactiontype','transactionid','debit','credit','entrydate','desc']
 
         def to_representation(self, instance):
             original_representation = super().to_representation(instance)

@@ -5,7 +5,7 @@ class TransactionsAdmin(admin.ModelAdmin):
     list_display = ['account','transactiontype','desc','drcr','amount','entity','createdby']
 
 class StockTransactionAdmin(admin.ModelAdmin):
-    list_display = ['accounthead','account','stock','transactiontype','desc','entity','createdby']
+    list_display = ['accounthead','account','transactiontype','desc','debitamount','creditamount']
 
 # Register your models here.
 
