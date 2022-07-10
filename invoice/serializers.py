@@ -39,7 +39,6 @@ class SalesOderHeaderSerializer(serializers.ModelSerializer):
         cgstid = account.objects.get(entity =pentity,accountcode = 6001)
         sgstid = account.objects.get(entity =pentity,accountcode = 6002)
         igstid = account.objects.get(entity =pentity,accountcode = 6003)
-        StockTransactions.objects.create(accounthead = igstid.accounthead, account= igstid,transactiontype = 'S',transactionid = id,desc = 'Sale By B.No ' + str(order.billno),drcr=0,creditamount=igstid,entity=pentity,createdby= order.owner)
         StockTransactions.objects.create(accounthead = cgstid.accounthead, account= cgstid,transactiontype = 'S',transactionid = id,desc = 'Sale By B.No ' + str(order.billno),drcr=0,creditamount=cgst,entity=pentity,createdby= order.owner)
         StockTransactions.objects.create(accounthead = sgstid.accounthead,account= sgstid,transactiontype = 'S',transactionid = id,desc = 'Sale By B.No ' + str(order.billno),drcr=0,creditamount=sgst,entity=pentity,createdby= order.owner)
         StockTransactions.objects.create(accounthead= order.accountid.accounthead,account= order.accountid,transactiontype = 'S',transactionid = id,desc = 'Sale By B.No ' + str(order.billno),drcr=1,debitamount=gtotal,entity=pentity,createdby= order.owner)
@@ -150,7 +149,6 @@ class PurchasereturnSerializer(serializers.ModelSerializer):
         cgstid = account.objects.get(entity =pentity,accountcode = 6001)
         sgstid = account.objects.get(entity =pentity,accountcode = 6002)
         igstid = account.objects.get(entity =pentity,accountcode = 6003)
-        StockTransactions.objects.create(accounthead = igstid.accounthead, account= igstid,transactiontype = 'PR',transactionid = id,desc = 'Purchase return By V.No ' + str(order.billno),drcr=0,creditamount=igstid,entity=pentity,createdby= order.owner)
         StockTransactions.objects.create(accounthead = cgstid.accounthead, account= cgstid,transactiontype = 'PR',transactionid = id,desc = 'Purchase return By V.No ' + str(order.billno),drcr=0,creditamount=cgst,entity=pentity,createdby= order.owner)
         StockTransactions.objects.create(accounthead = sgstid.accounthead,account= sgstid,transactiontype = 'PR',transactionid = id,desc = 'Purchase return By V.No ' + str(order.billno),drcr=0,creditamount=sgst,entity=pentity,createdby= order.owner)
         StockTransactions.objects.create(accounthead= order.accountid.accounthead,account= order.accountid,transactiontype = 'PR',transactionid = id,desc = 'Purchase return By V.No ' + str(order.billno),drcr=1,debitamount=gtotal,entity=pentity,createdby= order.owner)
@@ -288,7 +286,6 @@ class purchaseorderSerializer(serializers.ModelSerializer):
         sgstid = account.objects.get(entity =pentity,accountcode = 6002)
         igstid = account.objects.get(entity =pentity,accountcode = 6003)
         #Transactions.objects.create(account= purchaseid,transactiontype = 'P',transactionid = id,desc = 'Purchase from',drcr=1,amount=subtotal,entity=pentity,createdby = order.createdby )
-        StockTransactions.objects.create(accounthead = igstid.accounthead, account= cgstid,transactiontype = 'P',transactionid = id,desc = 'Purchase',drcr=1,debitamount=igstid,entity=pentity,createdby= order.createdby)
         StockTransactions.objects.create(accounthead = cgstid.accounthead, account= cgstid,transactiontype = 'P',transactionid = id,desc = 'Purchase',drcr=1,debitamount=cgst,entity=pentity,createdby= order.createdby)
         StockTransactions.objects.create(accounthead = sgstid.accounthead,account= sgstid,transactiontype = 'P',transactionid = id,desc = 'Purchase',drcr=1,debitamount=sgst,entity=pentity,createdby= order.createdby)
         StockTransactions.objects.create(accounthead= order.account.accounthead,account= order.account,transactiontype = 'P',transactionid = id,desc = 'PurchaseBy',drcr=0,creditamount=gtotal,entity=pentity,createdby= order.createdby)
@@ -438,7 +435,7 @@ class journalSerializer(serializers.ModelSerializer):
 
 
 
-        StockTransactions.objects.create(accounthead= order.account.accounthead,account= order.account,transactiontype = order.vouchertype,transactionid = order.id,desc = 'Journal V.No' + str(order.voucherno),drcr=order.drcr,creditamount=creditamount,debitamount=debitamount,entity=order.entity,createdby= order.createdby,entrydate = order.entrydate)
+        StockTransactions.objects.create(accounthead= order.account.accounthead,account= order.account,transactiontype = order.vouchertype,transactionid = order.id,desc = 'Journal V.No' + str(order.voucherno),drcr=order.drcr,creditamount=creditamount,debitamount=debitamount,entity=order.entity,createdby= order.createdby)
         #Transactions.objects.create(account= Jv.account,transactiontype = 'J',transactionid = Jv.id,desc = 'Journal',drcr=Jv.drcr,amount=Jv.amount,entity=Jv.entity,createdby= Jv.createdby)
 
         return order
@@ -773,10 +770,9 @@ class salesreturnSerializer(serializers.ModelSerializer):
         sgstid = account.objects.get(entity =pentity,accountcode = 6002)
         igstid = account.objects.get(entity =pentity,accountcode = 6003)
         #Transactions.objects.create(account= purchaseid,transactiontype = 'P',transactionid = id,desc = 'Purchase from',drcr=1,amount=subtotal,entity=pentity,createdby = order.createdby )
-        StockTransactions.objects.create(accounthead = igstid.accounthead, account= igstid,transactiontype = 'SR',transactionid = id,desc = 'Sale return By V.No ' + str(order.voucherno),drcr=1,debitamount=igstid,entity=pentity,createdby= order.createdby)
-        StockTransactions.objects.create(accounthead = cgstid.accounthead, account= cgstid,transactiontype = 'SR',transactionid = id,desc = 'Sale return By V.No ' + str(order.voucherno),drcr=1,debitamount=cgst,entity=pentity,createdby= order.createdby)
-        StockTransactions.objects.create(accounthead = sgstid.accounthead,account= sgstid,transactiontype = 'SR',transactionid = id,desc = 'Sale return By V.No ' + str(order.voucherno),drcr=1,debitamount=sgst,entity=pentity,createdby= order.createdby)
-        StockTransactions.objects.create(accounthead= order.account.accounthead,account= order.account,transactiontype = 'SR',transactionid = id,desc = 'Sale return By V.No ' + str(order.voucherno),drcr=0,creditamount=gtotal,entity=pentity,createdby= order.createdby)
+        StockTransactions.objects.create(accounthead = cgstid.accounthead, account= cgstid,transactiontype = 'SR',transactionid = id,desc = 'Sale return By V.No' + str(order.voucherno),drcr=1,debitamount=cgst,entity=pentity,createdby= order.createdby)
+        StockTransactions.objects.create(accounthead = sgstid.accounthead,account= sgstid,transactiontype = 'SR',transactionid = id,desc = 'Sale return By V.No' + str(order.voucherno),drcr=1,debitamount=sgst,entity=pentity,createdby= order.createdby)
+        StockTransactions.objects.create(accounthead= order.account.accounthead,account= order.account,transactiontype = 'SR',transactionid = id,desc = 'Sale return By V.No' + str(order.voucherno),drcr=0,creditamount=gtotal,entity=pentity,createdby= order.createdby)
         return id
 
     def create(self, validated_data):
