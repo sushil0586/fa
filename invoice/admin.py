@@ -7,6 +7,10 @@ class TransactionsAdmin(admin.ModelAdmin):
 class StockTransactionAdmin(admin.ModelAdmin):
     list_display = ['accounthead','account','transactiontype','desc','debitamount','creditamount']
 
+
+class journalAdmin(admin.ModelAdmin):
+    list_display = ['voucherno','vouchertype','account','drcr','amount','entrydate']
+
 # Register your models here.
 
 admin.site.register(SalesOderHeader)
@@ -18,6 +22,6 @@ admin.site.register(purchaseorder)
 admin.site.register(PurchaseOrderDetails)
 admin.site.register(salereturn)
 admin.site.register(salereturnDetails)
-admin.site.register(journal)
+admin.site.register(journal,journalAdmin)
 admin.site.register(Transactions,TransactionsAdmin)
 admin.site.register(StockTransactions,StockTransactionAdmin)

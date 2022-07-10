@@ -213,6 +213,15 @@ class journal(TrackingModel):
     entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity')
     createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
 
+    
+    class Meta:
+        verbose_name = 'journal'
+        verbose_name_plural = 'journal'
+        
+
+
+
+
 class Transactions(TrackingModel):
     account = models.ForeignKey(to = account, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Account Name')
     transactiontype = models.CharField(max_length=50, null=True,verbose_name='TransactionType')

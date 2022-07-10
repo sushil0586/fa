@@ -22,6 +22,8 @@ urlpatterns  = [
     path('salesreturn',views.salesreturnApiView.as_view(), name = 'journal'),
     path('salesreturn/<int:id>',views.salesreturnupdatedelview.as_view(), name = 'journal'),
     path('jvouccherno',views.journalordelatestview.as_view(), name = 'purchaseorder'),
+    path('bvouccherno',views.bankordelatestview.as_view(), name = 'purchaseorder'),
+    path('cvouccherno',views.cashordelatestview.as_view(), name = 'purchaseorder'),
     path('purchasereturn',views.PurchaseReturnApiView.as_view(),name = 'salesorder'),
     path('purchasereturn/<int:id>',views.PurchaseReturnupdatedelview.as_view(), name = 'salesorder'),
     path('purchasereturndetails',views.PurchaseOrderDetailsApiView.as_view(),name = 'salesorder'),
@@ -32,6 +34,7 @@ urlpatterns  = [
     path('trialbalancebyaccount',views.TrialbalancebyaccountApiView.as_view(), name = 'Trialbalance'),
     path('Trialview',views.Trialview.as_view(), name = 'Trialbalance'),
     path('trialviewaccount',views.Trialviewaccount.as_view(), name = 'Trialbalance'),
+    path('cash',views.cashviewaccount.as_view(), name = 'Trialbalance'),
 
     
 
