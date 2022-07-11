@@ -1,12 +1,161 @@
 
 import imp
 from itertools import product
+from os import device_encoding
+from select import select
 from rest_framework import serializers
 from invoice.models import SalesOderHeader,salesOrderdetails,purchaseorder,PurchaseOrderDetails,\
     journal,salereturn,salereturnDetails,Transactions,StockTransactions,PurchaseReturn,Purchasereturndetails
 from financial.models import account,accountHead
 from inventory.models import Product
 from django.db.models import Sum,Count
+
+
+
+class stocktransaction:
+    def __init__(self, order,transactiontype,debit,credit,description):
+        self.order = order
+        self.transactiontype = transactiontype
+        self.debit = debit
+        self.credit = credit
+        self.description = description
+    
+    def createtransaction(self):
+        id = self.order.id
+        subtotal = self.order.subtotal
+        cgst = self.order.cgst
+        sgst = self.order.sgst
+        igst = self.order.igst
+        gtotal = self.order.gtotal
+        pentity = self.order.entity
+        purchaseid = account.objects.get(entity =pentity,accountcode = 1000)
+        cgstid = account.objects.get(entity =pentity,accountcode = 6001)
+        sgstid = account.objects.get(entity =pentity,accountcode = 6002)
+        igstid = account.objects.get(entity =pentity,accountcode = 6003)
+        #Transactions.objects.create(account= purchaseid,transactiontype = 'P',transactionid = id,desc = 'Purchase from',drcr=1,amount=subtotal,entity=pentity,createdby = order.createdby )
+        StockTransactions.objects.create(accounthead = cgstid.accounthead, account= cgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description,drcr=self.debit,debitamount=cgst,entity=pentity,createdby= self.order.createdby)
+        StockTransactions.objects.create(accounthead = sgstid.accounthead,account= sgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description,drcr=self.debit,debitamount=sgst,entity=pentity,createdby= self.order.createdby)
+        StockTransactions.objects.create(accounthead= self.order.account.accounthead,account= self.order.account,transactiontype = self.transactiontype,transactionid = id,desc = self.description,drcr=self.credit,creditamount=gtotal,entity=pentity,createdby= self.order.createdby)
+        return id
+
+    def updateransaction(self):
+        id = self.order.id
+        subtotal = self.order.subtotal
+        cgst = self.order.cgst
+       
+        sgst = self.order.sgst
+        igst = self.order.igst
+        gtotal = self.order.gtotal
+        pentity = self.order.entity
+        purchaseid = account.objects.get(entity =pentity,accountcode = 1000)
+        cgstid = account.objects.get(entity =pentity,accountcode = 6001)
+        #print(cgstid.id)
+        sgstid = account.objects.get(entity =pentity,accountcode = 6002)
+        igstid = account.objects.get(entity =pentity,accountcode = 6003)
+
+        #print(self.order.id)
+
+        #print(StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = 'P'))
+        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account = self.order.account).update(accounthead= self.order.account.accounthead,account= self.order.account,transactiontype = self.transactiontype,desc = self.description,drcr=self.credit,creditamount=gtotal,entity=pentity,createdby= self.order.createdby)
+       # StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = 'P',account = self.order.account).update(accounthead= self.order.account.accounthead,account= self.order.account,transactiontype = self.transactiontype,desc = self.description,drcr=self.credit,creditamount=gtotal,entity=pentity,createdby= self.order.createdby)
+        #Transactions.objects.create(account= purchaseid,transactiontype = 'P',transactionid = id,desc = 'Purchase from',drcr=1,amount=subtotal,entity=pentity,createdby = order.createdby )
+        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account_id = cgstid.id).update(accounthead = cgstid.accounthead, account= cgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description,drcr=self.debit,debitamount=cgst,entity=pentity,createdby= self.order.createdby)
+        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account_id = sgstid.id).update(accounthead = sgstid.accounthead,account= sgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description,drcr=self.debit,debitamount=sgst,entity=pentity,createdby= self.order.createdby)
+        
+        return id
+
+
+    def createtransactiondetails(self,detail,stocktype):
+
+        if (detail.orderqty ==0.00):
+                qty = detail.pieces
+        else:
+                qty = detail.orderqty
+
+        details = StockTransactions.objects.create(accounthead = detail.product.purchaseaccount.accounthead,account= detail.product.purchaseaccount,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,desc = 'Purchase By V.No' + str(self.order.voucherno),stockttype = stocktype,purchasequantity = qty,drcr = self.debit,debitamount = detail.amount,cgstdr = detail.cgst,sgstdr= detail.sgst,igstdr = detail.igst,entrydate = self.order.billdate,entity = self.order.entity,createdby = self.order.createdby)
+
+        return details
+
+    def updatetranasationdetails(self,updateddetails,stocktype):
+        if (updateddetails.orderqty ==0.00):
+                qty = updateddetails.pieces
+        else:
+                qty = updateddetails.orderqty
+
+        details = StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account_id = updateddetails.product.purchaseaccount.id).create(accounthead = updateddetails.product.purchaseaccount.accounthead,account= updateddetails.product.purchaseaccount,stock=updateddetails.product,transactiontype = self.transactiontype,transactionid = self.order.id,desc = 'Purchase By V.No' + str(self.order.voucherno),stockttype = stocktype,purchasequantity = qty,drcr = self.debit,debitamount = updateddetails.amount,cgstdr = updateddetails.cgst,sgstdr= updateddetails.sgst,igstdr = updateddetails.igst,entrydate = self.order.billdate,entity = self.order.entity,createdby = self.order.createdby)
+        #details = StockTransactions.objects.filter(transactionid = instance.id,transactiontype = 'P',account_id = inv_item.product.purchaseaccount.id).create(accounthead = inv_item.product.purchaseaccount.accounthead,account= inv_item.product.purchaseaccount,stock=inv_item.product,transactiontype = 'P',transactionid = inv_item.id,desc = 'Purchase By V.No',stockttype = 'P',purchasequantity = qty,drcr = 1,debitamount = inv_item.amount,cgstdr = inv_item.cgst,sgstdr= inv_item.sgst,igstdr = inv_item.igst,entrydate = instance.billdate,entity = instance.entity,createdby = instance.createdby)
+
+        return details
+
+
+
+class stocktransactionsale:
+    def __init__(self, order,transactiontype,debit,credit,description):
+        self.order = order
+        self.transactiontype = transactiontype
+        self.debit = debit
+        self.credit = credit
+        self.description = description
+    
+    def createtransaction(self):
+        id = self.order.id
+        subtotal = self.order.subtotal
+        cgst = self.order.cgst
+        sgst = self.order.sgst
+        igst = self.order.igst
+        gtotal = self.order.gtotal
+        pentity = self.order.entity
+        purchaseid = account.objects.get(entity =pentity,accountcode = 3000)
+        cgstid = account.objects.get(entity =pentity,accountcode = 6001)
+        sgstid = account.objects.get(entity =pentity,accountcode = 6002)
+        igstid = account.objects.get(entity =pentity,accountcode = 6003)
+        StockTransactions.objects.create(accounthead = cgstid.accounthead, account= cgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.credit,creditamount=cgst,entity=self.order.entity,createdby= self.order.owner)
+        StockTransactions.objects.create(accounthead = sgstid.accounthead,account= sgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.credit,creditamount=sgst,entity=self.order.entity,createdby= self.order.owner)
+        StockTransactions.objects.create(accounthead= self.order.accountid.accounthead,account= self.order.accountid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.debit,debitamount=gtotal,entity=self.order.entity,createdby= self.order.owner)
+        return id
+
+    def updateransaction(self):
+
+        id = self.order.id
+        subtotal = self.order.subtotal
+        cgst = self.order.cgst
+        sgst = self.order.sgst
+        igst = self.order.igst
+        gtotal = self.order.gtotal
+        pentity = self.order.entity
+        purchaseid = account.objects.get(entity =pentity,accountcode = 3000)
+        cgstid = account.objects.get(entity =pentity,accountcode = 6001)
+        sgstid = account.objects.get(entity =pentity,accountcode = 6002)
+        igstid = account.objects.get(entity =pentity,accountcode = 6003)
+        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account_id = cgstid.id).create(accounthead = cgstid.accounthead, account= cgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.credit,creditamount=cgst,entity=self.order.entity,createdby= self.order.owner)
+        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account_id = sgstid.id).create(accounthead = sgstid.accounthead,account= sgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.credit,creditamount=sgst,entity=self.order.entity,createdby= self.order.owner)
+        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account = self.order.accountid).update(accounthead= self.order.accountid.accounthead,account= self.order.accountid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.debit,debitamount=gtotal,entity=self.order.entity,createdby= self.order.owner)
+        
+        return id
+
+
+    def createtransactiondetails(self,detail,stocktype):
+
+        if (detail.orderqty ==0.00):
+                qty = detail.pieces
+        else:
+                qty = detail.orderqty
+
+        details = StockTransactions.objects.create(accounthead = detail.product.saleaccount.accounthead,account= detail.product.saleaccount,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,desc = self.description + ' ' + str(self.order.voucherno),stockttype = stocktype,purchasequantity = qty,drcr = self.debit,debitamount = detail.amount,cgstdr = detail.cgst,sgstdr= detail.sgst,igstdr = detail.igst,entrydate = self.order.billdate,entity = self.order.entity,createdby = self.order.createdby)
+
+        return details
+
+    def updatetranasationdetails(self,updateddetails,stocktype):
+        if (updateddetails.orderqty ==0.00):
+                qty = updateddetails.pieces
+        else:
+                qty = updateddetails.orderqty
+
+        details = StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account_id = updateddetails.product.saleaccount.id).create(accounthead = updateddetails.product.saleaccount.accounthead,account= updateddetails.product.saleaccount,stock=updateddetails.product,transactiontype = self.transactiontype,transactionid = self.order.id,desc = 'Purchase By V.No' + str(self.order.voucherno),stockttype = stocktype,purchasequantity = qty,drcr = self.debit,debitamount = updateddetails.amount,cgstdr = updateddetails.cgst,sgstdr= updateddetails.sgst,igstdr = updateddetails.igst,entrydate = self.order.billdate,entity = self.order.entity,createdby = self.order.createdby)
+        #details = StockTransactions.objects.filter(transactionid = instance.id,transactiontype = 'P',account_id = inv_item.product.purchaseaccount.id).create(accounthead = inv_item.product.purchaseaccount.accounthead,account= inv_item.product.purchaseaccount,stock=inv_item.product,transactiontype = 'P',transactionid = inv_item.id,desc = 'Purchase By V.No',stockttype = 'P',purchasequantity = qty,drcr = 1,debitamount = inv_item.amount,cgstdr = inv_item.cgst,sgstdr= inv_item.sgst,igstdr = inv_item.igst,entrydate = instance.billdate,entity = instance.entity,createdby = instance.createdby)
+
+        return details
+
 
 
 
@@ -21,43 +170,30 @@ class salesOrderdetailsSerializer(serializers.ModelSerializer):
 
 class SalesOderHeaderSerializer(serializers.ModelSerializer):
     salesorderdetails = salesOrderdetailsSerializer(many=True)
-
     class Meta:
         model = SalesOderHeader
         fields = ('id','sorderdate','billno','accountid','latepaymentalert','grno','vehicle','taxtype','billcash','supply','shippedto','remarks','transport','broker','tds194q','tcs206c1ch1','tcs206c1ch2','tcs206c1ch3','tcs206C1','tcs206C2','duedate','subtotal','subtotal','cgst','sgst','igst','expenses','gtotal','entity','owner','salesorderdetails',)
 
 
-    def createtransaction(self,order):
-        id = order.id
-        subtotal = order.subtotal
-        cgst = order.cgst
-        sgst = order.sgst
-        igst = order.igst
-        gtotal = order.gtotal
-        pentity = order.entity
-        purchaseid = account.objects.get(entity =pentity,accountcode = 3000)
-        cgstid = account.objects.get(entity =pentity,accountcode = 6001)
-        sgstid = account.objects.get(entity =pentity,accountcode = 6002)
-        igstid = account.objects.get(entity =pentity,accountcode = 6003)
-        StockTransactions.objects.create(accounthead = cgstid.accounthead, account= cgstid,transactiontype = 'S',transactionid = id,desc = 'Sale By B.No ' + str(order.billno),drcr=0,creditamount=cgst,entity=pentity,createdby= order.owner)
-        StockTransactions.objects.create(accounthead = sgstid.accounthead,account= sgstid,transactiontype = 'S',transactionid = id,desc = 'Sale By B.No ' + str(order.billno),drcr=0,creditamount=sgst,entity=pentity,createdby= order.owner)
-        StockTransactions.objects.create(accounthead= order.accountid.accounthead,account= order.accountid,transactiontype = 'S',transactionid = id,desc = 'Sale By B.No ' + str(order.billno),drcr=1,debitamount=gtotal,entity=pentity,createdby= order.owner)
-        return id
+    
 
     def create(self, validated_data):
         #print(validated_data)
         salesOrderdetails_data = validated_data.pop('salesorderdetails')
         order = SalesOderHeader.objects.create(**validated_data)
+        stk = stocktransactionsale(order, transactiontype= 'S',debit=1,credit=0,description= 'Sale ')
         #print(tracks_data)
         for PurchaseOrderDetail_data in salesOrderdetails_data:
             detail = salesOrderdetails.objects.create(salesorderheader = order, **PurchaseOrderDetail_data)
-            if(detail.orderqty ==0.00):
-                qty = detail.pieces
-            else:
-                qty = detail.orderqty
-            StockTransactions.objects.create(accounthead = detail.product.saleaccount.accounthead,account= detail.product.saleaccount,stock=detail.product,transactiontype = 'S',transactionid = order.id,desc = 'Sale By B.No ' + str(order.billno),stockttype = 'S',salequantity = qty,drcr = 0,creditamount = detail.amount,cgstcr = detail.cgst,sgstcr= detail.sgst,igstcr = detail.igst,entrydate = order.sorderdate,entity = order.entity,createdby = order.owner)
+            stk.createtransactiondetails(detail=detail,stocktype='S')
 
-        self.createtransaction(order)
+            # if(detail.orderqty ==0.00):
+            #     qty = detail.pieces
+            # else:
+            #     qty = detail.orderqty
+            # StockTransactions.objects.create(accounthead = detail.product.saleaccount.accounthead,account= detail.product.saleaccount,stock=detail.product,transactiontype = 'S',transactionid = order.id,desc = 'Sale By B.No ' + str(order.billno),stockttype = 'S',salequantity = qty,drcr = 0,creditamount = detail.amount,cgstcr = detail.cgst,sgstcr= detail.sgst,igstcr = detail.igst,entrydate = order.sorderdate,entity = order.entity,createdby = order.owner)
+
+        stk.createtransaction()
         return order
 
     def update(self, instance, validated_data):
@@ -68,6 +204,8 @@ class SalesOderHeaderSerializer(serializers.ModelSerializer):
             except KeyError:  # validated_data may not contain all fields during HTTP PATCH
                 pass
         instance.save()
+        stk = stocktransactionsale(instance, transactiontype= 'S',debit=1,credit=0,description= 'Sale')
+        stk.updateransaction()
 
         items = validated_data.get('salesorderdetails')
 
@@ -93,8 +231,10 @@ class SalesOderHeaderSerializer(serializers.ModelSerializer):
                 inv_item.linetotal = item.get('linetotal', inv_item.linetotal)
                 inv_item.entity = item.get('entity', inv_item.entity)
                 inv_item.save()
+                stk.updatetranasationdetails(updateddetails= inv_item,stocktype='S')
             else:
-                salesOrderdetails.objects.create(salesorderheader=instance, **item)
+                detail = salesOrderdetails.objects.create(salesorderheader=instance, **item)
+                stk.createtransactiondetails(detail= detail,stocktype='S')
 
 
         if len(product_items_dict) > 0:
@@ -137,37 +277,19 @@ class PurchasereturnSerializer(serializers.ModelSerializer):
         fields = ('id','sorderdate','billno','accountid','latepaymentalert','grno','vehicle','taxtype','billcash','supply','shippedto','remarks','transport','broker','tds194q','tcs206c1ch1','tcs206c1ch2','tcs206c1ch3','tcs206C1','tcs206C2','duedate','subtotal','subtotal','cgst','sgst','igst','expenses','gtotal','entity','owner','purchasereturndetails',)
 
 
-    def createtransaction(self,order):
-        id = order.id
-        subtotal = order.subtotal
-        cgst = order.cgst
-        sgst = order.sgst
-        igst = order.igst
-        gtotal = order.gtotal
-        pentity = order.entity
-        purchaseid = account.objects.get(entity =pentity,accountcode = 3000)
-        cgstid = account.objects.get(entity =pentity,accountcode = 6001)
-        sgstid = account.objects.get(entity =pentity,accountcode = 6002)
-        igstid = account.objects.get(entity =pentity,accountcode = 6003)
-        StockTransactions.objects.create(accounthead = cgstid.accounthead, account= cgstid,transactiontype = 'PR',transactionid = id,desc = 'Purchase return By V.No ' + str(order.billno),drcr=0,creditamount=cgst,entity=pentity,createdby= order.owner)
-        StockTransactions.objects.create(accounthead = sgstid.accounthead,account= sgstid,transactiontype = 'PR',transactionid = id,desc = 'Purchase return By V.No ' + str(order.billno),drcr=0,creditamount=sgst,entity=pentity,createdby= order.owner)
-        StockTransactions.objects.create(accounthead= order.accountid.accounthead,account= order.accountid,transactiontype = 'PR',transactionid = id,desc = 'Purchase return By V.No ' + str(order.billno),drcr=1,debitamount=gtotal,entity=pentity,createdby= order.owner)
-        return id
-
     def create(self, validated_data):
         #print(validated_data)
         salesOrderdetails_data = validated_data.pop('purchasereturndetails')
         order = PurchaseReturn.objects.create(**validated_data)
+        stk = stocktransactionsale(order, transactiontype= 'SR',debit=1,credit=0,description= 'Purchase Return')
         #print(tracks_data)
         for PurchaseOrderDetail_data in salesOrderdetails_data:
             detail = Purchasereturndetails.objects.create(purchasereturn = order, **PurchaseOrderDetail_data)
-            if(detail.orderqty ==0.00):
-                qty = detail.pieces
-            else:
-                qty = detail.orderqty
-            StockTransactions.objects.create(accounthead = detail.product.saleaccount.accounthead,account= detail.product.saleaccount,stock=detail.product,transactiontype = 'PR',transactionid = order.id,desc = 'Purchase return By V.No ' + str(order.billno),stockttype = 'S',salequantity = qty,drcr = 0,creditamount = detail.amount,cgstcr = detail.cgst,sgstcr= detail.sgst,igstcr = detail.igst,entrydate = order.sorderdate,entity = order.entity,createdby = order.owner)
+            stk.createtransactiondetails(detail=detail,stocktype='PR')
 
-        self.createtransaction(order)
+            
+
+        stk.createtransaction()
         return order
 
     def update(self, instance, validated_data):
@@ -178,6 +300,8 @@ class PurchasereturnSerializer(serializers.ModelSerializer):
             except KeyError:  # validated_data may not contain all fields during HTTP PATCH
                 pass
         instance.save()
+        stk = stocktransactionsale(instance, transactiontype= 'PR',debit=1,credit=0,description= 'Purchase Return')
+        stk.updateransaction()
 
         items = validated_data.get('purchasereturndetails')
 
@@ -203,8 +327,10 @@ class PurchasereturnSerializer(serializers.ModelSerializer):
                 inv_item.linetotal = item.get('linetotal', inv_item.linetotal)
                 inv_item.entity = item.get('entity', inv_item.entity)
                 inv_item.save()
+                stk.updatetranasationdetails(updateddetails= inv_item,stocktype='PR')
             else:
-                Purchasereturndetails.objects.create(purchasereturn=instance, **item)
+                detail = Purchasereturndetails.objects.create(purchasereturn=instance, **item)
+                stk.createtransactiondetails(detail= detail,stocktype='PR')
 
 
         if len(product_items_dict) > 0:
@@ -254,11 +380,17 @@ class POSerializer(serializers.ModelSerializer):
 
 class PurchaseOrderDetailsSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
+    productname = serializers.SerializerMethodField()
+   # productdesc1 = serializers.SerializerMethodField()
     #entityUser = entityUserSerializer(many=True)
 
     class Meta:
         model = PurchaseOrderDetails
-        fields = ('id','product', 'purchasedesc','orderqty','pieces','rate','amount','cgst','sgst','igst','linetotal','entity',)
+        fields = ('id','product','productname','purchasedesc','orderqty','pieces','rate','amount','cgst','sgst','igst','linetotal','entity',)
+    
+    def get_productname(self,obj):
+        return obj.product.productname
+
 
 
 
@@ -267,70 +399,31 @@ class PurchaseOrderDetailsSerializer(serializers.ModelSerializer):
 
 class purchaseorderSerializer(serializers.ModelSerializer):
     purchaseorderdetails = PurchaseOrderDetailsSerializer(many=True)
+   # productname = serializers.SerializerMethodField()
 
     class Meta:
         model = purchaseorder
         fields = ('id','voucherdate','voucherno','account','billno','billdate','terms','taxtype','billcash','subtotal','cgst','sgst','igst','expenses','gtotal','entity','purchaseorderdetails',)
 
 
-    def createtransaction(self,order):
-        id = order.id
-        subtotal = order.subtotal
-        cgst = order.cgst
-        sgst = order.sgst
-        igst = order.igst
-        gtotal = order.gtotal
-        pentity = order.entity
-        purchaseid = account.objects.get(entity =pentity,accountcode = 1000)
-        cgstid = account.objects.get(entity =pentity,accountcode = 6001)
-        sgstid = account.objects.get(entity =pentity,accountcode = 6002)
-        igstid = account.objects.get(entity =pentity,accountcode = 6003)
-        #Transactions.objects.create(account= purchaseid,transactiontype = 'P',transactionid = id,desc = 'Purchase from',drcr=1,amount=subtotal,entity=pentity,createdby = order.createdby )
-        StockTransactions.objects.create(accounthead = cgstid.accounthead, account= cgstid,transactiontype = 'P',transactionid = id,desc = 'Purchase',drcr=1,debitamount=cgst,entity=pentity,createdby= order.createdby)
-        StockTransactions.objects.create(accounthead = sgstid.accounthead,account= sgstid,transactiontype = 'P',transactionid = id,desc = 'Purchase',drcr=1,debitamount=sgst,entity=pentity,createdby= order.createdby)
-        StockTransactions.objects.create(accounthead= order.account.accounthead,account= order.account,transactiontype = 'P',transactionid = id,desc = 'PurchaseBy',drcr=0,creditamount=gtotal,entity=pentity,createdby= order.createdby)
-        return id
+    
+    
 
 
     def create(self, validated_data):
        # print(validated_data)
         PurchaseOrderDetails_data = validated_data.pop('purchaseorderdetails')
         order = purchaseorder.objects.create(**validated_data)
-        pentity = order.entity
-
-        print(validated_data)
-
-
-
-
-
-
+        stk = stocktransaction(order, transactiontype= 'P',debit=1,credit=0,description= 'Purchase')
         #print(order.objects.get("id"))
         #print(tracks_data)
         for PurchaseOrderDetail_data in PurchaseOrderDetails_data:
-            print(PurchaseOrderDetails_data)
             detail = PurchaseOrderDetails.objects.create(purchaseorder = order, **PurchaseOrderDetail_data)
-            print(PurchaseOrderDetail_data)
-            print(detail.product.purchaseaccount)
-            print(detail.product)
-            if(detail.orderqty ==0.00):
-                qty = detail.pieces
-            else:
-                qty = detail.orderqty
+          
+            stk.createtransactiondetails(detail=detail,stocktype='P')
             
-            StockTransactions.objects.create(accounthead = detail.product.purchaseaccount.accounthead,account= detail.product.purchaseaccount,stock=detail.product,transactiontype = 'P',transactionid = order.id,desc = 'Purchase By V.No' + str(order.voucherno),stockttype = 'P',purchasequantity = qty,drcr = 1,debitamount = detail.amount,cgstdr = detail.cgst,sgstdr= detail.sgst,igstdr = detail.igst,entrydate = order.billdate,entity = order.entity,createdby = order.createdby)
-            
-            
-
-
-            
-
-
-
-
-          #  StockTransactions.objects.create(stock = detail.product,transactiontype = 'P',transactionid = detail.id,desc = 'Purchase By V.No' + str(order.voucherno),stocktransaction = 'P',quantity = qty,entrydate = order.billdate,entity = order.entity,createdby = order.createdby )
-
-        self.createtransaction(order)
+        
+        stk.createtransaction()
         return order
 
     def update(self, instance, validated_data):
@@ -340,105 +433,84 @@ class purchaseorderSerializer(serializers.ModelSerializer):
                 setattr(instance, field, validated_data[field])
             except KeyError:  # validated_data may not contain all fields during HTTP PATCH
                 pass
-        instance.save()
+        
 
-        items = validated_data.get('purchaseorderdetails')
+        # print(instance.id)
+        stk = stocktransaction(instance, transactiontype= 'P',debit=1,credit=0,description= 'updated')
+        stk.updateransaction()
+        
+        i = instance.save()
 
-        product_items_dict = dict((i.id, i) for i in instance.purchaseorderdetails.all())
-        print(product_items_dict)
+        PurchaseOrderDetails.objects.filter(purchaseorder=instance,entity = instance.entity).delete()
+       
+        PurchaseOrderDetails_data = validated_data.get('purchaseorderdetails')
 
-        for item in items:
-            item_id = item.get('id', None)
-            if item_id:
-
-                product_items_dict.pop(item_id)
-                inv_item = PurchaseOrderDetails.objects.get(id=item_id, purchaseorder=instance)
-                inv_item.product = item.get('product', inv_item.product)
-                inv_item.purchasedesc = item.get('purchasedesc', inv_item.purchasedesc)
-                inv_item.orderqty = item.get('orderqty', inv_item.orderqty)
-                inv_item.pieces = item.get('pieces', inv_item.pieces)
-                inv_item.rate = item.get('rate', inv_item.rate)
-                inv_item.amount = item.get('amount', inv_item.amount)
-                inv_item.cgst = item.get('cgst', inv_item.cgst)
-                inv_item.sgst = item.get('sgst', inv_item.sgst)
-                inv_item.igst = item.get('igst', inv_item.igst)
-                inv_item.linetotal = item.get('linetotal', inv_item.linetotal)
-                inv_item.entity = item.get('entity', inv_item.entity)
-                inv_item.save()
-            else:
-                PurchaseOrderDetails.objects.create(purchaseorder=instance, **item)
+        for PurchaseOrderDetail_data in PurchaseOrderDetails_data:
+            detail = PurchaseOrderDetails.objects.create(purchaseorder = instance, **PurchaseOrderDetail_data)
+            stk.createtransactiondetails(detail=detail,stocktype='P')
 
 
-        if len(product_items_dict) > 0:
-            for item in product_items_dict.values():
-                item.delete()
+
+
+        # product_items_dict = dict((i.id, i) for i in instance.purchaseorderdetails.all())
+        # #print(product_items_dict)
+
+        # for item in items:
+        #     item_id = item.get('id', None)
+        #     if item_id:
+
+        #         product_items_dict.pop(item_id)
+        #         inv_item = PurchaseOrderDetails.objects.get(id=item_id, purchaseorder=instance)
+        #         inv_item.product = item.get('product', inv_item.product)
+        #         inv_item.purchasedesc = item.get('purchasedesc', inv_item.purchasedesc)
+        #         inv_item.orderqty = item.get('orderqty', inv_item.orderqty)
+        #         inv_item.pieces = item.get('pieces', inv_item.pieces)
+        #         inv_item.rate = item.get('rate', inv_item.rate)
+        #         inv_item.amount = item.get('amount', inv_item.amount)
+        #         inv_item.cgst = item.get('cgst', inv_item.cgst)
+        #         inv_item.sgst = item.get('sgst', inv_item.sgst)
+        #         inv_item.igst = item.get('igst', inv_item.igst)
+        #         inv_item.linetotal = item.get('linetotal', inv_item.linetotal)
+        #         inv_item.entity = item.get('entity', inv_item.entity)
+        #         inv_item.save()
+        #         stk.updatetranasationdetails(updateddetails= inv_item,stocktype='P')
+
+
+                
+
+        #     else:
+        #         detail = PurchaseOrderDetails.objects.create(purchaseorder=instance, **item)
+        #         stk.createtransactiondetails(detail= detail,stocktype='P')
+
+
+        # if len(product_items_dict) > 0:
+        #     for item in product_items_dict.values():
+        #         item.delete()
         return instance
 
-    # def get_or_create_packages(self, packages):
-    #     package_ids = []
-    #     for package in packages:
-    #         package_instance, created = PurchaseOrderDetails.objects.get_or_create(pk=package.get('id'), defaults=package)
-    #         package_ids.append(package_instance.pk)
-    #     return package_ids
-
-    # def create_or_update_packages(self, packages):
-    #     package_ids = []
-    #     for package in packages:
-    #         package_id = package.get('id', None)
-    #         print(package_id)
-
-    #         package_instance, created = PurchaseOrderDetails.objects.update_or_create(pk=package.get('id'), defaults=package)
-    #         package_ids.append(package_instance.pk)
-    #     return package_ids
-
-    # def create(self, validated_data):
-    #     package = validated_data.pop('PurchaseOrderDetails', [])
-    #     order = purchaseorder.objects.create(**validated_data)
-    #     order.purchaseOrder.set(self.get_or_create_packages(package))
-    #     return order
-
-    # def update(self, instance, validated_data):
-    #     package = validated_data.pop('PurchaseOrderDetails', [])
-    #     instance.purchaseOrder.set(self.create_or_update_packages(package))
-        # fields = ['VoucherDate','VoucherNo','account','BillNo','BillDate','Terms','TaxType','BillCash','subtotal','Cgst','Sgst','Igst','Expenses','GTotal','entity']
-        # for field in fields:
-        #     try:
-        #         setattr(instance, field, validated_data[field])
-        #     except KeyError:  # validated_data may not contain all fields during HTTP PATCH
-        #         pass
-    #     print(list[instance])
-    #     instance.save()
-    #     return instance
 
 class journalSerializer(serializers.ModelSerializer):
-    #id = serializers.IntegerField(required=False)
-    #entityUser = entityUserSerializer(many=True)
-
+ 
     class Meta:
         model = journal
         fields = '__all__'
 
     def create(self, validated_data):
-
-        print(validated_data)
-
-        # print(validated_data.get('amount'))
-        # print('hello')
         order = journal.objects.create(**validated_data)
-
         if order.drcr == 0:
             creditamount = order.amount
             debitamount = 0
         else:
             debitamount = order.amount
             creditamount = 0
-
-
-
         StockTransactions.objects.create(accounthead= order.account.accounthead,account= order.account,transactiontype = order.vouchertype,transactionid = order.id,desc = 'Journal V.No' + str(order.voucherno),drcr=order.drcr,creditamount=creditamount,debitamount=debitamount,entity=order.entity,createdby= order.createdby)
-        #Transactions.objects.create(account= Jv.account,transactiontype = 'J',transactionid = Jv.id,desc = 'Journal',drcr=Jv.drcr,amount=Jv.amount,entity=Jv.entity,createdby= Jv.createdby)
-
         return order
+    
+    # def update(self,instance,validated_data):
+    #     instance.save()
+    #     StockTransactions.objects.filter(transactiontype = instance.vouchertype,account = instance.account,)
+
+    #     pass
 
 
 
@@ -757,43 +829,21 @@ class salesreturnSerializer(serializers.ModelSerializer):
         model = salereturn
         fields = ('id','voucherdate','voucherno','account','billno','billdate','terms','taxtype','billcash','subtotal','cgst','sgst','igst','expenses','gtotal','entity','salereturndetails',)
 
-    def createtransaction(self,order):
-        id = order.id
-        subtotal = order.subtotal
-        cgst = order.cgst
-        sgst = order.sgst
-        igst = order.igst
-        gtotal = order.gtotal
-        pentity = order.entity
-        purchaseid = account.objects.get(entity =pentity,accountcode = 1000)
-        cgstid = account.objects.get(entity =pentity,accountcode = 6001)
-        sgstid = account.objects.get(entity =pentity,accountcode = 6002)
-        igstid = account.objects.get(entity =pentity,accountcode = 6003)
-        #Transactions.objects.create(account= purchaseid,transactiontype = 'P',transactionid = id,desc = 'Purchase from',drcr=1,amount=subtotal,entity=pentity,createdby = order.createdby )
-        StockTransactions.objects.create(accounthead = cgstid.accounthead, account= cgstid,transactiontype = 'SR',transactionid = id,desc = 'Sale return By V.No' + str(order.voucherno),drcr=1,debitamount=cgst,entity=pentity,createdby= order.createdby)
-        StockTransactions.objects.create(accounthead = sgstid.accounthead,account= sgstid,transactiontype = 'SR',transactionid = id,desc = 'Sale return By V.No' + str(order.voucherno),drcr=1,debitamount=sgst,entity=pentity,createdby= order.createdby)
-        StockTransactions.objects.create(accounthead= order.account.accounthead,account= order.account,transactiontype = 'SR',transactionid = id,desc = 'Sale return By V.No' + str(order.voucherno),drcr=0,creditamount=gtotal,entity=pentity,createdby= order.createdby)
-        return id
-
+ 
     def create(self, validated_data):
         #print(validated_data)
         PurchaseOrderDetails_data = validated_data.pop('salereturndetails')
 
         print(validated_data.get('account'))
         order = salereturn.objects.create(**validated_data)
-        # pk = (salereturn.objects.last()).voucherno
-        # print(pk)
-        #print(order)
+        stk = stocktransaction(order, transactiontype= 'SR',debit=1,credit=0,description= 'Sale Return')
         for PurchaseOrderDetail_data in PurchaseOrderDetails_data:
-            #salereturnDetails.objects.create(salereturn = order, test = pk, **PurchaseOrderDetail_data)
+            
             detail = salereturnDetails.objects.create(salereturn = order,**PurchaseOrderDetail_data)
-            if(detail.orderqty ==0.00):
-                qty = detail.pieces
-            else:
-                qty = detail.orderqty
-            StockTransactions.objects.create(accounthead = detail.product.purchaseaccount.accounthead,account= detail.product.purchaseaccount,stock=detail.product,transactiontype = 'SR',transactionid = order.id,desc = 'Sale return By V.No' + str(order.voucherno),stockttype = 'P',purchasequantity = qty,drcr = 1,debitamount = detail.amount,cgstdr = detail.cgst,sgstdr= detail.sgst,igstdr = detail.igst,entrydate = order.billdate,entity = order.entity,createdby = order.createdby)
+            stk.createtransactiondetails(detail=detail,stocktype='SR')
+           
         
-        self.createtransaction(order)
+        stk.createtransaction()
         return order
 
     def update(self, instance, validated_data):
@@ -803,6 +853,9 @@ class salesreturnSerializer(serializers.ModelSerializer):
                 setattr(instance, field, validated_data[field])
             except KeyError:  # validated_data may not contain all fields during HTTP PATCH
                 pass
+        print(instance)
+        stk = stocktransaction(instance, transactiontype= 'P',debit=1,credit=0,description= 'updated')
+        stk.updateransaction()
         instance.save()
 
         items = validated_data.get('salereturndetails')
@@ -828,8 +881,10 @@ class salesreturnSerializer(serializers.ModelSerializer):
                 inv_item.linetotal = item.get('linetotal', inv_item.linetotal)
                 inv_item.entity = item.get('entity', inv_item.entity)
                 inv_item.save()
+                stk.updatetranasationdetails(updateddetails= inv_item,stocktype='P')
             else:
-                salereturnDetails.objects.create(salereturn=instance, **item)
+                detail = salereturnDetails.objects.create(salereturn=instance, **item)
+                stk.createtransactiondetails(detail= detail,stocktype='P')
 
 
         if len(product_items_dict) > 0:
@@ -837,42 +892,7 @@ class salesreturnSerializer(serializers.ModelSerializer):
                 item.delete()
         return instance
 
-    # def get_or_create_packages(self, packages):
-    #     package_ids = []
-    #     for package in packages:
-    #         package_instance, created = PurchaseOrderDetails.objects.get_or_create(pk=package.get('id'), defaults=package)
-    #         package_ids.append(package_instance.pk)
-    #     return package_ids
-
-    # def create_or_update_packages(self, packages):
-    #     package_ids = []
-    #     for package in packages:
-    #         package_id = package.get('id', None)
-    #         print(package_id)
-
-    #         package_instance, created = PurchaseOrderDetails.objects.update_or_create(pk=package.get('id'), defaults=package)
-    #         package_ids.append(package_instance.pk)
-    #     return package_ids
-
-    # def create(self, validated_data):
-    #     package = validated_data.pop('PurchaseOrderDetails', [])
-    #     order = purchaseorder.objects.create(**validated_data)
-    #     order.purchaseOrder.set(self.get_or_create_packages(package))
-    #     return order
-
-    # def update(self, instance, validated_data):
-    #     package = validated_data.pop('PurchaseOrderDetails', [])
-    #     instance.purchaseOrder.set(self.create_or_update_packages(package))
-        # fields = ['VoucherDate','VoucherNo','account','BillNo','BillDate','Terms','TaxType','BillCash','subtotal','Cgst','Sgst','Igst','Expenses','GTotal','entity']
-        # for field in fields:
-        #     try:
-        #         setattr(instance, field, validated_data[field])
-        #     except KeyError:  # validated_data may not contain all fields during HTTP PATCH
-        #         pass
-    #     print(list[instance])
-    #     instance.save()
-    #     return instance
-
+  
 
 
 
