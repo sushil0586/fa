@@ -357,7 +357,7 @@ class PurchaseOrderDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PurchaseOrderDetails
-        fields = ('id','product','productname','purchasedesc','orderqty','pieces','rate','amount','cgst','sgst','igst','linetotal','entity',)
+        fields = ('id','product','productname','productdesc','orderqty','pieces','rate','amount','cgst','sgst','igst','linetotal','entity',)
     
     def get_productname(self,obj):
         return obj.product.productname
@@ -750,7 +750,7 @@ class salesreturnDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = salereturnDetails
-        fields = ('id','product','productname','purchasedesc','orderqty','pieces','rate','amount','cgst','sgst','igst','linetotal','entity',)
+        fields = ('id','product','productname','productdesc','orderqty','pieces','rate','amount','cgst','sgst','igst','linetotal','entity',)
 
     def get_productname(self,obj):
         return obj.product.productname
