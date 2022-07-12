@@ -53,14 +53,20 @@ class stocktransaction:
         sgstid = account.objects.get(entity =pentity,accountcode = 6002)
         igstid = account.objects.get(entity =pentity,accountcode = 6003)
 
+        if self.transactiontype == 'P':
+            StockTransactions.objects.filter(entity = pentity,stockttype = 'P',transactionid= id).delete()
+        
+        if self.transactiontype == 'SR':
+            StockTransactions.objects.filter(entity = pentity,stockttype = 'SR',transactionid= id).delete()
+
         #print(self.order.id)
 
         #print(StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = 'P'))
-        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account = self.order.account).update(accounthead= self.order.account.accounthead,account= self.order.account,transactiontype = self.transactiontype,desc = self.description,drcr=self.credit,creditamount=gtotal,entity=pentity,createdby= self.order.createdby)
+        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account = self.order.account,entity = pentity).update(accounthead= self.order.account.accounthead,account= self.order.account,transactiontype = self.transactiontype,desc = self.description,drcr=self.credit,creditamount=gtotal,entity=pentity,createdby= self.order.createdby)
        # StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = 'P',account = self.order.account).update(accounthead= self.order.account.accounthead,account= self.order.account,transactiontype = self.transactiontype,desc = self.description,drcr=self.credit,creditamount=gtotal,entity=pentity,createdby= self.order.createdby)
         #Transactions.objects.create(account= purchaseid,transactiontype = 'P',transactionid = id,desc = 'Purchase from',drcr=1,amount=subtotal,entity=pentity,createdby = order.createdby )
-        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account_id = cgstid.id).update(accounthead = cgstid.accounthead, account= cgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description,drcr=self.debit,debitamount=cgst,entity=pentity,createdby= self.order.createdby)
-        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account_id = sgstid.id).update(accounthead = sgstid.accounthead,account= sgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description,drcr=self.debit,debitamount=sgst,entity=pentity,createdby= self.order.createdby)
+        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account_id = cgstid.id,entity = pentity).update(accounthead = cgstid.accounthead, account= cgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description,drcr=self.debit,debitamount=cgst,entity=pentity,createdby= self.order.createdby)
+        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account_id = sgstid.id,entity = pentity).update(accounthead = sgstid.accounthead,account= sgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description,drcr=self.debit,debitamount=sgst,entity=pentity,createdby= self.order.createdby)
         
         return id
 
@@ -123,13 +129,18 @@ class stocktransactionsale:
         igst = self.order.igst
         gtotal = self.order.gtotal
         pentity = self.order.entity
+        if self.transactiontype == 'S':
+            StockTransactions.objects.filter(entity = pentity,stockttype = 'S',transactionid= id).delete()
+        
+        if self.transactiontype == 'PR':
+            StockTransactions.objects.filter(entity = pentity,stockttype = 'PR',transactionid= id).delete()
         purchaseid = account.objects.get(entity =pentity,accountcode = 3000)
         cgstid = account.objects.get(entity =pentity,accountcode = 6001)
         sgstid = account.objects.get(entity =pentity,accountcode = 6002)
         igstid = account.objects.get(entity =pentity,accountcode = 6003)
-        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account_id = cgstid.id).create(accounthead = cgstid.accounthead, account= cgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.credit,creditamount=cgst,entity=self.order.entity,createdby= self.order.owner)
-        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account_id = sgstid.id).create(accounthead = sgstid.accounthead,account= sgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.credit,creditamount=sgst,entity=self.order.entity,createdby= self.order.owner)
-        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account = self.order.accountid).update(accounthead= self.order.accountid.accounthead,account= self.order.accountid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.debit,debitamount=gtotal,entity=self.order.entity,createdby= self.order.owner)
+        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account = cgstid,entity = pentity).update(accounthead = cgstid.accounthead, account= cgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.credit,creditamount=cgst,entity=self.order.entity,createdby= self.order.owner)
+        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account = sgstid,entity = pentity).update(accounthead = sgstid.accounthead,account= sgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.credit,creditamount=sgst,entity=self.order.entity,createdby= self.order.owner)
+        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account = self.order.accountid,entity = pentity).update(accounthead= self.order.accountid.accounthead,account= self.order.accountid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.debit,debitamount=gtotal,entity=self.order.entity,createdby= self.order.owner)
         
         return id
 
@@ -141,7 +152,7 @@ class stocktransactionsale:
         else:
                 qty = detail.orderqty
 
-        details = StockTransactions.objects.create(accounthead = detail.product.saleaccount.accounthead,account= detail.product.saleaccount,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,desc = self.description + ' ' + str(self.order.voucherno),stockttype = stocktype,purchasequantity = qty,drcr = self.debit,debitamount = detail.amount,cgstdr = detail.cgst,sgstdr= detail.sgst,igstdr = detail.igst,entrydate = self.order.billdate,entity = self.order.entity,createdby = self.order.createdby)
+        details = StockTransactions.objects.create(accounthead = detail.product.saleaccount.accounthead,account= detail.product.saleaccount,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,desc = self.description + ' ' + str(self.order.billno),stockttype = stocktype,purchasequantity = qty,drcr = self.debit,creditamount = detail.amount,cgstdr = detail.cgst,sgstdr= detail.sgst,igstdr = detail.igst,entrydate = self.order.sorderdate,entity = self.order.entity,createdby = self.order.owner)
 
         return details
 
@@ -162,10 +173,14 @@ class stocktransactionsale:
 class salesOrderdetailsSerializer(serializers.ModelSerializer):
     #entityUser = entityUserSerializer(many=True)
     id = serializers.IntegerField(required=False)
+    productname = serializers.SerializerMethodField()
 
     class Meta:
         model = salesOrderdetails
-        fields =  ('id','product','orderqty','pieces','rate','amount','cgst','sgst','igst','linetotal','entity',)
+        fields =  ('id','product','productname','productdesc','orderqty','pieces','rate','amount','cgst','sgst','igst','linetotal','entity',)
+
+    def get_productname(self,obj):
+        return obj.product.productname
 
 
 class SalesOderHeaderSerializer(serializers.ModelSerializer):
@@ -205,41 +220,16 @@ class SalesOderHeaderSerializer(serializers.ModelSerializer):
                 pass
         instance.save()
         stk = stocktransactionsale(instance, transactiontype= 'S',debit=1,credit=0,description= 'Sale')
+        salesOrderdetails.objects.filter(salesorderheader=instance,entity = instance.entity).delete()
         stk.updateransaction()
 
-        items = validated_data.get('salesorderdetails')
+        salesOrderdetails_data = validated_data.get('salesorderdetails')
 
-        product_items_dict = dict((i.id, i) for i in instance.salesorderdetails.all())
-        print(product_items_dict)
+        for PurchaseOrderDetail_data in salesOrderdetails_data:
+            detail = salesOrderdetails.objects.create(salesorderheader = instance, **PurchaseOrderDetail_data)
+            stk.createtransactiondetails(detail=detail,stocktype='S')
 
-        for item in items:
-            item_id = item.get('id', None)
-            if item_id:
-
-
-
-                product_items_dict.pop(item_id)
-                inv_item = salesOrderdetails.objects.get(id=item_id, salesorderheader=instance)
-                inv_item.product = item.get('product', inv_item.product)
-                inv_item.orderqty = item.get('orderqty', inv_item.orderqty)
-                inv_item.pieces = item.get('pieces', inv_item.pieces)
-                inv_item.rate = item.get('rate', inv_item.rate)
-                inv_item.amount = item.get('amount', inv_item.amount)
-                inv_item.cgst = item.get('cgst', inv_item.cgst)
-                inv_item.sgst = item.get('sgst', inv_item.sgst)
-                inv_item.igst = item.get('igst', inv_item.igst)
-                inv_item.linetotal = item.get('linetotal', inv_item.linetotal)
-                inv_item.entity = item.get('entity', inv_item.entity)
-                inv_item.save()
-                stk.updatetranasationdetails(updateddetails= inv_item,stocktype='S')
-            else:
-                detail = salesOrderdetails.objects.create(salesorderheader=instance, **item)
-                stk.createtransactiondetails(detail= detail,stocktype='S')
-
-
-        if len(product_items_dict) > 0:
-            for item in product_items_dict.values():
-                item.delete()
+        
         return instance
 
 class SOSerializer(serializers.ModelSerializer):
@@ -263,10 +253,14 @@ class SOSerializer(serializers.ModelSerializer):
 class purchasereturndetailsSerializer(serializers.ModelSerializer):
     #entityUser = entityUserSerializer(many=True)
     id = serializers.IntegerField(required=False)
+    productname = serializers.SerializerMethodField()
 
     class Meta:
         model = Purchasereturndetails
-        fields =  ('id','product','orderqty','pieces','rate','amount','cgst','sgst','igst','linetotal','entity',)
+        fields =  ('id','product','productname','productdesc','orderqty','pieces','rate','amount','cgst','sgst','igst','linetotal','entity',)
+
+    def get_productname(self,obj):
+        return obj.product.productname
 
 
 class PurchasereturnSerializer(serializers.ModelSerializer):
@@ -281,8 +275,9 @@ class PurchasereturnSerializer(serializers.ModelSerializer):
         #print(validated_data)
         salesOrderdetails_data = validated_data.pop('purchasereturndetails')
         order = PurchaseReturn.objects.create(**validated_data)
-        stk = stocktransactionsale(order, transactiontype= 'SR',debit=1,credit=0,description= 'Purchase Return')
+        stk = stocktransactionsale(order, transactiontype= 'PR',debit=1,credit=0,description= 'Purchase Return')
         #print(tracks_data)
+        
         for PurchaseOrderDetail_data in salesOrderdetails_data:
             detail = Purchasereturndetails.objects.create(purchasereturn = order, **PurchaseOrderDetail_data)
             stk.createtransactiondetails(detail=detail,stocktype='PR')
@@ -303,39 +298,15 @@ class PurchasereturnSerializer(serializers.ModelSerializer):
         stk = stocktransactionsale(instance, transactiontype= 'PR',debit=1,credit=0,description= 'Purchase Return')
         stk.updateransaction()
 
-        items = validated_data.get('purchasereturndetails')
+        Purchasereturndetails.objects.filter(purchasereturn=instance,entity = instance.entity).delete()
 
-        product_items_dict = dict((i.id, i) for i in instance.purchasereturndetails.all())
-        print(product_items_dict)
+        salesOrderdetails_data = validated_data.get('purchasereturndetails')
 
-        for item in items:
-            item_id = item.get('id', None)
-            if item_id:
+        for PurchaseOrderDetail_data in salesOrderdetails_data:
+            detail = Purchasereturndetails.objects.create(purchasereturn = instance, **PurchaseOrderDetail_data)
+            stk.createtransactiondetails(detail=detail,stocktype='PR')
 
-
-
-                product_items_dict.pop(item_id)
-                inv_item = Purchasereturndetails.objects.get(id=item_id, purchasereturn=instance)
-                inv_item.product = item.get('product', inv_item.product)
-                inv_item.orderqty = item.get('orderqty', inv_item.orderqty)
-                inv_item.pieces = item.get('pieces', inv_item.pieces)
-                inv_item.rate = item.get('rate', inv_item.rate)
-                inv_item.amount = item.get('amount', inv_item.amount)
-                inv_item.cgst = item.get('cgst', inv_item.cgst)
-                inv_item.sgst = item.get('sgst', inv_item.sgst)
-                inv_item.igst = item.get('igst', inv_item.igst)
-                inv_item.linetotal = item.get('linetotal', inv_item.linetotal)
-                inv_item.entity = item.get('entity', inv_item.entity)
-                inv_item.save()
-                stk.updatetranasationdetails(updateddetails= inv_item,stocktype='PR')
-            else:
-                detail = Purchasereturndetails.objects.create(purchasereturn=instance, **item)
-                stk.createtransactiondetails(detail= detail,stocktype='PR')
-
-
-        if len(product_items_dict) > 0:
-            for item in product_items_dict.values():
-                item.delete()
+        
         return instance
 
 class PRSerializer(serializers.ModelSerializer):
@@ -449,43 +420,6 @@ class purchaseorderSerializer(serializers.ModelSerializer):
             detail = PurchaseOrderDetails.objects.create(purchaseorder = instance, **PurchaseOrderDetail_data)
             stk.createtransactiondetails(detail=detail,stocktype='P')
 
-
-
-
-        # product_items_dict = dict((i.id, i) for i in instance.purchaseorderdetails.all())
-        # #print(product_items_dict)
-
-        # for item in items:
-        #     item_id = item.get('id', None)
-        #     if item_id:
-
-        #         product_items_dict.pop(item_id)
-        #         inv_item = PurchaseOrderDetails.objects.get(id=item_id, purchaseorder=instance)
-        #         inv_item.product = item.get('product', inv_item.product)
-        #         inv_item.purchasedesc = item.get('purchasedesc', inv_item.purchasedesc)
-        #         inv_item.orderqty = item.get('orderqty', inv_item.orderqty)
-        #         inv_item.pieces = item.get('pieces', inv_item.pieces)
-        #         inv_item.rate = item.get('rate', inv_item.rate)
-        #         inv_item.amount = item.get('amount', inv_item.amount)
-        #         inv_item.cgst = item.get('cgst', inv_item.cgst)
-        #         inv_item.sgst = item.get('sgst', inv_item.sgst)
-        #         inv_item.igst = item.get('igst', inv_item.igst)
-        #         inv_item.linetotal = item.get('linetotal', inv_item.linetotal)
-        #         inv_item.entity = item.get('entity', inv_item.entity)
-        #         inv_item.save()
-        #         stk.updatetranasationdetails(updateddetails= inv_item,stocktype='P')
-
-
-                
-
-        #     else:
-        #         detail = PurchaseOrderDetails.objects.create(purchaseorder=instance, **item)
-        #         stk.createtransactiondetails(detail= detail,stocktype='P')
-
-
-        # if len(product_items_dict) > 0:
-        #     for item in product_items_dict.values():
-        #         item.delete()
         return instance
 
 
@@ -587,15 +521,15 @@ class stocktranserilaizer(serializers.ModelSerializer):
 class cashserializer(serializers.ModelSerializer):
 
 
-    stk = stocktranserilaizer(many=True, read_only=True)
-    select_related_fields = ('accounthead')
+   # stk = stocktranserilaizer(many=True, read_only=True)
+   # select_related_fields = ('accounthead')
 
     # debit  = serializers.SerializerMethodField()
-    # credit = serializers.SerializerMethodField()
+   # day = serializers.CharField()
 
     class Meta:
-        model = accountHead
-        fields = ['name','stk']
+        model = StockTransactions
+        fields = ['entrydate']
 
     # def get_debit(self, obj):
     #     # fromDate = parse_datetime(self.context['request'].query_params.get(
@@ -811,13 +745,15 @@ class SRSerializer(serializers.ModelSerializer):
 
 class salesreturnDetailsSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
+    productname = serializers.SerializerMethodField()
     #entityUser = entityUserSerializer(many=True)
 
     class Meta:
         model = salereturnDetails
-        fields = ('id','product', 'purchasedesc','orderqty','pieces','rate','amount','cgst','sgst','igst','linetotal','entity',)
+        fields = ('id','product','productname','purchasedesc','orderqty','pieces','rate','amount','cgst','sgst','igst','linetotal','entity',)
 
-
+    def get_productname(self,obj):
+        return obj.product.productname
 
 
 
@@ -828,6 +764,9 @@ class salesreturnSerializer(serializers.ModelSerializer):
     class Meta:
         model = salereturn
         fields = ('id','voucherdate','voucherno','account','billno','billdate','terms','taxtype','billcash','subtotal','cgst','sgst','igst','expenses','gtotal','entity','salereturndetails',)
+
+    
+    
 
  
     def create(self, validated_data):
@@ -854,42 +793,20 @@ class salesreturnSerializer(serializers.ModelSerializer):
             except KeyError:  # validated_data may not contain all fields during HTTP PATCH
                 pass
         print(instance)
-        stk = stocktransaction(instance, transactiontype= 'P',debit=1,credit=0,description= 'updated')
+        stk = stocktransaction(instance, transactiontype= 'SR',debit=1,credit=0,description= 'updated')
         stk.updateransaction()
         instance.save()
+        salereturnDetails.objects.filter(salereturn=instance,entity = instance.entity).delete()
 
-        items = validated_data.get('salereturndetails')
+        PurchaseOrderDetails_data = validated_data.get('salereturndetails')
 
-        product_items_dict = dict((i.id, i) for i in instance.salereturndetails.all())
-        print(product_items_dict)
+        for PurchaseOrderDetail_data in PurchaseOrderDetails_data:
+            detail = salereturnDetails.objects.create(salereturn = instance,**PurchaseOrderDetail_data)
+            stk.createtransactiondetails(detail=detail,stocktype='SR')
 
-        for item in items:
-            item_id = item.get('id', None)
-            if item_id:
+        
 
-                product_items_dict.pop(item_id)
-                inv_item = salereturnDetails.objects.get(id=item_id, salereturn=instance)
-                inv_item.product = item.get('product', inv_item.product)
-                inv_item.purchasedesc = item.get('purchasedesc', inv_item.purchasedesc)
-                inv_item.orderqty = item.get('orderqty', inv_item.orderqty)
-                inv_item.pieces = item.get('pieces', inv_item.pieces)
-                inv_item.rate = item.get('rate', inv_item.rate)
-                inv_item.amount = item.get('amount', inv_item.amount)
-                inv_item.cgst = item.get('cgst', inv_item.cgst)
-                inv_item.sgst = item.get('sgst', inv_item.sgst)
-                inv_item.igst = item.get('igst', inv_item.igst)
-                inv_item.linetotal = item.get('linetotal', inv_item.linetotal)
-                inv_item.entity = item.get('entity', inv_item.entity)
-                inv_item.save()
-                stk.updatetranasationdetails(updateddetails= inv_item,stocktype='P')
-            else:
-                detail = salereturnDetails.objects.create(salereturn=instance, **item)
-                stk.createtransactiondetails(detail= detail,stocktype='P')
-
-
-        if len(product_items_dict) > 0:
-            for item in product_items_dict.values():
-                item.delete()
+        
         return instance
 
   

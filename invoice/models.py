@@ -52,6 +52,7 @@ class SalesOderHeader(TrackingModel):
 class salesOrderdetails(TrackingModel):
     salesorderheader = models.ForeignKey(to = SalesOderHeader,related_name='salesorderdetails', on_delete= models.CASCADE,verbose_name= 'Sale Order Number')
     product = models.ForeignKey(to = Product, on_delete= models.CASCADE,verbose_name= 'Product',null = True,default = 1)
+    productdesc = models.CharField(max_length=500, null=True,verbose_name='product Desc')
     orderqty =  models.DecimalField(max_digits=10, decimal_places=2,verbose_name= 'Order Qty')
     pieces =  models.IntegerField(verbose_name='pieces')
     rate =  models.DecimalField(max_digits=10, decimal_places=2,verbose_name= 'Rate')
@@ -109,6 +110,7 @@ class PurchaseReturn(TrackingModel):
 class Purchasereturndetails(TrackingModel):
     purchasereturn = models.ForeignKey(to = PurchaseReturn,related_name='purchasereturndetails', on_delete= models.CASCADE,verbose_name= 'Sale Order Number')
     product = models.ForeignKey(to = Product, on_delete= models.CASCADE,verbose_name= 'Product',null = True,default = 1)
+    productdesc = models.CharField(max_length=500, null=True,verbose_name='product Desc')
     orderqty =  models.DecimalField(max_digits=10, decimal_places=2,verbose_name= 'Order Qty')
     pieces =  models.IntegerField(verbose_name='pieces')
     rate =  models.DecimalField(max_digits=10, decimal_places=2,verbose_name= 'Rate')
