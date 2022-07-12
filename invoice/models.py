@@ -151,7 +151,7 @@ class purchaseorder(TrackingModel):
 class PurchaseOrderDetails(models.Model):
     purchaseorder = models.ForeignKey(to = purchaseorder,related_name='purchaseorderdetails', on_delete= models.CASCADE,verbose_name= 'Purchase Order Number')
     product = models.ForeignKey(to = Product, on_delete= models.CASCADE,verbose_name= 'Product',null = True,default = 1)
-    purchasedesc = models.CharField(max_length=500, null=True,verbose_name='Purchase Desc')
+    productdesc = models.CharField(max_length=500, null=True,verbose_name='Product Desc')
     orderqty =  models.DecimalField(max_digits=10, decimal_places=2,verbose_name= 'Order Qty')
     pieces =  models.IntegerField(verbose_name='pieces')
     rate =  models.DecimalField(max_digits=10, decimal_places=2,verbose_name= 'Rate')
@@ -188,7 +188,7 @@ class salereturn(TrackingModel):
 class salereturnDetails(models.Model):
     salereturn = models.ForeignKey(to = salereturn,related_name='salereturndetails', on_delete= models.CASCADE,verbose_name= 'Purchase Order Number')
     product = models.ForeignKey(to = Product, on_delete= models.CASCADE,verbose_name= 'Product',null = True,default = 1)
-    purchasedesc = models.CharField(max_length=500, null=True,verbose_name='Purchase Desc')
+    productdesc = models.CharField(max_length=500, null=True,verbose_name='Prduct Desc')
     orderqty =  models.DecimalField(max_digits=10, decimal_places=2,verbose_name= 'Order Qty')
     pieces =  models.IntegerField(verbose_name='pieces')
     rate =  models.DecimalField(max_digits=10, decimal_places=2,verbose_name= 'Rate')
