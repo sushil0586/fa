@@ -9,7 +9,7 @@ from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db import DatabaseError, transaction
 from rest_framework.response import Response
-from django.db.models import Sum
+from django.db.models import Sum,OuterRef,Subquery,F
 from django.db.models import Prefetch
 from financial.models import account
 
@@ -407,6 +407,10 @@ class cashviewaccount(ListAPIView):
         entity = self.request.query_params.get('entity')
 
         queryset1=StockTransactions.objects.filter(entity=entity).order_by('entity')
+
+        post_subquery = StockTransactions.objects.filter(entrydate=OuterRef('entrydate')).values('entrydate')
+
+        queryset1 = StockTransactions.objects.dates('entrydate','day').annotate(publish_day= F('entrydate'), posts=Subquery(post_subquery)).values('entrydate')
 
        # queryset=StockTransactions.objects.select_related(Prefetch('accounthead', queryset=queryset1,to_attr='cash_transactions'))
 
