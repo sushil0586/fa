@@ -202,7 +202,7 @@ class journalmainSerializer(serializers.ModelSerializer):
         #print(tracks_data)
         for journaldetail_data in journaldetails_data:
             detail = journaldetails.objects.create(Journalmain = order, **journaldetail_data)
-            StockTransactions.objects.create(accounthead= detail.account.accounthead,account= detail.account,transactiontype = order.vouchertype,transactionid = order.id,desc = 'Journal V.No' + str(order.voucherno),drcr=detail.drcr,creditamount=detail.creditamount,debitamount=detail.debitamount,entity=order.entity,createdby= order.createdby)
+            StockTransactions.objects.create(accounthead= detail.account.accounthead,account= detail.account,transactiontype = order.vouchertype,transactionid = order.id,desc = 'Journal V.No' + str(order.voucherno),drcr=detail.drcr,creditamount=detail.creditamount,debitamount=detail.debitamount,entity=order.entity,createdby= order.createdby,entrydate = order.entrydate)
            # stk.createtransactiondetails(detail=detail,stocktype='S')
 
             # if(detail.orderqty ==0.00):
@@ -231,7 +231,7 @@ class journalmainSerializer(serializers.ModelSerializer):
 
         for journaldetail_data in journaldetails_data:
             detail = journaldetails.objects.create(Journalmain = instance, **journaldetail_data)
-            StockTransactions.objects.create(accounthead= detail.account.accounthead,account= detail.account,transactiontype = instance.vouchertype,transactionid = instance.id,desc = 'Journal V.No' + str(instance.voucherno),drcr=detail.drcr,creditamount=detail.creditamount,debitamount=detail.debitamount,entity=instance.entity,createdby= instance.createdby)
+            StockTransactions.objects.create(accounthead= detail.account.accounthead,account= detail.account,transactiontype = instance.vouchertype,transactionid = instance.id,desc = 'Journal V.No' + str(instance.voucherno),drcr=detail.drcr,creditamount=detail.creditamount,debitamount=detail.debitamount,entity=instance.entity,createdby= instance.createdby,entrydate = instance.entrydate,entrydatetime = instance.entrydate)
             #stk.createtransactiondetails(detail=detail,stocktype='S')
 
         
