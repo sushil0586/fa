@@ -174,14 +174,14 @@ class stocktransactionsale:
 class journaldetailsSerializer(serializers.ModelSerializer):
     #entityUser = entityUserSerializer(many=True)
     id = serializers.IntegerField(required=False)
-   # productname = serializers.SerializerMethodField()
+    accountname = serializers.SerializerMethodField()
 
     class Meta:
         model = journaldetails
-        fields =  ('id','account','desc','drcr','debitamount','creditamount','entity',)
+        fields =  ('id','account','accountname','desc','drcr','debitamount','creditamount','entity',)
 
-    # def get_productname(self,obj):
-    #     return obj.product.productname
+    def get_accountname(self,obj):
+         return obj.account.accountname
 
 
 
