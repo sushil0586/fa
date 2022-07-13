@@ -35,6 +35,12 @@ urlpatterns  = [
     path('Trialview',views.Trialview.as_view(), name = 'Trialbalance'),
     path('trialviewaccount',views.Trialviewaccount.as_view(), name = 'Trialbalance'),
     path('cash',views.cashviewaccount.as_view(), name = 'Trialbalance'),
+    path('journalmain',views.journalmainApiView.as_view(), name = 'journal'),
+    path('journalmain/<int:id>',views.journalmainupdateapiview.as_view(), name = 'journal'),
+
+
+
+    
 
     
 
