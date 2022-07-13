@@ -186,7 +186,7 @@ class journalordelatestview(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     def get(self,request):
         entity = self.request.query_params.get('entity')
-        id = journal.objects.filter(entity= entity,vouchertype = 'J').last()
+        id = journalmain.objects.filter(entity= entity,vouchertype = 'J').last()
         serializer = JournalVSerializer(id)
         return Response(serializer.data)
 
@@ -199,7 +199,7 @@ class bankordelatestview(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     def get(self,request):
         entity = self.request.query_params.get('entity')
-        id = journal.objects.filter(entity= entity,vouchertype = 'B').last()
+        id = journalmain.objects.filter(entity= entity,vouchertype = 'B').last()
         serializer = JournalVSerializer(id)
         return Response(serializer.data)
 
@@ -212,7 +212,7 @@ class cashordelatestview(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     def get(self,request):
         entity = self.request.query_params.get('entity')
-        id = journal.objects.filter(entity= entity,vouchertype = 'C').last()
+        id = journalmain.objects.filter(entity= entity,vouchertype = 'C').last()
         serializer = JournalVSerializer(id)
         return Response(serializer.data)
 
