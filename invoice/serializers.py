@@ -5,7 +5,7 @@ from os import device_encoding
 from select import select
 from rest_framework import serializers
 from invoice.models import SalesOderHeader,salesOrderdetails,purchaseorder,PurchaseOrderDetails,\
-    journal,salereturn,salereturnDetails,Transactions,StockTransactions,PurchaseReturn,Purchasereturndetails
+    journal,salereturn,salereturnDetails,Transactions,StockTransactions,PurchaseReturn,Purchasereturndetails,journalmain,journaldetails
 from financial.models import account,accountHead
 from inventory.models import Product
 from django.db.models import Sum,Count
@@ -166,6 +166,80 @@ class stocktransactionsale:
         #details = StockTransactions.objects.filter(transactionid = instance.id,transactiontype = 'P',account_id = inv_item.product.purchaseaccount.id).create(accounthead = inv_item.product.purchaseaccount.accounthead,account= inv_item.product.purchaseaccount,stock=inv_item.product,transactiontype = 'P',transactionid = inv_item.id,desc = 'Purchase By V.No',stockttype = 'P',purchasequantity = qty,drcr = 1,debitamount = inv_item.amount,cgstdr = inv_item.cgst,sgstdr= inv_item.sgst,igstdr = inv_item.igst,entrydate = instance.billdate,entity = instance.entity,createdby = instance.createdby)
 
         return details
+
+
+
+
+
+class journaldetailsSerializer(serializers.ModelSerializer):
+    #entityUser = entityUserSerializer(many=True)
+    id = serializers.IntegerField(required=False)
+   # productname = serializers.SerializerMethodField()
+
+    class Meta:
+        model = journaldetails
+        fields =  ('id','account','desc','drcr','debitamount','creditamount','entity',)
+
+    # def get_productname(self,obj):
+    #     return obj.product.productname
+
+
+
+class journalmainSerializer(serializers.ModelSerializer):
+    journaldetails = journaldetailsSerializer(many=True)
+    class Meta:
+        model = journalmain
+        fields = ('id','voucherdate','voucherno','vouchertype','entrydate','entity','createdby','journaldetails',)
+
+
+    
+
+    def create(self, validated_data):
+        #print(validated_data)
+        journaldetails_data = validated_data.pop('journaldetails')
+        order = journalmain.objects.create(**validated_data)
+       # stk = stocktransactionsale(order, transactiontype= 'S',debit=1,credit=0,description= 'Sale ')
+        #print(tracks_data)
+        for journaldetail_data in journaldetails_data:
+            detail = journaldetails.objects.create(Journalmain = order, **journaldetail_data)
+            StockTransactions.objects.create(accounthead= detail.account.accounthead,account= detail.account,transactiontype = order.vouchertype,transactionid = order.id,desc = 'Journal V.No' + str(order.voucherno),drcr=detail.drcr,creditamount=detail.creditamount,debitamount=detail.debitamount,entity=order.entity,createdby= order.createdby)
+           # stk.createtransactiondetails(detail=detail,stocktype='S')
+
+            # if(detail.orderqty ==0.00):
+            #     qty = detail.pieces
+            # else:
+            #     qty = detail.orderqty
+            # StockTransactions.objects.create(accounthead = detail.product.saleaccount.accounthead,account= detail.product.saleaccount,stock=detail.product,transactiontype = 'S',transactionid = order.id,desc = 'Sale By B.No ' + str(order.billno),stockttype = 'S',salequantity = qty,drcr = 0,creditamount = detail.amount,cgstcr = detail.cgst,sgstcr= detail.sgst,igstcr = detail.igst,entrydate = order.sorderdate,entity = order.entity,createdby = order.owner)
+
+       # stk.createtransaction()
+        return order
+
+    def update(self, instance, validated_data):
+        fields = ['voucherdate','voucherno','vouchertype','entrydate','entity','createdby',]
+        for field in fields:
+            try:
+                setattr(instance, field, validated_data[field])
+            except KeyError:  # validated_data may not contain all fields during HTTP PATCH
+                pass
+        instance.save()
+       # stk = stocktransactionsale(instance, transactiontype= 'S',debit=1,credit=0,description= 'Sale')
+        journaldetails.objects.filter(Journalmain=instance,entity = instance.entity).delete()
+        StockTransactions.objects.filter(entity = instance.entity,transactiontype = instance.vouchertype,transactionid = instance.id).delete()
+     #   stk.updateransaction()
+
+        journaldetails_data = validated_data.get('journaldetails')
+
+        for journaldetail_data in journaldetails_data:
+            detail = journaldetails.objects.create(Journalmain = instance, **journaldetail_data)
+            StockTransactions.objects.create(accounthead= detail.account.accounthead,account= detail.account,transactiontype = instance.vouchertype,transactionid = instance.id,desc = 'Journal V.No' + str(instance.voucherno),drcr=detail.drcr,creditamount=detail.creditamount,debitamount=detail.debitamount,entity=instance.entity,createdby= instance.createdby)
+            #stk.createtransactiondetails(detail=detail,stocktype='S')
+
+        
+        return instance
+
+
+
+
 
 
 
@@ -687,17 +761,20 @@ class TrialbalanceSerializerbyaccount(serializers.ModelSerializer):
         model = StockTransactions
         fields = ['accountname','transactiontype','transactionid','debit','credit','entrydate','desc']
 
-        def to_representation(self, instance):
-            original_representation = super().to_representation(instance)
 
-            print(original_representation)
+        
 
-            representation = {
+        # def to_representation(self, instance):
+        #     original_representation = super().to_representation(instance)
+
+        #     print(original_representation)
+
+        #     representation = {
                 
-                'detail': original_representation,
-            }
+        #         'detail': original_representation,
+        #     }
 
-            return representation
+        #     return representation
 
 
 

@@ -203,6 +203,39 @@ class salereturnDetails(models.Model):
 
 
 
+
+class journalmain(TrackingModel):
+    voucherdate = models.DateField(verbose_name='Vocucher Date',auto_now_add=True)
+    voucherno = models.IntegerField(verbose_name='Voucher No')
+    vouchertype = models.CharField(max_length=50, null=True,verbose_name='Voucher Type',default='J')
+    entrydate = models.DateField(verbose_name='Entry Date',auto_now_add=True)
+    entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity')
+    createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
+
+    def __str__(self):
+        return f'{self.voucherno} '
+
+
+
+class journaldetails(TrackingModel):
+    Journalmain = models.ForeignKey(to = journalmain,related_name='journaldetails', on_delete= models.CASCADE,null=True,blank=True,verbose_name='Journal Main')
+    account = models.ForeignKey(to = account, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Account Name')
+    desc = models.CharField(max_length=500, null=True,verbose_name='Description')
+    drcr = models.BooleanField(verbose_name='Debit/Credit')
+    debitamount =  models.DecimalField(max_digits=10, decimal_places=2,verbose_name= 'Debit Amount',null=True)
+    creditamount =  models.DecimalField(max_digits=10, decimal_places=2,verbose_name= 'Credit Amount',null=True)
+    entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity')
+    createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
+
+
+
+
+
+
+
+
+
+
 class journal(TrackingModel):
     voucherdate = models.DateField(verbose_name='Vocucher Date',auto_now_add=True)
     voucherno = models.IntegerField(verbose_name='Voucher No')
