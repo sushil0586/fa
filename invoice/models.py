@@ -1,6 +1,7 @@
 import imp
 from sre_parse import Verbose
 from django.db import models
+from django.forms import DateField
 from helpers.models import TrackingModel
 from Authentication.models import User
 from financial.models import account,accountHead
@@ -208,6 +209,7 @@ class journalmain(TrackingModel):
     voucherdate = models.DateField(verbose_name='Vocucher Date',auto_now_add=True)
     voucherno = models.IntegerField(verbose_name='Voucher No')
     vouchertype = models.CharField(max_length=50, null=True,verbose_name='Voucher Type',default='J')
+    mainaccountid = models.IntegerField(verbose_name='Main account Id',null=True)
     entrydate = models.DateTimeField(verbose_name='Entry Date')
     entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity')
     createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
@@ -268,6 +270,10 @@ class Transactions(TrackingModel):
     entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity')
     createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
 
+class entry(TrackingModel):
+    entrydate1 = models.DateField()
+
+
 class StockTransactions(TrackingModel):
     accounthead = models.ForeignKey(to = accountHead, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Account Head',related_name='headtrans')
     account = models.ForeignKey(to = account, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Account Name',related_name='accounttrans')
@@ -289,6 +295,7 @@ class StockTransactions(TrackingModel):
     cgstcr =  models.DecimalField(max_digits=10,null = True, decimal_places=2,verbose_name= 'CGST Credit')
     sgstcr =  models.DecimalField(max_digits=10,null = True,decimal_places=2,verbose_name= 'SGST Credit')
     igstcr =  models.DecimalField(max_digits=10, null = True,decimal_places=2,verbose_name= 'IGST Credit')
+    entry = models.ForeignKey(entry,null=True,on_delete=models.CASCADE)
     entrydate = models.DateField(verbose_name='Entry Date',null=True)
     entrydatetime = models.DateTimeField(verbose_name='Entry Date', null=True)
     entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity')
