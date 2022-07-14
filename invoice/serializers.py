@@ -5,7 +5,7 @@ from os import device_encoding
 from select import select
 from rest_framework import serializers
 from invoice.models import SalesOderHeader,salesOrderdetails,purchaseorder,PurchaseOrderDetails,\
-    journal,salereturn,salereturnDetails,Transactions,StockTransactions,PurchaseReturn,Purchasereturndetails,journalmain,journaldetails
+    journal,salereturn,salereturnDetails,Transactions,StockTransactions,PurchaseReturn,Purchasereturndetails,journalmain,journaldetails,entry
 from financial.models import account,accountHead
 from inventory.models import Product
 from django.db.models import Sum,Count
@@ -189,7 +189,7 @@ class journalmainSerializer(serializers.ModelSerializer):
     journaldetails = journaldetailsSerializer(many=True)
     class Meta:
         model = journalmain
-        fields = ('id','voucherdate','voucherno','vouchertype','entrydate','entity','createdby','journaldetails',)
+        fields = ('id','voucherdate','voucherno','vouchertype','mainaccountid','entrydate','entity','createdby','journaldetails',)
 
 
     
@@ -202,7 +202,8 @@ class journalmainSerializer(serializers.ModelSerializer):
         #print(tracks_data)
         for journaldetail_data in journaldetails_data:
             detail = journaldetails.objects.create(Journalmain = order, **journaldetail_data)
-            StockTransactions.objects.create(accounthead= detail.account.accounthead,account= detail.account,transactiontype = order.vouchertype,transactionid = order.id,desc = 'Journal V.No' + str(order.voucherno),drcr=detail.drcr,creditamount=detail.creditamount,debitamount=detail.debitamount,entity=order.entity,createdby= order.createdby,entrydate = order.entrydate)
+            id,created  = entry.objects.get_or_create(entrydate1 = order.entrydate)
+            StockTransactions.objects.create(accounthead= detail.account.accounthead,account= detail.account,transactiontype = order.vouchertype,transactionid = order.id,desc = 'Journal V.No' + str(order.voucherno),drcr=detail.drcr,creditamount=detail.creditamount,debitamount=detail.debitamount,entity=order.entity,createdby= order.createdby,entrydate = order.entrydate,entry =id)
            # stk.createtransactiondetails(detail=detail,stocktype='S')
 
             # if(detail.orderqty ==0.00):
@@ -215,7 +216,7 @@ class journalmainSerializer(serializers.ModelSerializer):
         return order
 
     def update(self, instance, validated_data):
-        fields = ['voucherdate','voucherno','vouchertype','entrydate','entity','createdby',]
+        fields = ['voucherdate','voucherno','vouchertype','mainaccountid','entrydate','entity','createdby',]
         for field in fields:
             try:
                 setattr(instance, field, validated_data[field])
