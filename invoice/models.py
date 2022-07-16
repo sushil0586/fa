@@ -231,6 +231,30 @@ class journaldetails(TrackingModel):
 
 
 
+class stockmain(TrackingModel):
+    voucherdate = models.DateField(verbose_name='Vocucher Date',auto_now_add=True)
+    voucherno = models.IntegerField(verbose_name='Voucher No')
+    vouchertype = models.CharField(max_length=50, null=True,verbose_name='Voucher Type',default='PC')
+    entrydate = models.DateTimeField(verbose_name='Entry Date')
+    entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity')
+    createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
+
+    def __str__(self):
+        return f'{self.voucherno} '
+
+
+
+class stockdetails(TrackingModel):
+    stockmain = models.ForeignKey(to = stockmain,related_name='stockdetails', on_delete= models.CASCADE,null=True,blank=True,verbose_name='Journal Main')
+    stock = models.ForeignKey(to = Product, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Product Name')
+    desc = models.CharField(max_length=500, null=True,verbose_name='Description')
+    issuereceived = models.BooleanField(verbose_name='Issue/Receipt')
+    issuedquantity =  models.DecimalField(max_digits=10,null = True, decimal_places=2,verbose_name= 'Issued quantity')
+    recivedquantity =  models.DecimalField(max_digits=10,null = True, decimal_places=2,verbose_name= 'Received quantity')
+    entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity')
+    createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
+
+
 
 
 
@@ -295,11 +319,32 @@ class StockTransactions(TrackingModel):
     cgstcr =  models.DecimalField(max_digits=10,null = True, decimal_places=2,verbose_name= 'CGST Credit')
     sgstcr =  models.DecimalField(max_digits=10,null = True,decimal_places=2,verbose_name= 'SGST Credit')
     igstcr =  models.DecimalField(max_digits=10, null = True,decimal_places=2,verbose_name= 'IGST Credit')
-    entry = models.ForeignKey(entry,null=True,on_delete=models.CASCADE)
+    entry = models.ForeignKey(entry,null=True,on_delete=models.CASCADE,related_name='cashtrans')
     entrydate = models.DateField(verbose_name='Entry Date',null=True)
     entrydatetime = models.DateTimeField(verbose_name='Entry Date', null=True)
     entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity')
     createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
+
+
+
+class goodstransaction(TrackingModel):
+    account = models.ForeignKey(to = account, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Account Name',related_name='Goodaccount')
+    stock = models.ForeignKey(to = Product, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Product Name')
+    transactiontype = models.CharField(max_length=50, null=True,verbose_name='TransactionType')
+    transactionid = models.IntegerField(verbose_name='Transaction id')
+    desc = models.CharField(max_length=500, null=True,verbose_name='Description')
+    stockttype = models.CharField(verbose_name='Stock Transaction',max_length=10,null=True)
+    salequantity =  models.DecimalField(max_digits=10,null = True, decimal_places=2,verbose_name= 'Sale quantity')
+    purchasequantity =  models.DecimalField(max_digits=10,null = True, decimal_places=2,verbose_name= 'Purchase quantity')
+    issuedquantity =  models.DecimalField(max_digits=10,null = True, decimal_places=2,verbose_name= 'Issued quantity')
+    recivedquantity =  models.DecimalField(max_digits=10,null = True, decimal_places=2,verbose_name= 'Received quantity')
+    entry = models.ForeignKey(entry,null=True,on_delete=models.CASCADE,related_name='gooddatetrans')
+    entrydate = models.DateField(verbose_name='Entry Date',null=True)
+    entrydatetime = models.DateTimeField(verbose_name='Entry Date', null=True)
+    entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity')
+    createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
+
+
 
 
     

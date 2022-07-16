@@ -1,10 +1,10 @@
 from django.http import request
 from django.shortcuts import render
 
-from rest_framework.generics import CreateAPIView,ListAPIView,ListCreateAPIView,RetrieveUpdateDestroyAPIView,GenericAPIView
-from invoice.models import salesOrderdetails,SalesOderHeader,purchaseorder,PurchaseOrderDetails,journal,salereturn,salereturnDetails,PurchaseReturn,Purchasereturndetails,StockTransactions,journalmain
+from rest_framework.generics import CreateAPIView,ListAPIView,ListCreateAPIView,RetrieveUpdateDestroyAPIView,GenericAPIView,RetrieveAPIView
+from invoice.models import salesOrderdetails,SalesOderHeader,purchaseorder,PurchaseOrderDetails,journal,salereturn,salereturnDetails,PurchaseReturn,Purchasereturndetails,StockTransactions,journalmain,entry,stockdetails,stockmain
 from invoice.serializers import SalesOderHeaderSerializer,salesOrderdetailsSerializer,purchaseorderSerializer,PurchaseOrderDetailsSerializer,POSerializer,SOSerializer,journalSerializer,SRSerializer,salesreturnSerializer,salesreturnDetailsSerializer,JournalVSerializer,PurchasereturnSerializer,\
-purchasereturndetailsSerializer,PRSerializer,TrialbalanceSerializer,TrialbalanceSerializerbyaccounthead,TrialbalanceSerializerbyaccount,accountheadserializer,accountHead,accountserializer,accounthserializer, stocktranserilaizer,cashserializer,journalmainSerializer
+purchasereturndetailsSerializer,PRSerializer,TrialbalanceSerializer,TrialbalanceSerializerbyaccounthead,TrialbalanceSerializerbyaccount,accountheadserializer,accountHead,accountserializer,accounthserializer, stocktranserilaizer,cashserializer,journalmainSerializer,stockdetailsSerializer,stockmainSerializer
 from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db import DatabaseError, transaction
@@ -56,6 +56,19 @@ class salesOrderupdatedelview(RetrieveUpdateDestroyAPIView):
         return SalesOderHeader.objects.filter(entity = entity)
 
 
+class salesOrderpreviousview(RetrieveAPIView):
+
+    serializer_class = SalesOderHeaderSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+    lookup_field = "billno"
+
+    def get_queryset(self):
+        entity = self.request.query_params.get('entity')
+        #billno = self.request.query_params.get('billno')
+        return SalesOderHeader.objects.filter(entity = entity)
+
+
+
 class salesorderlatestview(ListCreateAPIView):
 
     serializer_class = SOSerializer
@@ -98,6 +111,18 @@ class PurchaseReturnupdatedelview(RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         entity = self.request.query_params.get('entity')
+        return PurchaseReturn.objects.filter(entity = entity)
+
+
+class PurchaseReturnpreviousview(RetrieveAPIView):
+
+    serializer_class = PurchasereturnSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+    lookup_field = "billno"
+
+    def get_queryset(self):
+        entity = self.request.query_params.get('entity')
+        #billno = self.request.query_params.get('billno')
         return PurchaseReturn.objects.filter(entity = entity)
 
 class PurchaseReturnlatestview(ListCreateAPIView):
@@ -161,6 +186,17 @@ class purchaseorderupdatedelview(RetrieveUpdateDestroyAPIView):
     serializer_class = purchaseorderSerializer
     permission_classes = (permissions.IsAuthenticated,)
     lookup_field = "id"
+
+    def get_queryset(self):
+        entity = self.request.query_params.get('entity')
+        return purchaseorder.objects.filter()
+
+
+class purchaseorderpreviousview(RetrieveUpdateDestroyAPIView):
+
+    serializer_class = purchaseorderSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+    lookup_field = "voucherno"
 
     def get_queryset(self):
         entity = self.request.query_params.get('entity')
@@ -267,6 +303,51 @@ class journalmainupdateapiview(RetrieveUpdateDestroyAPIView):
 
 
 
+class stockmainApiView(ListCreateAPIView):
+
+    serializer_class = stockmainSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    filter_backends = [DjangoFilterBackend]
+    #filterset_fields = ['id','unitType','entityName']
+
+    @transaction.atomic
+    def perform_create(self, serializer):
+        return serializer.save(createdby = self.request.user)
+    
+    def get_queryset(self):
+        entity = self.request.query_params.get('entity')
+        return stockmain.objects.filter(entity = entity)
+
+
+
+class stockmainupdateapiview(RetrieveUpdateDestroyAPIView):
+
+    serializer_class = stockmainSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+    lookup_field = "id"
+
+    def get_queryset(self):
+        entity = self.request.query_params.get('entity')
+        return stockmain.objects.filter(entity = entity)
+
+
+
+class journalmainpreviousapiview(RetrieveUpdateDestroyAPIView):
+
+    serializer_class = journalmainSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+    lookup_field = "voucherno"
+
+    def get_queryset(self):
+        entity = self.request.query_params.get('entity')
+        vouchertype = self.request.query_params.get('vouchertype')
+        return journalmain.objects.filter(entity = entity,vouchertype=vouchertype)
+
+
+
+
+
 class salesreturnlatestview(ListCreateAPIView):
 
     serializer_class = SRSerializer
@@ -285,6 +366,17 @@ class salesreturnupdatedelview(RetrieveUpdateDestroyAPIView):
     serializer_class = salesreturnSerializer
     permission_classes = (permissions.IsAuthenticated,)
     lookup_field = "id"
+
+    def get_queryset(self):
+        entity = self.request.query_params.get('entity')
+        return salereturn.objects.filter()
+
+
+class salesreturnpreviousview(RetrieveUpdateDestroyAPIView):
+
+    serializer_class = salesreturnSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+    lookup_field = "voucherno"
 
     def get_queryset(self):
         entity = self.request.query_params.get('entity')
@@ -369,7 +461,7 @@ class TrialbalancebyaccountApiView(ListAPIView):
         #entity = self.request.query_params.get('entity')
         entity = self.request.query_params.get('entity')
         account = self.request.query_params.get('account')
-        stk =StockTransactions.objects.filter(entity = entity,account = account).values('account__accountname','transactiontype','transactionid','entrydate','desc').annotate(debit = Sum('debitamount'),credit = Sum('creditamount') )
+        stk =StockTransactions.objects.filter(entity = entity,account = account).values('account__accountname','transactiontype','transactionid','entrydatetime','desc').annotate(debit = Sum('debitamount'),credit = Sum('creditamount') )
         #print(stk)
         return stk
 
@@ -411,7 +503,7 @@ class Trialviewaccount(ListAPIView):
         #account = self.request.query_params.get('account')
         entity = self.request.query_params.get('entity')
 
-        queryset1=StockTransactions.objects.filter(entity=entity).order_by('entity').only('account__accountname','transactiontype','transactionid','entrydate','desc','debitamount','creditamount')
+        queryset1=StockTransactions.objects.filter(entity=entity).order_by('entity').only('account__accountname','transactiontype','transactionid','entrydatetime','desc','debitamount','creditamount')
 
         queryset=account.objects.prefetch_related(Prefetch('accounttrans', queryset=queryset1,to_attr='account_transactions'))
 
@@ -436,11 +528,17 @@ class cashviewaccount(ListAPIView):
         #account = self.request.query_params.get('account')
         entity = self.request.query_params.get('entity')
 
-        queryset1=StockTransactions.objects.filter(entity=entity).order_by('entity')
 
-        post_subquery = StockTransactions.objects.filter(entrydate=OuterRef('entrydate')).values('entrydate')
 
-        queryset1 = StockTransactions.objects.dates('entrydate','day').annotate(publish_day= F('entrydate'), posts=Subquery(post_subquery)).values('entrydate')
+        queryset1=StockTransactions.objects.filter(entity=entity).order_by('entity').only('account__accountname','transactiontype','transactionid','entrydatetime','desc','debitamount','creditamount')
+
+        queryset=entry.objects.prefetch_related(Prefetch('cashtrans', queryset=queryset1,to_attr='account_transactions'))
+
+       # queryset1=StockTransactions.objects.filter(entity=entity).order_by('entity')
+
+        #post_subquery = StockTransactions.objects.filter(entrydate=OuterRef('entrydate')).values('entrydate')
+
+      #  queryset1 = StockTransactions.objects.dates('entrydate','day').annotate(publish_day= F('entrydate'), posts=Subquery(post_subquery)).values('entrydate')
 
        # queryset=StockTransactions.objects.select_related(Prefetch('accounthead', queryset=queryset1,to_attr='cash_transactions'))
 
@@ -448,5 +546,5 @@ class cashviewaccount(ListAPIView):
         #stk = account.objects.prefetch_related(Prefetch('accounthead_accounts', queryset=queryset1, to_attr='account_transactions')
         
      
-        return queryset1
+        return queryset
 

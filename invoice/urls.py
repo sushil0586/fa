@@ -37,6 +37,22 @@ urlpatterns  = [
     path('cash',views.cashviewaccount.as_view(), name = 'Trialbalance'),
     path('journalmain',views.journalmainApiView.as_view(), name = 'journal'),
     path('journalmain/<int:id>',views.journalmainupdateapiview.as_view(), name = 'journal'),
+    path('salesOrderbno/<int:billno>',views.salesOrderpreviousview.as_view(), name = 'journal'),
+    path('purchasereturnbno/<int:billno>',views.PurchaseReturnpreviousview.as_view(), name = 'journal'),
+    path('purchaseordervno/<int:voucherno>',views.purchaseorderpreviousview.as_view(), name = 'journal'),
+    path('journalmainvno/<int:voucherno>',views.journalmainpreviousapiview.as_view(), name = 'journal'),
+    path('salesreturnvno/<int:voucherno>',views.salesreturnpreviousview.as_view(), name = 'journal'),
+
+
+    
+
+
+    
+
+    
+
+
+    
 
 
 
