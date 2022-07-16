@@ -57,9 +57,11 @@ class stocktransaction:
 
         if self.transactiontype == 'P':
             StockTransactions.objects.filter(entity = pentity,stockttype = 'P',transactionid= id).delete()
+            goodstransaction.objects.filter(entity = pentity,stockttype = 'P',transactionid= id).delete()
         
         if self.transactiontype == 'SR':
             StockTransactions.objects.filter(entity = pentity,stockttype = 'SR',transactionid= id).delete()
+            goodstransaction.objects.filter(entity = pentity,stockttype = 'SR',transactionid= id).delete()
 
         #print(self.order.id)
 
@@ -83,7 +85,7 @@ class stocktransaction:
         entryid,created  = entry.objects.get_or_create(entrydate1 = self.order.billdate)
 
         details = StockTransactions.objects.create(accounthead = detail.product.purchaseaccount.accounthead,account= detail.product.purchaseaccount,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,desc = 'Purchase By V.No' + str(self.order.voucherno),stockttype = stocktype,purchasequantity = qty,drcr = self.debit,debitamount = detail.amount,cgstdr = detail.cgst,sgstdr= detail.sgst,igstdr = detail.igst,entrydate = self.order.billdate,entity = self.order.entity,createdby = self.order.createdby,entry = entryid,entrydatetime = self.order.billdate)
-        goodstransaction.objects.create(account= detail.product.purchaseaccount,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,stockttype = stocktype,purchasequantity = qty,entrydatetime = self.order.billdate,entity = self.order.entity,createdby = self.order.owner,entry = entryid)
+        goodstransaction.objects.create(account= detail.product.purchaseaccount,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,stockttype = stocktype,purchasequantity = qty,entrydatetime = self.order.billdate,entity = self.order.entity,createdby = self.order.createdby,entry = entryid)
 
 
         return details
@@ -138,9 +140,11 @@ class stocktransactionsale:
         pentity = self.order.entity
         if self.transactiontype == 'S':
             StockTransactions.objects.filter(entity = pentity,stockttype = 'S',transactionid= id).delete()
+            goodstransaction.objects.filter(entity = pentity,stockttype = 'S',transactionid= id).delete()
         
         if self.transactiontype == 'PR':
             StockTransactions.objects.filter(entity = pentity,stockttype = 'PR',transactionid= id).delete()
+            goodstransaction.objects.filter(entity = pentity,stockttype = 'PR',transactionid= id).delete()
         purchaseid = account.objects.get(entity =pentity,accountcode = 3000)
         cgstid = account.objects.get(entity =pentity,accountcode = 6001)
         sgstid = account.objects.get(entity =pentity,accountcode = 6002)
@@ -255,10 +259,10 @@ class stockdetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = stockdetails
-        fields =  ('id','stock','productname','desc','issuereceived','issuedquantity','Recivedquantity','entity',)
+        fields =  ('id','stock','productname','desc','issuereceived','issuedquantity','recivedquantity','entity',)
 
     def get_productname(self,obj):
-         return obj.productname.productname
+         return obj.stock.productname
 
 
 
