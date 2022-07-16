@@ -42,6 +42,8 @@ urlpatterns  = [
     path('purchaseordervno/<int:voucherno>',views.purchaseorderpreviousview.as_view(), name = 'journal'),
     path('journalmainvno/<int:voucherno>',views.journalmainpreviousapiview.as_view(), name = 'journal'),
     path('salesreturnvno/<int:voucherno>',views.salesreturnpreviousview.as_view(), name = 'journal'),
+    path('stockmain',views.stockmainApiView.as_view(), name = 'journal'),
+    path('stockmain/<int:id>',views.stockmainupdateapiview.as_view(), name = 'journal'),
 
 
     
