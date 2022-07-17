@@ -329,7 +329,7 @@ class StockTransactions(TrackingModel):
 
 class goodstransaction(TrackingModel):
     account = models.ForeignKey(to = account, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Account Name',related_name='Goodaccount')
-    stock = models.ForeignKey(to = Product, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Product Name')
+    stock = models.ForeignKey(to = Product, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Product Name', related_name='goods')
     transactiontype = models.CharField(max_length=50, null=True,verbose_name='TransactionType')
     transactionid = models.IntegerField(verbose_name='Transaction id')
     desc = models.CharField(max_length=500, null=True,verbose_name='Description')
