@@ -410,6 +410,25 @@ class SOSerializer(serializers.ModelSerializer):
         fields =  ['newbillno']
 
 
+
+class PRSerializer(serializers.ModelSerializer):
+    #entityUser = entityUserSerializer(many=True)
+  #  id = serializers.IntegerField(required=False)
+
+    newbillno = serializers.SerializerMethodField()
+
+    def get_newbillno(self, obj):
+        if not obj.billno :
+            return 1
+        else:
+            return obj.billno + 1
+
+
+    class Meta:
+        model = PurchaseReturn
+        fields =  ['newbillno']
+
+
 class purchasereturndetailsSerializer(serializers.ModelSerializer):
     #entityUser = entityUserSerializer(many=True)
     id = serializers.IntegerField(required=False)
@@ -504,6 +523,25 @@ class POSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = purchaseorder
+        fields =  ['newvoucher']
+
+
+
+class SRSerializer(serializers.ModelSerializer):
+    #entityUser = entityUserSerializer(many=True)
+  #  id = serializers.IntegerField(required=False)
+
+    newvoucher = serializers.SerializerMethodField()
+
+    def get_newvoucher(self, obj):
+        if not obj.voucherno:
+            return 1
+        else:
+            return obj.voucherno + 1
+
+
+    class Meta:
+        model = salereturn
         fields =  ['newvoucher']
 
 
@@ -885,8 +923,27 @@ class JournalVSerializer(serializers.ModelSerializer):
             return obj.voucherno + 1
 
     class Meta:
-        model = journal
+        model = journalmain
         fields =  ['newvoucher']
+
+
+class stockVSerializer(serializers.ModelSerializer):
+    #entityUser = entityUserSerializer(many=True)
+  #  id = serializers.IntegerField(required=False)
+
+    newvoucher = serializers.SerializerMethodField()
+
+    def get_newvoucher(self, obj):
+        if not obj.voucherno:
+            return 1
+        else:
+            return obj.voucherno + 1
+
+    class Meta:
+        model = stockmain
+        fields =  ['newvoucher']
+
+
 
 
 class SRSerializer(serializers.ModelSerializer):
