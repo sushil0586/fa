@@ -23,7 +23,7 @@ urlpatterns  = [
     path('salesreturn',views.salesreturnApiView.as_view(), name = 'journal'),
     path('salesreturn/<int:id>',views.salesreturnupdatedelview.as_view(), name = 'journal'),
     path('jvouccherno',views.journalordelatestview.as_view(), name = 'purchaseorder'),
-    path('svouccherno',views.journalordelatestview.as_view(), name = 'purchaseorder'),
+    path('svouccherno',views.stockordelatestview.as_view(), name = 'purchaseorder'),
     path('bvouccherno',views.bankordelatestview.as_view(), name = 'purchaseorder'),
     path('cvouccherno',views.cashordelatestview.as_view(), name = 'purchaseorder'),
     path('purchasereturn',views.PurchaseReturnApiView.as_view(),name = 'salesorder'),
@@ -44,8 +44,13 @@ urlpatterns  = [
     path('purchaseordervno/<int:voucherno>',views.purchaseorderpreviousview.as_view(), name = 'journal'),
     path('journalmainvno/<int:voucherno>',views.journalmainpreviousapiview.as_view(), name = 'journal'),
     path('salesreturnvno/<int:voucherno>',views.salesreturnpreviousview.as_view(), name = 'journal'),
+    path('stockmainvno/<int:voucherno>',views.stockmainpreviousapiview.as_view(), name = 'journal'),
     path('stockmain',views.stockmainApiView.as_view(), name = 'journal'),
     path('stockmain/<int:id>',views.stockmainupdateapiview.as_view(), name = 'journal'),
+    path('stockviewapi',views.stockviewapi.as_view(), name = 'journal'),
+
+
+    
 
 
     

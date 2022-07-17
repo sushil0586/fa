@@ -2,10 +2,10 @@ from django.http import request
 from django.shortcuts import render
 
 from rest_framework.generics import CreateAPIView,ListAPIView,ListCreateAPIView,RetrieveUpdateDestroyAPIView,GenericAPIView,RetrieveAPIView
-from invoice.models import salesOrderdetails,SalesOderHeader,purchaseorder,PurchaseOrderDetails,journal,salereturn,salereturnDetails,PurchaseReturn,Purchasereturndetails,StockTransactions,journalmain,entry,stockdetails,stockmain
+from invoice.models import salesOrderdetails,SalesOderHeader,purchaseorder,PurchaseOrderDetails,journal,salereturn,salereturnDetails,PurchaseReturn,Purchasereturndetails,StockTransactions,journalmain,entry,stockdetails,stockmain,goodstransaction
 from invoice.serializers import SalesOderHeaderSerializer,salesOrderdetailsSerializer,purchaseorderSerializer,PurchaseOrderDetailsSerializer,POSerializer,SOSerializer,journalSerializer,SRSerializer,salesreturnSerializer,salesreturnDetailsSerializer,JournalVSerializer,PurchasereturnSerializer,\
 purchasereturndetailsSerializer,PRSerializer,TrialbalanceSerializer,TrialbalanceSerializerbyaccounthead,TrialbalanceSerializerbyaccount,accountheadserializer,accountHead,accountserializer,accounthserializer, stocktranserilaizer,cashserializer,journalmainSerializer,stockdetailsSerializer,stockmainSerializer,\
-PRSerializer,SRSerializer,stockVSerializer
+PRSerializer,SRSerializer,stockVSerializer,stockserializer
 from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db import DatabaseError, transaction
@@ -13,6 +13,7 @@ from rest_framework.response import Response
 from django.db.models import Sum,OuterRef,Subquery,F
 from django.db.models import Prefetch
 from financial.models import account
+from inventory.models import Product
 
 
 class SalesOderHeaderApiView(ListCreateAPIView):
@@ -274,7 +275,7 @@ class stockordelatestview(ListCreateAPIView):
     filter_backends = [DjangoFilterBackend]
     def get(self,request):
         entity = self.request.query_params.get('entity')
-        id = stockmain.objects.filter(entity= entity,vouchertype = 'J').last()
+        id = stockmain.objects.filter(entity= entity,vouchertype = 'PC').last()
         serializer = stockVSerializer(id)
         return Response(serializer.data)
 
@@ -395,6 +396,18 @@ class journalmainpreviousapiview(RetrieveUpdateDestroyAPIView):
         entity = self.request.query_params.get('entity')
         vouchertype = self.request.query_params.get('vouchertype')
         return journalmain.objects.filter(entity = entity,vouchertype=vouchertype)
+
+
+class stockmainpreviousapiview(RetrieveUpdateDestroyAPIView):
+
+    serializer_class = stockmainSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+    lookup_field = "voucherno"
+
+    def get_queryset(self):
+        entity = self.request.query_params.get('entity')
+       # vouchertype = self.request.query_params.get('vouchertype')
+        return stockmain.objects.filter(entity = entity)
 
 
 
@@ -586,16 +599,39 @@ class daybookviewapi(ListAPIView):
 
         queryset=entry.objects.prefetch_related(Prefetch('cashtrans', queryset=queryset1,to_attr='account_transactions'))
 
-       # queryset1=StockTransactions.objects.filter(entity=entity).order_by('entity')
+        print(queryset)
+        print('account_transactions')
 
-        #post_subquery = StockTransactions.objects.filter(entrydate=OuterRef('entrydate')).values('entrydate')
-
-      #  queryset1 = StockTransactions.objects.dates('entrydate','day').annotate(publish_day= F('entrydate'), posts=Subquery(post_subquery)).values('entrydate')
-
-       # queryset=StockTransactions.objects.select_related(Prefetch('accounthead', queryset=queryset1,to_attr='cash_transactions'))
-
+     
         
-        #stk = account.objects.prefetch_related(Prefetch('accounthead_accounts', queryset=queryset1, to_attr='account_transactions')
+     
+        return queryset
+
+
+
+
+class stockviewapi(ListAPIView):
+
+    serializer_class = stockserializer
+  #  filter_class = accountheadFilter
+    permission_classes = (permissions.IsAuthenticated,)
+
+    filter_backends = [DjangoFilterBackend]
+    #filterset_fields = ['id']
+    def get_queryset(self):
+        #account = self.request.query_params.get('account')
+        entity = self.request.query_params.get('entity')
+
+
+
+        queryset1=goodstransaction.objects.filter(entity=entity).order_by('entity').only('account__accountname','stock__productname','transactiontype','transactionid','entrydatetime')
+
+        queryset=Product.objects.filter(entity=entity).prefetch_related(Prefetch('goods', queryset=queryset1,to_attr='account_transactions'))
+
+        print(queryset)
+        print('account_transactions')
+
+     
         
      
         return queryset
