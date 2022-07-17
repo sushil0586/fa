@@ -717,6 +717,24 @@ class stocktranserilaizer(serializers.ModelSerializer):
 
 
 
+class goodsserilaizer(serializers.ModelSerializer):
+
+    # # debit  = serializers.SerializerMethodField()
+    entrydate1 = serializers.SerializerMethodField()
+
+
+    
+
+    def get_entrydate1(self, obj):
+        return obj.entry.entrydate1
+
+
+    class Meta:
+        model = goodstransaction
+        fields = ['account','stock','transactiontype','purchasequantity','issuedquantity','recivedquantity','salequantity','entrydatetime','entrydate1']
+
+
+
 
 
 class cashserializer(serializers.ModelSerializer):
@@ -750,6 +768,57 @@ class cashserializer(serializers.ModelSerializer):
         # toDate = parse_datetime(self.context['request'].query_params.get(
         #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
         return obj.cashtrans.aggregate(Sum('creditamount'))['creditamount__sum']
+
+
+
+
+
+class stockserializer(serializers.ModelSerializer):
+
+
+    goods = goodsserilaizer(source = 'account_transactions', many=True, read_only=True)
+    salequantity  = serializers.SerializerMethodField()
+    purchasequantity = serializers.SerializerMethodField()
+    issuedquantity  = serializers.SerializerMethodField()
+    recivedquantity = serializers.SerializerMethodField()
+
+
+   # stk = stocktranserilaizer(many=True, read_only=True)
+   # select_related_fields = ('accounthead')
+
+    # debit  = serializers.SerializerMethodField()
+   # day = serializers.CharField()
+
+    class Meta:
+        model = Product
+        fields = ['productname','salequantity','purchasequantity','issuedquantity','recivedquantity','goods']
+
+    def get_salequantity(self, obj):
+
+        print(obj)
+        # fromDate = parse_datetime(self.context['request'].query_params.get(
+        #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        # toDate = parse_datetime(self.context['request'].query_params.get(
+        #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        return obj.goods.aggregate(Sum('salequantity'))['salequantity__sum']
+
+    def get_purchasequantity(self, obj):
+        # fromDate = parse_datetime(self.context['request'].query_params.get(
+        #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        # toDate = parse_datetime(self.context['request'].query_params.get(
+        #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        return obj.goods.aggregate(Sum('purchasequantity'))['purchasequantity__sum']
+
+    def get_issuedquantity(self, obj):
+        return obj.goods.aggregate(Sum('issuedquantity'))['issuedquantity__sum']
+
+    def get_recivedquantity(self, obj):
+        return obj.goods.aggregate(Sum('recivedquantity'))['recivedquantity__sum']
+    
+
+
+
+
 
    
 
