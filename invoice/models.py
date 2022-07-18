@@ -46,9 +46,12 @@ class SalesOderHeader(TrackingModel):
     entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity',null= True)
     owner = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
 
+    class Meta:
+        unique_together = ('billno', 'entity',)
+
 
     def __str__(self):
-        return f'{self.accountid} '
+        return f'{self.billno} '
 
 class salesOrderdetails(TrackingModel):
     salesorderheader = models.ForeignKey(to = SalesOderHeader,related_name='salesorderdetails', on_delete= models.CASCADE,verbose_name= 'Sale Order Number')
@@ -104,9 +107,12 @@ class PurchaseReturn(TrackingModel):
     entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity',null= True)
     owner = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
 
+    class Meta:
+        unique_together = ('billno', 'entity',)
+
 
     def __str__(self):
-        return f'{self.accountid} '
+        return f'{self.billno} '
 
 class Purchasereturndetails(TrackingModel):
     purchasereturn = models.ForeignKey(to = PurchaseReturn,related_name='purchasereturndetails', on_delete= models.CASCADE,verbose_name= 'Sale Order Number')
@@ -146,8 +152,14 @@ class purchaseorder(TrackingModel):
     entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity')
     createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
 
+
+    class Meta:
+        unique_together = ('voucherno', 'entity',)
+        unique_together = ('billno', 'account','entity',)
+        
+
     def __str__(self):
-        return f'{self.account} '
+        return f'{self.voucherno} '
 
 class PurchaseOrderDetails(models.Model):
     purchaseorder = models.ForeignKey(to = purchaseorder,related_name='purchaseorderdetails', on_delete= models.CASCADE,verbose_name= 'Purchase Order Number')
@@ -183,8 +195,12 @@ class salereturn(TrackingModel):
     entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity')
     createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
 
+    class Meta:
+        unique_together = ('voucherno', 'entity',)
+
+
     def __str__(self):
-        return f'{self.account} '
+        return f'{self.voucherno} '
 
 class salereturnDetails(models.Model):
     salereturn = models.ForeignKey(to = salereturn,related_name='salereturndetails', on_delete= models.CASCADE,verbose_name= 'Purchase Order Number')
@@ -214,8 +230,14 @@ class journalmain(TrackingModel):
     entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity')
     createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
 
+
+    class Meta:
+        unique_together = ('voucherno','vouchertype','entity',)
+        
+
+
     def __str__(self):
-        return f'{self.voucherno} '
+        return f'{self.voucherno}  '
 
 
 
@@ -238,6 +260,10 @@ class stockmain(TrackingModel):
     entrydate = models.DateTimeField(verbose_name='Entry Date')
     entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity')
     createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
+
+
+    class Meta:
+        unique_together = ('voucherno','vouchertype','entity',)
 
     def __str__(self):
         return f'{self.voucherno} '
