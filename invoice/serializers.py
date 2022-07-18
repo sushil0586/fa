@@ -702,36 +702,36 @@ class TrialbalanceSerializerbyaccounthead(serializers.ModelSerializer):
 class stocktranserilaizer(serializers.ModelSerializer):
 
     # # debit  = serializers.SerializerMethodField()
-    entrydate1 = serializers.SerializerMethodField()
+    entrydate= serializers.SerializerMethodField()
 
 
     
 
-    def get_entrydate1(self, obj):
+    def get_entrydate(self, obj):
         return obj.entry.entrydate1
 
 
     class Meta:
         model = StockTransactions
-        fields = ['accounthead','account','transactiontype','debitamount','creditamount','entrydatetime','entrydate1']
+        fields = ['accounthead','account','transactiontype','transactionid','debitamount','creditamount','entrydatetime','entrydate']
 
 
 
 class goodsserilaizer(serializers.ModelSerializer):
 
     # # debit  = serializers.SerializerMethodField()
-    entrydate1 = serializers.SerializerMethodField()
+    entrydate = serializers.SerializerMethodField()
 
 
     
 
-    def get_entrydate1(self, obj):
+    def get_entrydate(self, obj):
         return obj.entry.entrydate1
 
 
     class Meta:
         model = goodstransaction
-        fields = ['account','stock','transactiontype','purchasequantity','issuedquantity','recivedquantity','salequantity','entrydatetime','entrydate1']
+        fields = ['account','stock','transactiontype','transactionid','purchasequantity','issuedquantity','recivedquantity','salequantity','entrydatetime','entrydate']
 
 
 
@@ -743,6 +743,10 @@ class cashserializer(serializers.ModelSerializer):
     cashtrans = stocktranserilaizer(source = 'account_transactions', many=True, read_only=True)
     debit  = serializers.SerializerMethodField()
     credit = serializers.SerializerMethodField()
+    entrydate = serializers.SerializerMethodField()
+
+
+
 
 
    # stk = stocktranserilaizer(many=True, read_only=True)
@@ -753,7 +757,7 @@ class cashserializer(serializers.ModelSerializer):
 
     class Meta:
         model = entry
-        fields = ['entrydate1','debit','credit','cashtrans']
+        fields = ['entrydate','debit','credit','cashtrans']
 
     def get_debit(self, obj):
         # fromDate = parse_datetime(self.context['request'].query_params.get(
@@ -768,6 +772,9 @@ class cashserializer(serializers.ModelSerializer):
         # toDate = parse_datetime(self.context['request'].query_params.get(
         #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
         return obj.cashtrans.aggregate(Sum('creditamount'))['creditamount__sum']
+
+    def get_entrydate(self,obj):
+        return obj.entrydate1
 
 
 
