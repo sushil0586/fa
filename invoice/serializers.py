@@ -757,7 +757,7 @@ class cashserializer(serializers.ModelSerializer):
 
     class Meta:
         model = entry
-        fields = ['entrydate','debit','credit','cashtrans']
+        fields = ['id','entrydate','debit','credit','cashtrans']
 
     def get_debit(self, obj):
         # fromDate = parse_datetime(self.context['request'].query_params.get(
