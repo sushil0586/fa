@@ -1,10 +1,10 @@
 
 from django.shortcuts import render
 from rest_framework import response,status,permissions
-from rest_framework.generics import GenericAPIView,ListAPIView,UpdateAPIView
-from Authentication.serializers import Registerserializer,LoginSerializer,Userserializer,ChangePasswordSerializer,RoleSerializer
+from rest_framework.generics import GenericAPIView,ListAPIView,UpdateAPIView,ListCreateAPIView
+from Authentication.serializers import Registerserializer,LoginSerializer,Userserializer,ChangePasswordSerializer,RoleSerializer,mainmenuserializer
 from django.contrib.auth import authenticate
-from Authentication.models import User,Role
+from Authentication.models import User,Role,MainMenu
 from rest_framework.response import Response
 
 
@@ -108,6 +108,23 @@ class ChangePasswordView(UpdateAPIView):
             return Response(response)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class MenusApiView(ListCreateAPIView):
+
+    serializer_class = mainmenuserializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+  #  filter_backends = [DjangoFilterBackend]
+    #filterset_fields = ['id','unitType','entityName']
+
+    #def perform_create(self, serializer):
+     #   return serializer.save(owner = self.request.user)
+    
+    def get_queryset(self):
+       # entity = self.request.query_params.get('entity')
+        return MainMenu.objects.filter()
 
 
 

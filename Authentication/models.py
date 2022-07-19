@@ -124,3 +124,34 @@ class User(AbstractBaseUser,PermissionsMixin,TrackingModel,UserManager):
          )
         return token
 
+class MainMenu(TrackingModel):
+    mainmenu = models.CharField(max_length=50) 
+    menuurl = models.CharField(max_length=50, null=True,blank=True)
+    menucode = models.CharField(max_length=50)
+
+    class Meta:
+        verbose_name = _('Menu')
+        verbose_name_plural = _('Menus')
+
+
+    
+    def __str__(self):
+        return f'{self.mainmenu}'
+
+class submenu(TrackingModel):
+    mainmenu =     models.ForeignKey(MainMenu, on_delete=models.CASCADE,null= True,related_name='submenu')
+    submenu =      models.CharField(max_length=50)
+    subMenuurl =   models.CharField(max_length=50)
+
+
+    class Meta:
+        verbose_name = _('submenu')
+        verbose_name_plural = _('submenu')
+
+
+    
+    def __str__(self):
+        return f'{self.submenu}'
+
+
+
