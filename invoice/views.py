@@ -595,12 +595,11 @@ class daybookviewapi(ListAPIView):
 
 
 
-        queryset1=StockTransactions.objects.filter(entity=entity).order_by('entity').only('account__accountname','transactiontype','transactionid','entrydatetime','desc','debitamount','creditamount')
+        queryset1=StockTransactions.objects.filter(entity=entity).order_by('entity').only('account__accountname','transactiontype','drcr','transactionid','desc','debitamount','creditamount').order_by('account')
 
         queryset=entry.objects.prefetch_related(Prefetch('cashtrans', queryset=queryset1,to_attr='account_transactions'))
 
-        print(queryset)
-        print('account_transactions')
+       
 
      
         
