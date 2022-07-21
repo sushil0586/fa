@@ -702,18 +702,22 @@ class TrialbalanceSerializerbyaccounthead(serializers.ModelSerializer):
 class stocktranserilaizer(serializers.ModelSerializer):
 
     # # debit  = serializers.SerializerMethodField()
+    accountname= serializers.SerializerMethodField()
     entrydate= serializers.SerializerMethodField()
 
 
     
 
+    def get_accountname(self, obj):
+         return obj.account.accountname
+    
     def get_entrydate(self, obj):
-        return obj.entry.entrydate1
+         return obj.entry.entrydate1
 
 
     class Meta:
         model = StockTransactions
-        fields = ['accounthead','account','transactiontype','transactionid','debitamount','creditamount','entrydatetime','entrydate']
+        fields = ['account','accountname','entrydate','transactiontype','transactionid','drcr','desc', 'debitamount','creditamount']
 
 
 
@@ -760,6 +764,8 @@ class cashserializer(serializers.ModelSerializer):
         fields = ['id','entrydate','debit','credit','cashtrans']
 
     def get_debit(self, obj):
+
+       # print(obj.cashtrans('account'))
         # fromDate = parse_datetime(self.context['request'].query_params.get(
         #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
         # toDate = parse_datetime(self.context['request'].query_params.get(
