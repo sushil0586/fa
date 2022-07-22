@@ -699,6 +699,10 @@ class TrialbalanceSerializerbyaccounthead(serializers.ModelSerializer):
         fields = ['account','accountname','debit','credit']
 
 
+
+
+
+
 class stocktranserilaizer(serializers.ModelSerializer):
 
     # # debit  = serializers.SerializerMethodField()
@@ -709,6 +713,7 @@ class stocktranserilaizer(serializers.ModelSerializer):
     
 
     def get_accountname(self, obj):
+         print(obj)
          return obj.account.accountname
     
     def get_entrydate(self, obj):
@@ -739,15 +744,28 @@ class goodsserilaizer(serializers.ModelSerializer):
 
 
 
+class actserializer(serializers.ModelSerializer):
+    accounttrans = stocktranserilaizer(many=True, read_only=True)
+
+  #  dateentry = serializers.SerializerMethodField()
+
+    class Meta:
+        model = account
+        fields = ['id','accountname','accounttrans']
+        
+    
+   
 
 
 class cashserializer(serializers.ModelSerializer):
 
 
-    cashtrans = stocktranserilaizer(source = 'account_transactions', many=True, read_only=True)
+   # cashtrans = stocktranserilaizer(source = 'account_transactions', many=True, read_only=True)
     debit  = serializers.SerializerMethodField()
     credit = serializers.SerializerMethodField()
     entrydate = serializers.SerializerMethodField()
+    cr = serializers.SerializerMethodField()
+    dr = serializers.SerializerMethodField()
 
 
 
@@ -761,7 +779,7 @@ class cashserializer(serializers.ModelSerializer):
 
     class Meta:
         model = entry
-        fields = ['id','entrydate','debit','credit','cashtrans']
+        fields = ['id','entrydate','debit','credit','cr','dr']
 
     def get_debit(self, obj):
 
@@ -781,6 +799,20 @@ class cashserializer(serializers.ModelSerializer):
 
     def get_entrydate(self,obj):
         return obj.entrydate1
+
+    def get_cr(self,obj):
+        
+        stock =  obj.cashtrans.filter(drcr = False).order_by('account')
+        print(stock)
+        return stocktranserilaizer(stock, many=True).data
+
+    
+    def get_dr(self,obj):
+        stock =  obj.cashtrans.filter(drcr = True).order_by('account')
+        return stocktranserilaizer(stock, many=True).data
+
+  
+        
 
 
 
