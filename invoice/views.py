@@ -623,10 +623,12 @@ class salebyaccountapi(ListAPIView):
         #account = self.request.query_params.get('account')
         entity = self.request.query_params.get('entity')
         transactiontype = self.request.query_params.get('transactiontype')
+        startdate = self.request.query_params.get('startdate')
+        enddate = self.request.query_params.get('endate')
 
 
 
-        queryset1=StockTransactions.objects.filter(entity=entity,accounttype = 'M',transactiontype = transactiontype).order_by('account')
+        queryset1=StockTransactions.objects.filter(entity=entity,accounttype = 'M',transactiontype = transactiontype,entrydatetime__range=(startdate, enddate)).order_by('account')
 
        # queryset=entry.objects.prefetch_related(Prefetch('cashtrans', queryset=queryset1,to_attr='account_transactions')).order_by('-entrydate1')
 
@@ -649,10 +651,13 @@ class purchasebyaccountapi(ListAPIView):
         #account = self.request.query_params.get('account')
         entity = self.request.query_params.get('entity')
         transactiontype = self.request.query_params.get('transactiontype')
+        startdate = self.request.query_params.get('startdate')
+        enddate = self.request.query_params.get('endate')
 
 
 
-        queryset1=StockTransactions.objects.filter(entity=entity,accounttype = 'M',transactiontype = transactiontype).order_by('account').only('account__accountname','account__city', 'transactiontype','drcr','transactionid','desc','creditamount','cgstdr','sgstdr','igstdr','subtotal', )
+
+        queryset1=StockTransactions.objects.filter(entity=entity,accounttype = 'M',transactiontype = transactiontype,entrydatetime__range=(startdate, enddate)).order_by('account').only('account__accountname','account__city', 'transactiontype','drcr','transactionid','desc','creditamount','cgstdr','sgstdr','igstdr','subtotal', )
 
        # queryset=entry.objects.prefetch_related(Prefetch('cashtrans', queryset=queryset1,to_attr='account_transactions')).order_by('-entrydate1')
 

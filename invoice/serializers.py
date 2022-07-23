@@ -781,6 +781,7 @@ class Salebyaccountserializer(serializers.ModelSerializer):
     accountname = serializers.SerializerMethodField()
     accountcode = serializers.SerializerMethodField()
     city = serializers.SerializerMethodField()
+    entrydate = serializers.SerializerMethodField()
 
     def get_accountname(self, obj):
         return obj.account.accountname
@@ -793,13 +794,15 @@ class Salebyaccountserializer(serializers.ModelSerializer):
 
     def get_city(self, obj):
         return obj.account.city.cityname
+    
+    def get_entrydate(self, obj):
+        return obj.entry.entrydate1
 
 
 
     class Meta:
         model = StockTransactions
-        fields = ['id','transactiontype','transactionid','desc','debitamount','cgstcr','sgstcr','igstcr','subtotal','pieces','weightqty','account','accountname','accountcode','city',]
-
+        fields = ['id','transactiontype','transactionid','desc','debitamount','cgstcr','sgstcr','igstcr','subtotal','pieces','weightqty','account','accountname','accountcode','city','entrydate',]
 
 
 
@@ -810,6 +813,7 @@ class Purchasebyaccountserializer(serializers.ModelSerializer):
     accountname = serializers.SerializerMethodField()
     accountcode = serializers.SerializerMethodField()
     city = serializers.SerializerMethodField()
+    entrydate = serializers.SerializerMethodField()
 
     def get_accountname(self, obj):
         return obj.account.accountname
@@ -823,11 +827,14 @@ class Purchasebyaccountserializer(serializers.ModelSerializer):
     def get_city(self, obj):
         return obj.account.city.cityname
 
+    def get_entrydate(self, obj):
+        return obj.entry.entrydate1
+
 
 
     class Meta:
         model = StockTransactions
-        fields = ['id','transactiontype','transactionid','desc','creditamount','cgstdr','sgstdr','igstdr','igstdr','subtotal','pieces','weightqty','account','accountname','accountcode','city',]
+        fields = ['id','transactiontype','transactionid','desc','creditamount','cgstdr','sgstdr','igstdr','igstdr','subtotal','pieces','weightqty','account','accountname','accountcode','city',"entrydate",]
         
     
    
