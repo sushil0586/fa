@@ -215,7 +215,52 @@ class journalmainSerializer(serializers.ModelSerializer):
         #print(tracks_data)
         for journaldetail_data in journaldetails_data:
             detail = journaldetails.objects.create(Journalmain = order, **journaldetail_data)
-            id,created  = entry.objects.get_or_create(entrydate1 = order.entrydate)
+            print(order.entrydate)
+            id,created  = entry.objects.get_or_create(entrydate1 = order.entrydate,entity = order.entity)
+
+            if detail.account.accounthead.code == 4000:
+                if created == True:
+
+                    openingbalance =   entry.objects.filter(entrydate1__lt = id.entrydate1).last()
+                    print(openingbalance)
+                    if not openingbalance:
+                        ob = 0
+                        if detail.drcr == 1:
+                            cb = detail.debitamount
+                            entry.objects.filter(id = id.id).update(openingbalance = ob,closingbalance = cb)
+                        else:
+                            cb =  -(detail.creditamount)
+                            entry.objects.filter(id = id.id).update(openingbalance = ob,closingbalance = cb)
+
+                                    
+                    else:
+                        ob = openingbalance.closingbalance
+                        if detail.drcr == 1:
+                            cb = ob + detail.debitamount
+                            entry.objects.filter(id = id.id).update(openingbalance = ob,closingbalance = cb)
+                        else:
+                            cb = ob - detail.creditamount
+                            entry.objects.filter(id = id.id).update(openingbalance = ob,closingbalance = cb)
+                    
+                else:
+                        ob = id.closingbalance
+                        if not ob:
+                            ob = 0
+                        if detail.drcr == 1:
+                            cb = ob + detail.debitamount
+                            entry.objects.filter(id = id.id).update(closingbalance = cb)
+                        else:
+                            cb = ob - detail.creditamount
+                            entry.objects.filter(id = id.id).update(closingbalance = cb)
+
+                
+
+            
+
+
+
+            print(id)
+            print(created)
             if detail.account.accounthead.code == 2000:
                 accounttype = 'BIH'
             elif detail.account.accounthead.code == 4000:
@@ -782,6 +827,10 @@ class Salebyaccountserializer(serializers.ModelSerializer):
     accountcode = serializers.SerializerMethodField()
     city = serializers.SerializerMethodField()
     entrydate = serializers.SerializerMethodField()
+    cgst = serializers.DecimalField(max_digits=13, decimal_places=3,source = 'cgstcr')
+    sgst = serializers.DecimalField(max_digits=13,decimal_places=3,source = 'sgstcr')
+    igst = serializers.DecimalField(max_digits=13,decimal_places=3,source = 'igstcr')
+    gtotal = serializers.DecimalField(max_digits=13,decimal_places=3,source = 'debitamount')
 
     def get_accountname(self, obj):
         return obj.account.accountname
@@ -802,7 +851,7 @@ class Salebyaccountserializer(serializers.ModelSerializer):
 
     class Meta:
         model = StockTransactions
-        fields = ['id','transactiontype','transactionid','desc','debitamount','cgstcr','sgstcr','igstcr','subtotal','pieces','weightqty','account','accountname','accountcode','city','entrydate',]
+        fields = ['id','transactiontype','transactionid','desc','gtotal','cgst','sgst','igst','subtotal','pieces','weightqty','account','accountname','accountcode','city','entrydate',]
 
 
 
@@ -814,6 +863,16 @@ class Purchasebyaccountserializer(serializers.ModelSerializer):
     accountcode = serializers.SerializerMethodField()
     city = serializers.SerializerMethodField()
     entrydate = serializers.SerializerMethodField()
+    cgst = serializers.DecimalField(max_digits=13,decimal_places=3,source = 'cgstdr')
+    sgst = serializers.DecimalField(max_digits=13,decimal_places=3,source = 'sgstdr')
+    igst = serializers.DecimalField(max_digits=13,decimal_places=3,source = 'igstdr')
+    gtotal = serializers.DecimalField(max_digits=13,decimal_places=3,source = 'creditamount')
+
+    
+
+    
+
+    #models.DecimalField(max_digits=10,null = True,decimal_places=3,verbose_name= 'Opening Amount')
 
     def get_accountname(self, obj):
         return obj.account.accountname
@@ -834,7 +893,7 @@ class Purchasebyaccountserializer(serializers.ModelSerializer):
 
     class Meta:
         model = StockTransactions
-        fields = ['id','transactiontype','transactionid','desc','creditamount','cgstdr','sgstdr','igstdr','igstdr','subtotal','pieces','weightqty','account','accountname','accountcode','city',"entrydate",]
+        fields = ['id','transactiontype','transactionid','desc','gtotal','cgst','sgst','igst','subtotal','pieces','weightqty','account','accountname','accountcode','city',"entrydate",]
         
     
    

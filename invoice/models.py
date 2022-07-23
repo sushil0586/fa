@@ -322,6 +322,10 @@ class Transactions(TrackingModel):
 
 class entry(TrackingModel):
     entrydate1 = models.DateField()
+    account = models.ForeignKey(to = account, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Account Name',related_name='accountentry')
+    openingbalance =  models.DecimalField(max_digits=10,null = True,decimal_places=3,verbose_name= 'Opening Amount')
+    closingbalance =  models.DecimalField(max_digits=10,null = True,decimal_places=3,verbose_name= 'closing Amount')
+    entity = models.ForeignKey(entity,null=True,on_delete=models.CASCADE,verbose_name= 'entity')
  
 
 class accountentry(TrackingModel):
