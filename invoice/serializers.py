@@ -36,7 +36,7 @@ class stocktransaction:
         #Transactions.objects.create(account= purchaseid,transactiontype = 'P',transactionid = id,desc = 'Purchase from',drcr=1,amount=subtotal,entity=pentity,createdby = order.createdby )
         StockTransactions.objects.create(accounthead = cgstid.accounthead, account= cgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description,drcr=self.debit,debitamount=cgst,entity=pentity,createdby= self.order.createdby,entry =entryid,entrydatetime = self.order.billdate)
         StockTransactions.objects.create(accounthead = sgstid.accounthead,account= sgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description,drcr=self.debit,debitamount=sgst,entity=pentity,createdby= self.order.createdby,entry =entryid,entrydatetime = self.order.billdate)
-        StockTransactions.objects.create(accounthead= self.order.account.accounthead,account= self.order.account,transactiontype = self.transactiontype,transactionid = id,desc = self.description,drcr=self.credit,creditamount=gtotal,entity=pentity,createdby= self.order.createdby,entry =entryid,entrydatetime = self.order.billdate)
+        StockTransactions.objects.create(accounthead= self.order.account.accounthead,account= self.order.account,transactiontype = self.transactiontype,transactionid = id,desc = self.description,drcr=self.credit,creditamount=gtotal,cgstdr = cgst,sgstdr= sgst,igstdr = igst, entity=pentity,createdby= self.order.createdby,entry =entryid,entrydatetime = self.order.billdate,accounttype = 'M',subtotal = subtotal)
         return id
 
     def updateransaction(self):
@@ -66,7 +66,7 @@ class stocktransaction:
         #print(self.order.id)
 
         #print(StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = 'P'))
-        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account = self.order.account,entity = pentity).update(accounthead= self.order.account.accounthead,account= self.order.account,transactiontype = self.transactiontype,desc = self.description,drcr=self.credit,creditamount=gtotal,entity=pentity,createdby= self.order.createdby,entry =entryid,entrydatetime = self.order.billdate)
+        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account = self.order.account,entity = pentity).update(accounthead= self.order.account.accounthead,account= self.order.account,transactiontype = self.transactiontype,desc = self.description,drcr=self.credit,creditamount=gtotal,cgstdr = cgst,sgstdr= sgst,igstdr = igst, entity=pentity,createdby= self.order.createdby,entry =entryid,entrydatetime = self.order.billdate,accounttype = 'M',subtotal = subtotal)
        # StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = 'P',account = self.order.account).update(accounthead= self.order.account.accounthead,account= self.order.account,transactiontype = self.transactiontype,desc = self.description,drcr=self.credit,creditamount=gtotal,entity=pentity,createdby= self.order.createdby)
         #Transactions.objects.create(account= purchaseid,transactiontype = 'P',transactionid = id,desc = 'Purchase from',drcr=1,amount=subtotal,entity=pentity,createdby = order.createdby )
         StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account_id = cgstid.id,entity = pentity).update(accounthead = cgstid.accounthead, account= cgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description,drcr=self.debit,debitamount=cgst,entity=pentity,createdby= self.order.createdby,entry =entryid,entrydatetime = self.order.billdate)
@@ -126,7 +126,7 @@ class stocktransactionsale:
         entryid,created  = entry.objects.get_or_create(entrydate1 = self.order.sorderdate)
         StockTransactions.objects.create(accounthead = cgstid.accounthead, account= cgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.credit,creditamount=cgst,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate)
         StockTransactions.objects.create(accounthead = sgstid.accounthead,account= sgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.credit,creditamount=sgst,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate)
-        StockTransactions.objects.create(accounthead= self.order.accountid.accounthead,account= self.order.accountid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.debit,debitamount=gtotal,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate)
+        StockTransactions.objects.create(accounthead= self.order.accountid.accounthead,account= self.order.accountid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.debit,debitamount=gtotal,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate,cgstcr = cgst,sgstcr= sgst,igstcr = igst,accounttype = 'M',subtotal = subtotal)
         return id
 
     def updateransaction(self):
@@ -152,7 +152,7 @@ class stocktransactionsale:
         entryid,created  = entry.objects.get_or_create(entrydate1 = self.order.sorderdate)
         StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account = cgstid,entity = pentity).update(accounthead = cgstid.accounthead, account= cgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.credit,creditamount=cgst,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate)
         StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account = sgstid,entity = pentity).update(accounthead = sgstid.accounthead,account= sgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.credit,creditamount=sgst,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate)
-        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account = self.order.accountid,entity = pentity).update(accounthead= self.order.accountid.accounthead,account= self.order.accountid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.debit,debitamount=gtotal,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate)
+        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account = self.order.accountid,entity = pentity).update(accounthead= self.order.accountid.accounthead,account= self.order.accountid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.debit,debitamount=gtotal,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate,cgstcr = cgst,sgstcr= sgst,igstcr = igst,accounttype = 'M',subtotal = subtotal)
         
         return id
 
@@ -216,7 +216,13 @@ class journalmainSerializer(serializers.ModelSerializer):
         for journaldetail_data in journaldetails_data:
             detail = journaldetails.objects.create(Journalmain = order, **journaldetail_data)
             id,created  = entry.objects.get_or_create(entrydate1 = order.entrydate)
-            StockTransactions.objects.create(accounthead= detail.account.accounthead,account= detail.account,transactiontype = order.vouchertype,transactionid = order.id,desc = 'Journal V.No' + str(order.voucherno),drcr=detail.drcr,creditamount=detail.creditamount,debitamount=detail.debitamount,entity=order.entity,createdby= order.createdby,entrydate = order.entrydate,entry =id,entrydatetime = order.entrydate)
+            if detail.account.accounthead.code == 2000:
+                accounttype = 'BIH'
+            elif detail.account.accounthead.code == 4000:
+                accounttype = 'CIH'
+            else:
+                accounttype = 'M'
+            StockTransactions.objects.create(accounthead= detail.account.accounthead,account= detail.account,transactiontype = order.vouchertype,transactionid = order.id,desc = 'Journal V.No' + str(order.voucherno),drcr=detail.drcr,creditamount=detail.creditamount,debitamount=detail.debitamount,entity=order.entity,createdby= order.createdby,entrydate = order.entrydate,entry =id,entrydatetime = order.entrydate,accounttype=accounttype)
            # stk.createtransactiondetails(detail=detail,stocktype='S')
 
             # if(detail.orderqty ==0.00):
@@ -635,7 +641,20 @@ class journalSerializer(serializers.ModelSerializer):
         else:
             debitamount = order.amount
             creditamount = 0
-        StockTransactions.objects.create(accounthead= order.account.accounthead,account= order.account,transactiontype = order.vouchertype,transactionid = order.id,desc = 'Journal V.No' + str(order.voucherno),drcr=order.drcr,creditamount=creditamount,debitamount=debitamount,entity=order.entity,createdby= order.createdby)
+            
+
+    
+
+        print(order.account.accounthead.code)
+
+        if order.account.accounthead.code == 2000:
+            accounttype = 'BIH'
+        elif order.account.accounthead.code == 4000:
+            accounttype = 'CIH'
+        else:
+            accounttype = 'M'
+
+        StockTransactions.objects.create(accounthead= order.account.accounthead,account= order.account,transactiontype = order.vouchertype,transactionid = order.id,desc = 'Journal V.No' + str(order.voucherno),drcr=order.drcr,creditamount=creditamount,debitamount=debitamount,entity=order.entity,createdby= order.createdby,accounttype = accounttype)
         return order
     
     # def update(self,instance,validated_data):
@@ -752,6 +771,63 @@ class actserializer(serializers.ModelSerializer):
     class Meta:
         model = account
         fields = ['id','accountname','accounttrans']
+
+
+
+
+class Salebyaccountserializer(serializers.ModelSerializer):
+  #  accounttrans = stocktranserilaizer(many=True, read_only=True)
+
+    accountname = serializers.SerializerMethodField()
+    accountcode = serializers.SerializerMethodField()
+    city = serializers.SerializerMethodField()
+
+    def get_accountname(self, obj):
+        return obj.account.accountname
+
+    def get_accountcode(self, obj):
+        return obj.account.accountcode
+
+    def get_accountcode(self, obj):
+        return obj.account.accountcode
+
+    def get_city(self, obj):
+        return obj.account.city.cityname
+
+
+
+    class Meta:
+        model = StockTransactions
+        fields = ['id','transactiontype','transactionid','desc','debitamount','cgstcr','sgstcr','igstcr','subtotal','pieces','weightqty','account','accountname','accountcode','city',]
+
+
+
+
+
+class Purchasebyaccountserializer(serializers.ModelSerializer):
+  #  accounttrans = stocktranserilaizer(many=True, read_only=True)
+
+    accountname = serializers.SerializerMethodField()
+    accountcode = serializers.SerializerMethodField()
+    city = serializers.SerializerMethodField()
+
+    def get_accountname(self, obj):
+        return obj.account.accountname
+
+    def get_accountcode(self, obj):
+        return obj.account.accountcode
+
+    def get_accountcode(self, obj):
+        return obj.account.accountcode
+
+    def get_city(self, obj):
+        return obj.account.city.cityname
+
+
+
+    class Meta:
+        model = StockTransactions
+        fields = ['id','transactiontype','transactionid','desc','creditamount','cgstdr','sgstdr','igstdr','igstdr','subtotal','pieces','weightqty','account','accountname','accountcode','city',]
         
     
    

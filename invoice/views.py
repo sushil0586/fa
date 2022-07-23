@@ -5,7 +5,7 @@ from rest_framework.generics import CreateAPIView,ListAPIView,ListCreateAPIView,
 from invoice.models import salesOrderdetails,SalesOderHeader,purchaseorder,PurchaseOrderDetails,journal,salereturn,salereturnDetails,PurchaseReturn,Purchasereturndetails,StockTransactions,journalmain,entry,stockdetails,stockmain,goodstransaction
 from invoice.serializers import SalesOderHeaderSerializer,salesOrderdetailsSerializer,purchaseorderSerializer,PurchaseOrderDetailsSerializer,POSerializer,SOSerializer,journalSerializer,SRSerializer,salesreturnSerializer,salesreturnDetailsSerializer,JournalVSerializer,PurchasereturnSerializer,\
 purchasereturndetailsSerializer,PRSerializer,TrialbalanceSerializer,TrialbalanceSerializerbyaccounthead,TrialbalanceSerializerbyaccount,accountheadserializer,accountHead,accountserializer,accounthserializer, stocktranserilaizer,cashserializer,journalmainSerializer,stockdetailsSerializer,stockmainSerializer,\
-PRSerializer,SRSerializer,stockVSerializer,stockserializer
+PRSerializer,SRSerializer,stockVSerializer,stockserializer,Purchasebyaccountserializer,Salebyaccountserializer
 from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db import DatabaseError, transaction
@@ -595,9 +595,9 @@ class daybookviewapi(ListAPIView):
 
 
 
-        queryset1=StockTransactions.objects.filter(entity=entity,drcr = True).order_by('entity').only('account__accountname','transactiontype','drcr','transactionid','desc','debitamount','creditamount').order_by('account')
+        queryset1=StockTransactions.objects.filter(entity=entity).order_by('account').only('account__accountname','transactiontype','drcr','transactionid','desc','debitamount','creditamount')
 
-        queryset=entry.objects.prefetch_related(Prefetch('cashtrans', queryset=queryset1,to_attr='account_transactions'))
+        queryset=entry.objects.prefetch_related(Prefetch('cashtrans', queryset=queryset1,to_attr='account_transactions')).order_by('-entrydate1')
 
        
 
@@ -605,6 +605,63 @@ class daybookviewapi(ListAPIView):
         
      
         return queryset
+
+
+
+
+
+
+class salebyaccountapi(ListAPIView):
+
+    serializer_class = Salebyaccountserializer
+  #  filter_class = accountheadFilter
+    permission_classes = (permissions.IsAuthenticated,)
+
+    filter_backends = [DjangoFilterBackend]
+    #filterset_fields = ['id']
+    def get_queryset(self):
+        #account = self.request.query_params.get('account')
+        entity = self.request.query_params.get('entity')
+        transactiontype = self.request.query_params.get('transactiontype')
+
+
+
+        queryset1=StockTransactions.objects.filter(entity=entity,accounttype = 'M',transactiontype = transactiontype).order_by('account')
+
+       # queryset=entry.objects.prefetch_related(Prefetch('cashtrans', queryset=queryset1,to_attr='account_transactions')).order_by('-entrydate1')
+
+       
+
+     
+        
+     
+        return queryset1
+
+class purchasebyaccountapi(ListAPIView):
+
+    serializer_class = Purchasebyaccountserializer
+  #  filter_class = accountheadFilter
+    permission_classes = (permissions.IsAuthenticated,)
+
+    filter_backends = [DjangoFilterBackend]
+    #filterset_fields = ['id']
+    def get_queryset(self):
+        #account = self.request.query_params.get('account')
+        entity = self.request.query_params.get('entity')
+        transactiontype = self.request.query_params.get('transactiontype')
+
+
+
+        queryset1=StockTransactions.objects.filter(entity=entity,accounttype = 'M',transactiontype = transactiontype).order_by('account').only('account__accountname','account__city', 'transactiontype','drcr','transactionid','desc','creditamount','cgstdr','sgstdr','igstdr','subtotal', )
+
+       # queryset=entry.objects.prefetch_related(Prefetch('cashtrans', queryset=queryset1,to_attr='account_transactions')).order_by('-entrydate1')
+
+       
+
+     
+        
+     
+        return queryset1
 
 
 
