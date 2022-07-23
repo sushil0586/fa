@@ -624,7 +624,7 @@ class salebyaccountapi(ListAPIView):
         entity = self.request.query_params.get('entity')
         transactiontype = self.request.query_params.get('transactiontype')
         startdate = self.request.query_params.get('startdate')
-        enddate = self.request.query_params.get('endate')
+        enddate = self.request.query_params.get('enddate')
 
 
 
@@ -652,7 +652,7 @@ class purchasebyaccountapi(ListAPIView):
         entity = self.request.query_params.get('entity')
         transactiontype = self.request.query_params.get('transactiontype')
         startdate = self.request.query_params.get('startdate')
-        enddate = self.request.query_params.get('endate')
+        enddate = self.request.query_params.get('enddate')
 
 
 
