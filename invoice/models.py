@@ -348,6 +348,10 @@ class StockTransactions(TrackingModel):
     entry = models.ForeignKey(entry,null=True,on_delete=models.CASCADE,related_name='cashtrans')
     entrydate = models.DateField(verbose_name='Entry Date',null=True)
     entrydatetime = models.DateTimeField(verbose_name='Entry Date', null=True)
+    accounttype = models.CharField(max_length=10, null=True,verbose_name='accounttype')
+    subtotal =  models.DecimalField(max_digits=10,null = True, decimal_places=2,verbose_name= 'Sub Total')
+    pieces = models.IntegerField(verbose_name='Pieces',null=True)
+    weightqty =  models.DecimalField(max_digits=10,null = True, decimal_places=2,verbose_name= 'Weight Quantity')
     entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity')
     createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
 
