@@ -625,7 +625,7 @@ class cbviewapi(ListAPIView):
 
       #  queryset1=StockTransactions.objects.filter(entity=entity,accounttype = 'M').order_by('account').only('account__accountname','transactiontype','drcr','transactionid','desc','debitamount','creditamount')
 
-        queryset=entry.objects.prefetch_related('cashtrans').order_by('-entrydate1')
+        queryset=entry.objects.prefetch_related('cashtrans').order_by('entrydate1')
 
        
 
