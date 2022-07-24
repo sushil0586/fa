@@ -9,6 +9,7 @@ from invoice.models import SalesOderHeader,salesOrderdetails,purchaseorder,Purch
 from financial.models import account,accountHead
 from inventory.models import Product
 from django.db.models import Sum,Count
+from datetime import timedelta
 
 
 
@@ -1000,26 +1001,51 @@ class cbserializer(serializers.ModelSerializer):
 
     def get_reciept(self, obj):
 
+        # yesterday = obj.entrydate1 - timedelta(days = 0)
+        # startdate = obj.entrydate1 - timedelta(days = 10)
+
        # print(obj.cashtrans('account'))
         # fromDate = parse_datetime(self.context['request'].query_params.get(
         #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
         # toDate = parse_datetime(self.context['request'].query_params.get(
         #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
-        return obj.cashtrans.aggregate(Sum('debitamount'))['debitamount__sum']
+        return obj.cashtrans.filter(accounttype = 'CIH',transactiontype = 'C').aggregate(Sum('debitamount'))['debitamount__sum']
 
     def get_payment(self, obj):
         # fromDate = parse_datetime(self.context['request'].query_params.get(
         #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
         # toDate = parse_datetime(self.context['request'].query_params.get(
         #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
-        return obj.cashtrans.filter(accounttype = 'M' ).aggregate(Sum('creditamount'))['creditamount__sum']
+        return obj.cashtrans.filter(accounttype = 'CIH',transactiontype = 'C' ).aggregate(Sum('creditamount'))['creditamount__sum']
 
     def get_openingbalance(self, obj):
+
+        yesterday = obj.entrydate1 - timedelta(days = 1)
+        startdate = obj.entrydate1 - timedelta(days = 10)
+
+        print(yesterday)
+        print(startdate)
+
+
+
+        debit = obj.cashtrans.filter(accounttype = 'CIH',entry__entrydate1__range=(startdate, yesterday),transactiontype = 'C').aggregate(Sum('debitamount'))['debitamount__sum']
+        credit = obj.cashtrans.filter(accounttype = 'CIH',entry__entrydate1__range=(startdate, yesterday),transactiontype = 'C').aggregate(Sum('creditamount'))['creditamount__sum']
+
+        print(debit)
+        print(credit)
+
+        if not debit:
+            debit = 0
+        
+        if not credit:
+            credit = 0
+
+
         # fromDate = parse_datetime(self.context['request'].query_params.get(
         #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
         # toDate = parse_datetime(self.context['request'].query_params.get(
         #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
-        return 100
+        return debit - credit
 
     def get_entrydate(self,obj):
         return obj.entrydate1
@@ -1029,15 +1055,15 @@ class cbserializer(serializers.ModelSerializer):
         #stock =  obj.cashtrans.filter(drcr = False).order_by('account')
        # print(stock)
 
-        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = False)
+        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = False,accounttype = 'M',transactiontype = 'C')
         #return account1Serializer(accounts,many=True).data
-        return stock1DriverSerializer(stock, many=True).data
+        return stocktranserilaizer(stock, many=True).data
 
     
     def get_reciepts(self,obj):
-        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = True,accounttype = 'M')
+        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = True,accounttype = 'M',transactiontype = 'C')
         #return account1Serializer(accounts,many=True).data
-        return stock1DriverSerializer(stock, many=True).data
+        return stocktranserilaizer(stock, many=True).data
 
   
         
