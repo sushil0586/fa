@@ -5,7 +5,7 @@ from os import device_encoding
 from select import select
 from rest_framework import serializers
 from invoice.models import SalesOderHeader,salesOrderdetails,purchaseorder,PurchaseOrderDetails,\
-    journal,salereturn,salereturnDetails,Transactions,StockTransactions,PurchaseReturn,Purchasereturndetails,journalmain,journaldetails,entry,goodstransaction,stockdetails,stockmain
+    journal,salereturn,salereturnDetails,Transactions,StockTransactions,PurchaseReturn,Purchasereturndetails,journalmain,journaldetails,entry,goodstransaction,stockdetails,stockmain,accountentry
 from financial.models import account,accountHead
 from inventory.models import Product
 from django.db.models import Sum,Count
@@ -218,40 +218,51 @@ class journalmainSerializer(serializers.ModelSerializer):
             print(order.entrydate)
             id,created  = entry.objects.get_or_create(entrydate1 = order.entrydate,entity = order.entity)
 
-            if detail.account.accounthead.code == 4000:
-                if created == True:
+            accountentryid,accountentrycreated  = accountentry.objects.get_or_create(entrydate2 = order.entrydate,account =detail.account,  entity = order.entity)
 
-                    openingbalance =   entry.objects.filter(entrydate1__lt = id.entrydate1).last()
-                    print(openingbalance)
-                    if not openingbalance:
-                        ob = 0
-                        if detail.drcr == 1:
-                            cb = detail.debitamount
-                            entry.objects.filter(id = id.id).update(openingbalance = ob,closingbalance = cb)
-                        else:
-                            cb =  -(detail.creditamount)
-                            entry.objects.filter(id = id.id).update(openingbalance = ob,closingbalance = cb)
+            
+
+           
+            if accountentrycreated == True:
+                openingbalance =   accountentry.objects.filter(entrydate2__lt = accountentryid.entrydate2,entity = order.entity,account =detail.account).last()
+                print(openingbalance)
+                if not openingbalance:
+                    ob = 0
+                    if detail.drcr == 1:
+                        cb = detail.debitamount
+                        accountentry.objects.filter(id = accountentryid.id).update(openingbalance = ob,closingbalance = cb)
+                    else:
+                        cb =  -(detail.creditamount)
+                        accountentry.objects.filter(id = accountentryid.id).update(openingbalance = ob,closingbalance = cb)
 
                                     
-                    else:
-                        ob = openingbalance.closingbalance
-                        if detail.drcr == 1:
-                            cb = ob + detail.debitamount
-                            entry.objects.filter(id = id.id).update(openingbalance = ob,closingbalance = cb)
-                        else:
-                            cb = ob - detail.creditamount
-                            entry.objects.filter(id = id.id).update(openingbalance = ob,closingbalance = cb)
-                    
                 else:
-                        ob = id.closingbalance
-                        if not ob:
-                            ob = 0
-                        if detail.drcr == 1:
-                            cb = ob + detail.debitamount
-                            entry.objects.filter(id = id.id).update(closingbalance = cb)
-                        else:
-                            cb = ob - detail.creditamount
-                            entry.objects.filter(id = id.id).update(closingbalance = cb)
+                    ob = openingbalance.closingbalance
+                    if detail.drcr == 1:
+                        cb = ob + detail.debitamount
+                        accountentry.objects.filter(id = accountentryid.id).update(openingbalance = ob,closingbalance = cb)
+                    else:
+                        cb = ob - detail.creditamount
+                        accountentry.objects.filter(id = accountentryid.id).update(openingbalance = ob,closingbalance = cb)
+                    
+            else:
+                ob = accountentryid.closingbalance
+                if not ob:
+                    ob = 0
+                    if detail.drcr == 1:
+                        cb = ob + detail.debitamount
+                        accountentry.objects.filter(id = accountentryid.id).update(closingbalance = cb)
+                    else:
+                        cb = ob - detail.creditamount
+                        accountentry.objects.filter(id = accountentryid.id).update(closingbalance = cb)
+                else:
+                    if detail.drcr == 1:
+                        cb = ob + detail.debitamount
+                        accountentry.objects.filter(id = accountentryid.id).update(closingbalance = cb)
+                    else:
+                        cb = ob - detail.creditamount
+                        accountentry.objects.filter(id = accountentryid.id).update(closingbalance = cb)
+
 
                 
 
@@ -944,14 +955,89 @@ class cashserializer(serializers.ModelSerializer):
 
     def get_cr(self,obj):
         
-        stock =  obj.cashtrans.filter(drcr = False).order_by('account')
-        print(stock)
+        #stock =  obj.cashtrans.filter(drcr = False).order_by('account')
+       # print(stock)
+
+        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = False)
+        #return account1Serializer(accounts,many=True).data
         return stocktranserilaizer(stock, many=True).data
 
     
     def get_dr(self,obj):
-        stock =  obj.cashtrans.filter(drcr = True).order_by('account')
+        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = True)
+        #return account1Serializer(accounts,many=True).data
         return stocktranserilaizer(stock, many=True).data
+
+
+
+
+
+class cbserializer(serializers.ModelSerializer):
+
+
+   # cashtrans = stocktranserilaizer(source = 'account_transactions', many=True, read_only=True)
+
+    openingbalance  = serializers.SerializerMethodField()
+    reciept  = serializers.SerializerMethodField()
+    payment = serializers.SerializerMethodField()
+    entrydate = serializers.SerializerMethodField()
+    payments = serializers.SerializerMethodField()
+    reciepts = serializers.SerializerMethodField()
+
+
+
+
+
+   # stk = stocktranserilaizer(many=True, read_only=True)
+   # select_related_fields = ('accounthead')
+
+    # debit  = serializers.SerializerMethodField()
+   # day = serializers.CharField()
+
+    class Meta:
+        model = entry
+        fields = ['id','entrydate','openingbalance','reciept','payment','payments','reciepts']
+
+    def get_reciept(self, obj):
+
+       # print(obj.cashtrans('account'))
+        # fromDate = parse_datetime(self.context['request'].query_params.get(
+        #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        # toDate = parse_datetime(self.context['request'].query_params.get(
+        #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        return obj.cashtrans.aggregate(Sum('debitamount'))['debitamount__sum']
+
+    def get_payment(self, obj):
+        # fromDate = parse_datetime(self.context['request'].query_params.get(
+        #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        # toDate = parse_datetime(self.context['request'].query_params.get(
+        #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        return obj.cashtrans.filter(accounttype = 'M' ).aggregate(Sum('creditamount'))['creditamount__sum']
+
+    def get_openingbalance(self, obj):
+        # fromDate = parse_datetime(self.context['request'].query_params.get(
+        #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        # toDate = parse_datetime(self.context['request'].query_params.get(
+        #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        return 100
+
+    def get_entrydate(self,obj):
+        return obj.entrydate1
+
+    def get_payments(self,obj):
+        
+        #stock =  obj.cashtrans.filter(drcr = False).order_by('account')
+       # print(stock)
+
+        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = False)
+        #return account1Serializer(accounts,many=True).data
+        return stock1DriverSerializer(stock, many=True).data
+
+    
+    def get_reciepts(self,obj):
+        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = True,accounttype = 'M')
+        #return account1Serializer(accounts,many=True).data
+        return stock1DriverSerializer(stock, many=True).data
 
   
         
@@ -1001,6 +1087,66 @@ class stockserializer(serializers.ModelSerializer):
 
     def get_recivedquantity(self, obj):
         return obj.goods.aggregate(Sum('recivedquantity'))['recivedquantity__sum']
+
+
+
+
+
+class stock1DriverSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = StockTransactions
+        fields = '__all__'
+
+
+class account1Serializer(serializers.ModelSerializer):
+    accounttrans = stock1DriverSerializer(many=True, read_only=True)
+    debit  = serializers.SerializerMethodField()
+    credit = serializers.SerializerMethodField()
+
+    class Meta:
+        model = account
+        fields = ('accountname','accountcode','debit','credit','accounttrans')
+
+    
+    def get_debit(self, obj):
+        # fromDate = parse_datetime(self.context['request'].query_params.get(
+        #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        # toDate = parse_datetime(self.context['request'].query_params.get(
+        #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        return obj.accounttrans.aggregate(Sum('debitamount'))['debitamount__sum']
+
+    def get_credit(self, obj):
+        # fromDate = parse_datetime(self.context['request'].query_params.get(
+        #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        # toDate = parse_datetime(self.context['request'].query_params.get(
+        #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        return obj.accounttrans.aggregate(Sum('creditamount'))['creditamount__sum']
+
+
+class accounthead1Serializer(serializers.ModelSerializer):
+    accounthead_accounts = account1Serializer(many=True, read_only=True)
+    debit  = serializers.SerializerMethodField()
+    credit = serializers.SerializerMethodField()
+   # amount_of_trucks = serializers.IntegerField()
+
+    class Meta:
+        model = accountHead
+        fields = ('name', 'code','debit','credit','accounthead_accounts')
+
+    def get_debit(self, obj):
+        # fromDate = parse_datetime(self.context['request'].query_params.get(
+        #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        # toDate = parse_datetime(self.context['request'].query_params.get(
+        #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        return obj.accounthead_accounts.aggregate(Sum('accounttrans__debitamount'))['accounttrans__debitamount__sum']
+
+    def get_credit(self, obj):
+        # fromDate = parse_datetime(self.context['request'].query_params.get(
+        #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        # toDate = parse_datetime(self.context['request'].query_params.get(
+        #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        return obj.accounthead_accounts.aggregate(Sum('accounttrans__creditamount'))['accounttrans__creditamount__sum']
     
 
 

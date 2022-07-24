@@ -50,6 +50,9 @@ urlpatterns  = [
     path('stockviewapi',views.stockviewapi.as_view(), name = 'journal'),
     path('purchasebook',views.purchasebyaccountapi.as_view(), name = 'purchasebook'),
     path('salebook',views.salebyaccountapi.as_view(), name = 'salebok'),
+    path('cashbook',views.cbviewapi.as_view(), name = 'Trialbalance'),
+
+    
 
 
 
