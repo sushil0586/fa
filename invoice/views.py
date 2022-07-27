@@ -597,9 +597,12 @@ class daybookviewapi(ListAPIView):
 
 
 
-        queryset1=StockTransactions.objects.filter(entity=entity,accounttype = 'M').order_by('account').only('account__accountname','transactiontype','drcr','transactionid','desc','debitamount','creditamount')
+        queryset1=StockTransactions.objects.filter(entity=entity,accounttype = 'M').only('account__accountname','transactiontype','drcr','transactionid','desc').annotate(debit = Sum('debitamount'),credit = Sum('creditamount')).order_by('account')
 
-        queryset=entry.objects.prefetch_related(Prefetch('cashtrans', queryset=queryset1,to_attr='account_transactions')).order_by('-entrydate1')
+        print(queryset1)
+
+        queryset=entry.objects.prefetch_related(Prefetch('cashtrans', queryset=queryset1,to_attr='account_transactions'))
+        print(queryset)
 
        
 
@@ -646,14 +649,16 @@ class ledgerviewapi(ListAPIView):
     filter_backends = [DjangoFilterBackend]
     #filterset_fields = ['id']
     def get_queryset(self):
-        #account = self.request.query_params.get('account')
+        acc = self.request.query_params.get('acc')
         entity = self.request.query_params.get('entity')
+
+        
 
 
 
       #  queryset1=StockTransactions.objects.filter(entity=entity,accounttype = 'M').order_by('account').only('account__accountname','transactiontype','drcr','transactionid','desc','debitamount','creditamount')
 
-        queryset=account.objects.filter(entity=entity).prefetch_related('accounttrans').order_by('accountname')
+        queryset=account.objects.filter(entity=entity,id = acc).prefetch_related('accounttrans').order_by('accountname')
 
        
 
