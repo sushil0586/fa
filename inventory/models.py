@@ -95,8 +95,8 @@ class ProductCategory(TrackingModel):
 
 class Product(TrackingModel):
     productname = models.CharField(max_length= 255,verbose_name=_('Product Name'))
-    productcode = models.IntegerField(default=1001,blank=True,verbose_name=_('Product Code'))
-    productdesc = models.CharField(max_length= 255,verbose_name=_('product desc'))
+    productcode = models.IntegerField(null = True,blank=True,verbose_name=_('Product Code'))
+    productdesc = models.CharField(max_length= 255,null = True,verbose_name=_('product desc'))
     is_pieces = models.BooleanField(default=True)
     openingstockqty = models.DecimalField(max_digits=10, decimal_places=2,default=True,blank=True,null=True)
     openingstockboxqty = models.IntegerField(default=True,blank=True,verbose_name=_('Box/Pcs'),null=True)
