@@ -202,8 +202,15 @@ class entitySerializer(serializers.ModelSerializer):
         package = validated_data.pop('user', [])
         for key in range(len(package)):
             print(key)
-            u = User.objects.create(**package[key])
-            instance.user.add(u)
+            try:
+                id = User.objects.get(email = package[key]['email'])
+                instance.user.add(id)
+            except User.DoesNotExist:
+                 u = User.objects.create(**package[key])
+                 instance.user.add(u)
+
+            
+            
            # print(package[key])
         
         # #instance.user.set(self.create_or_update_packages(package))

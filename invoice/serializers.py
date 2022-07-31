@@ -1530,7 +1530,7 @@ class  ledgersummaryserializer(serializers.ModelSerializer):
         else:
             credit = self.get_credit(obj)
 
-        return  debit - credit
+        return  opening + debit - credit
 
     
     # def get_accounts(self,obj):

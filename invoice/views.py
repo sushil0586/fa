@@ -222,7 +222,7 @@ class purchaseorderpreviousview(RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         entity = self.request.query_params.get('entity')
-        return purchaseorder.objects.filter()
+        return purchaseorder.objects.filter(entity =entity)
 
 class purchaseordelatestview(ListCreateAPIView):
 
@@ -445,7 +445,7 @@ class salesreturnpreviousview(RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         entity = self.request.query_params.get('entity')
-        return salereturn.objects.filter()
+        return salereturn.objects.filter(entity =entity)
     
 
 
