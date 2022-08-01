@@ -102,7 +102,7 @@ class Product(TrackingModel):
     openingstockboxqty = models.IntegerField(blank=True,verbose_name=_('Box/Pcs'),null=True)
     openingstockvalue = models.DecimalField(max_digits=10, decimal_places=2,null=True,default=True)
     productcategory = models.ForeignKey(to= ProductCategory,blank=True, on_delete= models.CASCADE,verbose_name=_('Product Category'))
-    purchaserate = models.DecimalField(max_digits=10, decimal_places=2,default=True,blank=True,verbose_name=_('Purchase Rate'))
+    purchaserate = models.DecimalField(max_digits=10, decimal_places=2,blank=True,verbose_name=_('Purchase Rate'),null=True)
     prlesspercentage = models.DecimalField(max_digits=10, decimal_places=2,null=True,blank=True)
     mrp = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True)
     mrpless = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True)
