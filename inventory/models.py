@@ -114,7 +114,7 @@ class Product(TrackingModel):
     sgstcess = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True)
     igst = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True)
     igstcess = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True)
-    is_stockable = models.BooleanField(default=True)
+    is_product = models.BooleanField(default=True)
     purchaseaccount = models.ForeignKey(account,related_name = 'purchaseaccount',on_delete=models.CASCADE,null=True,blank=True)
     saleaccount = models.ForeignKey(account,on_delete=models.CASCADE,null=True,blank=True)
     hsn = models.IntegerField(default=1001,blank=True,verbose_name=_('Hsn Code'))
