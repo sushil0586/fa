@@ -4,7 +4,7 @@ from django.shortcuts import render
 from rest_framework.generics import CreateAPIView,ListAPIView,ListCreateAPIView,RetrieveUpdateDestroyAPIView
 from inventory.models import Album, Product, Track,ProductCategory,gsttype,typeofgoods,Ratecalculate,UnitofMeasurement
 from inventory.serializers import ProductSerializer,AlbumSerializer,Trackserializer,ProductCategorySerializer,GSTserializer,TOGserializer,UOMserializer,Ratecalculateserializer
-from rest_framework import permissions
+from rest_framework import permissions,filters
 from django_filters.rest_framework import DjangoFilterBackend
 
 
@@ -59,8 +59,11 @@ class productApiView(ListCreateAPIView):
     serializer_class = ProductSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['id','productname',]
+    # filter_backends = [DjangoFilterBackend]
+    # filterset_fields = ['id','productname',]
+
+    filter_backends = [filters.SearchFilter,filters.OrderingFilter]
+    search_fields = ['productname', 'productdesc','id']
 
     def perform_create(self, serializer):
         return serializer.save(createdby = self.request.user)
