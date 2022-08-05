@@ -384,6 +384,7 @@ class goodstransaction(TrackingModel):
     entry = models.ForeignKey(entry,null=True,on_delete=models.CASCADE,related_name='gooddatetrans')
     entrydate = models.DateField(verbose_name='Entry Date',null=True)
     entrydatetime = models.DateTimeField(verbose_name='Entry Date', null=True)
+    goodstransactiontype = models.CharField(max_length=50, null=True,verbose_name='Goods TransactionType')
     entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity')
     createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
 

@@ -53,6 +53,12 @@ urlpatterns  = [
     path('cashbook',views.cbviewapi.as_view(), name = 'Trialbalance'),
     path('ledgerbook',views.ledgerviewapi.as_view(), name = 'Trialbalance'),
     path('ledgersummary',views.ledgersummaryapi.as_view(), name = 'Trialbalance'),
+    path('stockledgersummary',views.stockledgersummaryapi.as_view(), name = 'Trialbalance'),
+    path('stockledgerbook',views.stockledgerbookapi.as_view(), name = 'Trialbalance'),
+
+    
+
+    
 
     
 

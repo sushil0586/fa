@@ -1,3 +1,4 @@
+from itertools import product
 from django.http import request
 from django.shortcuts import render
 
@@ -5,7 +6,7 @@ from rest_framework.generics import CreateAPIView,ListAPIView,ListCreateAPIView,
 from invoice.models import salesOrderdetails,SalesOderHeader,purchaseorder,PurchaseOrderDetails,journal,salereturn,salereturnDetails,PurchaseReturn,Purchasereturndetails,StockTransactions,journalmain,entry,stockdetails,stockmain,goodstransaction
 from invoice.serializers import SalesOderHeaderSerializer,salesOrderdetailsSerializer,purchaseorderSerializer,PurchaseOrderDetailsSerializer,POSerializer,SOSerializer,journalSerializer,SRSerializer,salesreturnSerializer,salesreturnDetailsSerializer,JournalVSerializer,PurchasereturnSerializer,\
 purchasereturndetailsSerializer,PRSerializer,TrialbalanceSerializer,TrialbalanceSerializerbyaccounthead,TrialbalanceSerializerbyaccount,accountheadserializer,accountHead,accountserializer,accounthserializer, stocktranserilaizer,cashserializer,journalmainSerializer,stockdetailsSerializer,stockmainSerializer,\
-PRSerializer,SRSerializer,stockVSerializer,stockserializer,Purchasebyaccountserializer,Salebyaccountserializer,accounthead1Serializer,cbserializer,ledgerserializer,ledgersummaryserializer
+PRSerializer,SRSerializer,stockVSerializer,stockserializer,Purchasebyaccountserializer,Salebyaccountserializer,accounthead1Serializer,cbserializer,ledgerserializer,ledgersummaryserializer,stockledgersummaryserializer,stockledgerbookserializer
 from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db import DatabaseError, transaction
@@ -14,6 +15,7 @@ from django.db.models import Sum,OuterRef,Subquery,F
 from django.db.models import Prefetch
 from financial.models import account
 from inventory.models import Product
+from django.db import connection
 
 
 class SalesOderHeaderApiView(ListCreateAPIView):
@@ -572,7 +574,17 @@ class Trialviewaccount(ListAPIView):
 
         queryset1=StockTransactions.objects.filter(entity=entity).order_by('entity').only('account__accountname','transactiontype','transactionid','entrydatetime','desc','debitamount','creditamount')
 
+        print(connection.queries[-1])
+
+        print(queryset1.values())
+
         queryset=account.objects.prefetch_related(Prefetch('accounttrans', queryset=queryset1,to_attr='account_transactions'))
+
+        print(queryset.values())
+      #  print(connection.queries[])
+
+
+        
 
         
         #stk = account.objects.prefetch_related(Prefetch('accounthead_accounts', queryset=queryset1, to_attr='account_transactions')
@@ -707,6 +719,72 @@ class ledgersummaryapi(ListAPIView):
         
      
         return queryset
+
+
+
+
+class stockledgersummaryapi(ListAPIView):
+
+    serializer_class = stockledgersummaryserializer
+  #  filter_class = accountheadFilter
+    permission_classes = (permissions.IsAuthenticated,)
+
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = {'id':["in", "exact"]
+    
+    }
+    #filterset_fields = ['id']
+    def get_queryset(self):
+       # acc = self.request.query_params.get('acc')
+        entity = self.request.query_params.get('entity')
+
+        
+
+
+
+      #  queryset1=StockTransactions.objects.filter(entity=entity,accounttype = 'M').order_by('account').only('account__accountname','transactiontype','drcr','transactionid','desc','debitamount','creditamount')
+
+        queryset=Product.objects.filter(entity=entity).prefetch_related('goods').order_by('productname')
+
+       
+
+     
+        
+     
+        return queryset
+
+
+class stockledgerbookapi(ListAPIView):
+
+    serializer_class = stockledgerbookserializer
+  #  filter_class = accountheadFilter
+    permission_classes = (permissions.IsAuthenticated,)
+
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = {'id':["in", "exact"]
+    
+    }
+    #filterset_fields = ['id']
+    def get_queryset(self):
+       # acc = self.request.query_params.get('acc')
+        entity = self.request.query_params.get('entity')
+
+        
+
+
+
+      #  queryset1=StockTransactions.objects.filter(entity=entity,accounttype = 'M').order_by('account').only('account__accountname','transactiontype','drcr','transactionid','desc','debitamount','creditamount')
+
+        queryset=Product.objects.filter(entity=entity).prefetch_related('goods').order_by('productname')
+
+       
+
+     
+        
+     
+        return queryset
+
+
 
 
 
