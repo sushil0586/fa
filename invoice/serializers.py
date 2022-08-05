@@ -86,7 +86,8 @@ class stocktransaction:
         entryid,created  = entry.objects.get_or_create(entrydate1 = self.order.billdate,entity=self.order.entity)
 
         details = StockTransactions.objects.create(accounthead = detail.product.purchaseaccount.accounthead,account= detail.product.purchaseaccount,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,desc = self.description + ' '  + str(self.order.voucherno),stockttype = stocktype,purchasequantity = qty,drcr = self.debit,debitamount = detail.amount,cgstdr = detail.cgst,sgstdr= detail.sgst,igstdr = detail.igst,entrydate = self.order.billdate,entity = self.order.entity,createdby = self.order.createdby,entry = entryid,entrydatetime = self.order.billdate)
-        goodstransaction.objects.create(account= detail.product.purchaseaccount,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,stockttype = stocktype,purchasequantity = qty,entrydatetime = self.order.billdate,entity = self.order.entity,createdby = self.order.createdby,entry = entryid)
+        goodstransaction.objects.create(account= detail.product.purchaseaccount,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,stockttype = stocktype,purchasequantity = qty,entrydatetime = self.order.billdate,entity = self.order.entity,createdby = self.order.createdby,entry = entryid,goodstransactiontype = 'D')
+        goodstransaction.objects.create(account= self.order.account,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,stockttype = stocktype,purchasequantity = qty,entrydatetime = self.order.billdate,entity = self.order.entity,createdby = self.order.createdby,entry = entryid,goodstransactiontype = 'M')
 
 
         return details
@@ -166,7 +167,8 @@ class stocktransactionsale:
                 qty = detail.orderqty
         entryid,created  = entry.objects.get_or_create(entrydate1 = self.order.sorderdate,entity=self.order.entity)
         details = StockTransactions.objects.create(accounthead = detail.product.saleaccount.accounthead,account= detail.product.saleaccount,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,desc = self.description + ' ' + str(self.order.billno),stockttype = stocktype,salequantity = qty,drcr = self.credit,creditamount = detail.amount,cgstdr = detail.cgst,sgstdr= detail.sgst,igstdr = detail.igst,entrydate = self.order.sorderdate,entity = self.order.entity,createdby = self.order.owner,entry = entryid)
-        goodstransaction.objects.create(account= detail.product.saleaccount,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,stockttype = stocktype,salequantity = qty,entrydatetime = self.order.sorderdate,entity = self.order.entity,createdby = self.order.owner,entry = entryid)
+        goodstransaction.objects.create(account= detail.product.saleaccount,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,stockttype = stocktype,salequantity = qty,entrydatetime = self.order.sorderdate,entity = self.order.entity,createdby = self.order.owner,entry = entryid,goodstransactiontype = 'D')
+        goodstransaction.objects.create(account= self.order.accountid,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,stockttype = stocktype,salequantity = qty,entrydatetime = self.order.sorderdate,entity = self.order.entity,createdby = self.order.owner,entry = entryid,goodstransactiontype = 'M')
 
         return details
 
@@ -1508,7 +1510,169 @@ class  ledgersummaryserializer(serializers.ModelSerializer):
     #     #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
     #     return obj.cashtrans.filter(accounttype = 'CIH',transactiontype = 'C' ).aggregate(Sum('creditamount'))['creditamount__sum']
 
-  
+class  stockledgersummaryserializer(serializers.ModelSerializer):
+
+
+   # accounttrans = stocktranledgerserilaizer(many=True, read_only=True)
+
+    openingbalance  = serializers.SerializerMethodField()
+    sale  = serializers.SerializerMethodField()
+    purchase = serializers.SerializerMethodField()
+    issued  = serializers.SerializerMethodField()
+    recieved = serializers.SerializerMethodField()
+ 
+    balancetotal = serializers.SerializerMethodField()
+    # paymenttotal = serializers.SerializerMethodField()
+
+
+
+
+
+    class Meta:
+        model = Product
+        fields = ['id','productname','sale','purchase','issued','recieved','openingbalance','balancetotal',]
+
+    def get_openingbalance(self, obj):
+
+        yesterday = date.today() - timedelta(days = 100)
+
+        startdate = datetime.strptime(self.context['request'].query_params.get('startdate'), '%Y-%m-%d') - timedelta(days = 1)
+       
+         
+     
+       
+    
+        sale = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity).aggregate(Sum('salequantity'))['salequantity__sum']
+        purchase = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity).aggregate(Sum('purchasequantity'))['purchasequantity__sum']
+        issued = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity).aggregate(Sum('issuedquantity'))['issuedquantity__sum']
+        recived = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity).aggregate(Sum('recivedquantity'))['recivedquantity__sum']
+        # debit = obj.cashtrans.filter(accounttype = 'CIH').aggregate(Sum('debitamount'))['debitamount__sum']
+        # credit = obj.cashtrans.filter(accounttype = 'CIH').aggregate(Sum('creditamount'))['creditamount__sum']
+
+      
+        if not sale:
+            sale = 0
+        if not purchase:
+            purchase = 0
+        if not issued:
+            issued = 0
+        if not recived:
+            recived = 0
+
+
+        # fromDate = parse_datetime(self.context['request'].query_params.get(
+        #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        # toDate = parse_datetime(self.context['request'].query_params.get(
+        #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        return purchase + recived - sale - issued
+
+    def get_sale(self, obj):
+
+        # yesterday = obj.entrydate1 - timedelta(days = 0)
+        # startdate = obj.entrydate1 - timedelta(days = 10)
+
+        startdate = self.context['request'].query_params.get('startdate')
+        enddate = self.context['request'].query_params.get('enddate')
+
+        sale = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate)).aggregate(Sum('salequantity'))['salequantity__sum']
+
+        if self.get_openingbalance(obj=obj) > 0:
+            ob = self.get_openingbalance(obj=obj)
+        else:
+            ob = 0
+
+        if not sale:
+            sale = 0
+        else:
+            sale = sale
+            
+
+
+      
+        return sale
+
+    def get_purchase(self, obj):
+
+        # yesterday = obj.entrydate1 - timedelta(days = 0)
+        # startdate = obj.entrydate1 - timedelta(days = 10)
+
+        startdate = self.context['request'].query_params.get('startdate')
+        enddate = self.context['request'].query_params.get('enddate')
+
+        purchase = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate)).aggregate(Sum('purchasequantity'))['purchasequantity__sum']
+
+        if self.get_openingbalance(obj=obj) < 0:
+            ob = self.get_openingbalance(obj=obj)
+        else:
+            ob = 0
+
+        if not purchase:
+            purchase = 0
+        
+
+       # print(obj.cashtrans('account'))
+        # fromDate = parse_datetime(self.context['request'].query_params.get(
+        #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        # toDate = parse_datetime(self.context['request'].query_params.get(
+        #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        return purchase
+
+
+    def get_issued(self, obj):
+
+        # yesterday = obj.entrydate1 - timedelta(days = 0)
+        # startdate = obj.entrydate1 - timedelta(days = 10)
+
+        startdate = self.context['request'].query_params.get('startdate')
+        enddate = self.context['request'].query_params.get('enddate')
+
+        issued = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate)).aggregate(Sum('issuedquantity'))['issuedquantity__sum']
+
+        if self.get_openingbalance(obj=obj) < 0:
+            ob = self.get_openingbalance(obj=obj)
+        else:
+            ob = 0
+
+        if not issued:
+            issued = 0
+        
+
+       # print(obj.cashtrans('account'))
+        # fromDate = parse_datetime(self.context['request'].query_params.get(
+        #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        # toDate = parse_datetime(self.context['request'].query_params.get(
+        #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        return issued
+
+
+    def get_recieved(self, obj):
+
+        # yesterday = obj.entrydate1 - timedelta(days = 0)
+        # startdate = obj.entrydate1 - timedelta(days = 10)
+
+        startdate = self.context['request'].query_params.get('startdate')
+        enddate = self.context['request'].query_params.get('enddate')
+
+        recieved = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate)).aggregate(Sum('recivedquantity'))['recivedquantity__sum']
+
+        if self.get_openingbalance(obj=obj) < 0:
+            ob = self.get_openingbalance(obj=obj)
+        else:
+            ob = 0
+
+        if not recieved:
+            recieved = 0
+        
+
+       # print(obj.cashtrans('account'))
+        # fromDate = parse_datetime(self.context['request'].query_params.get(
+        #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        # toDate = parse_datetime(self.context['request'].query_params.get(
+        #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        return recieved
+
+
+
 
     
    
@@ -1520,35 +1684,243 @@ class  ledgersummaryserializer(serializers.ModelSerializer):
         else:
             opening = self.get_openingbalance(obj)
 
-        if not self.get_debit(obj):
-            debit = 0
+        if not self.get_sale(obj):
+            sale = 0
         else:
-            debit = self.get_debit(obj)
+            sale = self.get_sale(obj)
 
-        if not self.get_credit(obj):
-            credit = 0
+        if not self.get_purchase(obj):
+            purchase = 0
         else:
-            credit = self.get_credit(obj)
+            purchase = self.get_purchase(obj)
+        
+        if not self.get_issued(obj):
+            issued = 0
+        else:
+            issued = self.get_issued(obj)
 
-        return  opening + debit - credit
+        if not self.get_recieved(obj):
+            recived = 0
+        else:
+            recived = self.get_recieved(obj)
+
+        return  opening + purchase - sale + recived  -issued
+
+
+class  stockledgerbookserializer(serializers.ModelSerializer):
+
+
+   # accounttrans = stocktranledgerserilaizer(many=True, read_only=True)
+
+    openingbalance  = serializers.SerializerMethodField()
+    sale  = serializers.SerializerMethodField()
+    purchase = serializers.SerializerMethodField()
+    issued  = serializers.SerializerMethodField()
+    recieved = serializers.SerializerMethodField()
+    stock = serializers.SerializerMethodField()
+ 
+    balancetotal = serializers.SerializerMethodField()
+    # paymenttotal = serializers.SerializerMethodField()
+
+
+
+
+
+    class Meta:
+        model = Product
+        fields = ['id','productname','sale','purchase','issued','recieved','openingbalance','balancetotal','stock',]
+
+    def get_openingbalance(self, obj):
+
+        yesterday = date.today() - timedelta(days = 100)
+
+        startdate = datetime.strptime(self.context['request'].query_params.get('startdate'), '%Y-%m-%d') - timedelta(days = 1)
+       
+         
+     
+       
+    
+        sale = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity).aggregate(Sum('salequantity'))['salequantity__sum']
+        purchase = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity).aggregate(Sum('purchasequantity'))['purchasequantity__sum']
+        issued = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity).aggregate(Sum('issuedquantity'))['issuedquantity__sum']
+        recived = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity).aggregate(Sum('recivedquantity'))['recivedquantity__sum']
+        # debit = obj.cashtrans.filter(accounttype = 'CIH').aggregate(Sum('debitamount'))['debitamount__sum']
+        # credit = obj.cashtrans.filter(accounttype = 'CIH').aggregate(Sum('creditamount'))['creditamount__sum']
+
+      
+        if not sale:
+            sale = 0
+        if not purchase:
+            purchase = 0
+        if not issued:
+            issued = 0
+        if not recived:
+            recived = 0
+
+
+        # fromDate = parse_datetime(self.context['request'].query_params.get(
+        #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        # toDate = parse_datetime(self.context['request'].query_params.get(
+        #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        return purchase + recived - sale - issued
+
+    def get_sale(self, obj):
+
+        # yesterday = obj.entrydate1 - timedelta(days = 0)
+        # startdate = obj.entrydate1 - timedelta(days = 10)
+
+        startdate = self.context['request'].query_params.get('startdate')
+        enddate = self.context['request'].query_params.get('enddate')
+
+        sale = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate)).aggregate(Sum('salequantity'))['salequantity__sum']
+
+        if self.get_openingbalance(obj=obj) > 0:
+            ob = self.get_openingbalance(obj=obj)
+        else:
+            ob = 0
+
+        if not sale:
+            sale = 0
+        else:
+            sale = sale
+            
+
+
+      
+        return sale
+
+    def get_purchase(self, obj):
+
+        # yesterday = obj.entrydate1 - timedelta(days = 0)
+        # startdate = obj.entrydate1 - timedelta(days = 10)
+
+        startdate = self.context['request'].query_params.get('startdate')
+        enddate = self.context['request'].query_params.get('enddate')
+
+        purchase = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate)).aggregate(Sum('purchasequantity'))['purchasequantity__sum']
+
+        if self.get_openingbalance(obj=obj) < 0:
+            ob = self.get_openingbalance(obj=obj)
+        else:
+            ob = 0
+
+        if not purchase:
+            purchase = 0
+        
+
+       # print(obj.cashtrans('account'))
+        # fromDate = parse_datetime(self.context['request'].query_params.get(
+        #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        # toDate = parse_datetime(self.context['request'].query_params.get(
+        #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        return purchase
+
+
+    def get_issued(self, obj):
+
+        # yesterday = obj.entrydate1 - timedelta(days = 0)
+        # startdate = obj.entrydate1 - timedelta(days = 10)
+
+        startdate = self.context['request'].query_params.get('startdate')
+        enddate = self.context['request'].query_params.get('enddate')
+
+        issued = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate)).aggregate(Sum('issuedquantity'))['issuedquantity__sum']
+
+        if self.get_openingbalance(obj=obj) < 0:
+            ob = self.get_openingbalance(obj=obj)
+        else:
+            ob = 0
+
+        if not issued:
+            issued = 0
+        
+
+       # print(obj.cashtrans('account'))
+        # fromDate = parse_datetime(self.context['request'].query_params.get(
+        #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        # toDate = parse_datetime(self.context['request'].query_params.get(
+        #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        return issued
+
+
+    def get_recieved(self, obj):
+
+        # yesterday = obj.entrydate1 - timedelta(days = 0)
+        # startdate = obj.entrydate1 - timedelta(days = 10)
+
+        startdate = self.context['request'].query_params.get('startdate')
+        enddate = self.context['request'].query_params.get('enddate')
+
+        recieved = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate)).aggregate(Sum('recivedquantity'))['recivedquantity__sum']
+
+        if self.get_openingbalance(obj=obj) < 0:
+            ob = self.get_openingbalance(obj=obj)
+        else:
+            ob = 0
+
+        if not recieved:
+            recieved = 0
+        
+
+       # print(obj.cashtrans('account'))
+        # fromDate = parse_datetime(self.context['request'].query_params.get(
+        #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        # toDate = parse_datetime(self.context['request'].query_params.get(
+        #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+        return recieved
+
+
+
 
     
-    # def get_accounts(self,obj):
+   
 
-    #     startdate = self.context['request'].query_params.get('startdate')
-    #     enddate = self.context['request'].query_params.get('enddate')
+    def get_balancetotal(self,obj):
 
-    #     stock = obj.accounttrans.filter(entry__entrydate1__range = (startdate,enddate)).values('account','entry','transactiontype','transactionid','drcr','desc').annotate(debitamount = Sum('debitamount'),creditamount = Sum('creditamount')).order_by('entry__entrydate1')
-    #     #return account1Serializer(accounts,many=True).data
-    #     #return account1Serializer(accounts,many=True).data
-    #     #stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = False)
+        if not self.get_openingbalance(obj):
+            opening = 0
+        else:
+            opening = self.get_openingbalance(obj)
 
-    #     stock = stock.annotate(accountname=F('account__accountname'),entrydate = F('entry__entrydate1'))
-    #     return stock
-    #     #return stocktranledgerserilaizer(stock, many=True).data
+        if not self.get_sale(obj):
+            sale = 0
+        else:
+            sale = self.get_sale(obj)
+
+        if not self.get_purchase(obj):
+            purchase = 0
+        else:
+            purchase = self.get_purchase(obj)
+        
+        if not self.get_issued(obj):
+            issued = 0
+        else:
+            issued = self.get_issued(obj)
+
+        if not self.get_recieved(obj):
+            recived = 0
+        else:
+            recived = self.get_recieved(obj)
+
+        return  opening + purchase - sale + recived  -issued
 
 
-  
+    def get_stock(self,obj):
+
+        startdate = self.context['request'].query_params.get('startdate')
+        enddate = self.context['request'].query_params.get('enddate')
+
+        stock = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate)).values('stock','entry','transactiontype','transactionid','stockttype','desc').annotate(salequantity = Sum('salequantity'),purchasequantity = Sum('purchasequantity'),issuedquantity = Sum('issuedquantity'),recivedquantity = Sum('recivedquantity')).order_by('entry__entrydate1')
+        #return account1Serializer(accounts,many=True).data
+        #return account1Serializer(accounts,many=True).data
+        #stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = False)
+
+        stock = stock.annotate(productname=F('stock__productname'),entrydate = F('entry__entrydate1'))
+        return stock
+
+
+
+
         
 
 
@@ -1709,12 +2081,12 @@ class accountserializer(serializers.ModelSerializer):
 
     class Meta:
         model = account
-        fields = ['id','accountname','debit','credit', 'accounttrans']
+        fields = ['id','accountname','debit','credit', 'accounttrans',]
         
     
     def get_dateentry(self, obj):
 
-        print(obj)
+      #  print(obj)
         # fromDate = parse_datetime(self.context['request'].query_params.get(
         #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
         # toDate = parse_datetime(self.context['request'].query_params.get(
@@ -1725,7 +2097,7 @@ class accountserializer(serializers.ModelSerializer):
 
     def get_debit(self, obj):
 
-        print(obj)
+     #   print(obj)
         # fromDate = parse_datetime(self.context['request'].query_params.get(
         #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
         # toDate = parse_datetime(self.context['request'].query_params.get(
@@ -1743,7 +2115,7 @@ class accountserializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        print(representation)
+       # print(representation)
         if not representation['accounttrans']:
             return None
         return representation

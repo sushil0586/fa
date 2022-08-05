@@ -154,4 +154,18 @@ class submenu(TrackingModel):
         return f'{self.submenu}'
 
 
+class rolepriv(TrackingModel):
+    role =     models.ManyToManyField(Role,null= True,related_name='roles')
+    mainmenu =     models.ManyToManyField(MainMenu,null= True,related_name='mainmenus')
+ 
+
+
+    class Meta:
+        verbose_name = _('Role Priveledge')
+        verbose_name_plural = _('Role Priveledges')
+
+
+    
+    def __str__(self):
+        return f'{self.role}'
 
