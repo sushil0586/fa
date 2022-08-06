@@ -1561,10 +1561,10 @@ class  stockledgersummaryserializer(serializers.ModelSerializer):
      
        
     
-        sale = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity).aggregate(Sum('salequantity'))['salequantity__sum']
-        purchase = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity).aggregate(Sum('purchasequantity'))['purchasequantity__sum']
-        issued = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity).aggregate(Sum('issuedquantity'))['issuedquantity__sum']
-        recived = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity).aggregate(Sum('recivedquantity'))['recivedquantity__sum']
+        sale = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity,goodstransactiontype = 'M').aggregate(Sum('salequantity'))['salequantity__sum']
+        purchase = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity,goodstransactiontype = 'M').aggregate(Sum('purchasequantity'))['purchasequantity__sum']
+        issued = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity,goodstransactiontype = 'M').aggregate(Sum('issuedquantity'))['issuedquantity__sum']
+        recived = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity,goodstransactiontype = 'M').aggregate(Sum('recivedquantity'))['recivedquantity__sum']
         # debit = obj.cashtrans.filter(accounttype = 'CIH').aggregate(Sum('debitamount'))['debitamount__sum']
         # credit = obj.cashtrans.filter(accounttype = 'CIH').aggregate(Sum('creditamount'))['creditamount__sum']
 
@@ -1593,7 +1593,7 @@ class  stockledgersummaryserializer(serializers.ModelSerializer):
         startdate = self.context['request'].query_params.get('startdate')
         enddate = self.context['request'].query_params.get('enddate')
 
-        sale = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate)).aggregate(Sum('salequantity'))['salequantity__sum']
+        sale = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate),goodstransactiontype = 'M').aggregate(Sum('salequantity'))['salequantity__sum']
 
         if self.get_openingbalance(obj=obj) > 0:
             ob = self.get_openingbalance(obj=obj)
@@ -1618,7 +1618,7 @@ class  stockledgersummaryserializer(serializers.ModelSerializer):
         startdate = self.context['request'].query_params.get('startdate')
         enddate = self.context['request'].query_params.get('enddate')
 
-        purchase = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate)).aggregate(Sum('purchasequantity'))['purchasequantity__sum']
+        purchase = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate),goodstransactiontype = 'M').aggregate(Sum('purchasequantity'))['purchasequantity__sum']
 
         if self.get_openingbalance(obj=obj) < 0:
             ob = self.get_openingbalance(obj=obj)
@@ -1645,7 +1645,7 @@ class  stockledgersummaryserializer(serializers.ModelSerializer):
         startdate = self.context['request'].query_params.get('startdate')
         enddate = self.context['request'].query_params.get('enddate')
 
-        issued = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate)).aggregate(Sum('issuedquantity'))['issuedquantity__sum']
+        issued = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate),goodstransactiontype = 'M').aggregate(Sum('issuedquantity'))['issuedquantity__sum']
 
         if self.get_openingbalance(obj=obj) < 0:
             ob = self.get_openingbalance(obj=obj)
@@ -1672,7 +1672,7 @@ class  stockledgersummaryserializer(serializers.ModelSerializer):
         startdate = self.context['request'].query_params.get('startdate')
         enddate = self.context['request'].query_params.get('enddate')
 
-        recieved = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate)).aggregate(Sum('recivedquantity'))['recivedquantity__sum']
+        recieved = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate),goodstransactiontype = 'M').aggregate(Sum('recivedquantity'))['recivedquantity__sum']
 
         if self.get_openingbalance(obj=obj) < 0:
             ob = self.get_openingbalance(obj=obj)
@@ -1759,10 +1759,10 @@ class  stockledgerbookserializer(serializers.ModelSerializer):
      
        
     
-        sale = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity).aggregate(Sum('salequantity'))['salequantity__sum']
-        purchase = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity).aggregate(Sum('purchasequantity'))['purchasequantity__sum']
-        issued = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity).aggregate(Sum('issuedquantity'))['issuedquantity__sum']
-        recived = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity).aggregate(Sum('recivedquantity'))['recivedquantity__sum']
+        sale = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity,goodstransactiontype = 'M').aggregate(Sum('salequantity'))['salequantity__sum']
+        purchase = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity,goodstransactiontype = 'M').aggregate(Sum('purchasequantity'))['purchasequantity__sum']
+        issued = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity,goodstransactiontype = 'M').aggregate(Sum('issuedquantity'))['issuedquantity__sum']
+        recived = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity,goodstransactiontype = 'M').aggregate(Sum('recivedquantity'))['recivedquantity__sum']
         # debit = obj.cashtrans.filter(accounttype = 'CIH').aggregate(Sum('debitamount'))['debitamount__sum']
         # credit = obj.cashtrans.filter(accounttype = 'CIH').aggregate(Sum('creditamount'))['creditamount__sum']
 
@@ -1791,7 +1791,7 @@ class  stockledgerbookserializer(serializers.ModelSerializer):
         startdate = self.context['request'].query_params.get('startdate')
         enddate = self.context['request'].query_params.get('enddate')
 
-        sale = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate)).aggregate(Sum('salequantity'))['salequantity__sum']
+        sale = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate),goodstransactiontype = 'M').aggregate(Sum('salequantity'))['salequantity__sum']
 
         if self.get_openingbalance(obj=obj) > 0:
             ob = self.get_openingbalance(obj=obj)
@@ -1816,7 +1816,7 @@ class  stockledgerbookserializer(serializers.ModelSerializer):
         startdate = self.context['request'].query_params.get('startdate')
         enddate = self.context['request'].query_params.get('enddate')
 
-        purchase = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate)).aggregate(Sum('purchasequantity'))['purchasequantity__sum']
+        purchase = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate),goodstransactiontype = 'M').aggregate(Sum('purchasequantity'))['purchasequantity__sum']
 
         if self.get_openingbalance(obj=obj) < 0:
             ob = self.get_openingbalance(obj=obj)
@@ -1843,7 +1843,7 @@ class  stockledgerbookserializer(serializers.ModelSerializer):
         startdate = self.context['request'].query_params.get('startdate')
         enddate = self.context['request'].query_params.get('enddate')
 
-        issued = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate)).aggregate(Sum('issuedquantity'))['issuedquantity__sum']
+        issued = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate),goodstransactiontype = 'M').aggregate(Sum('issuedquantity'))['issuedquantity__sum']
 
         if self.get_openingbalance(obj=obj) < 0:
             ob = self.get_openingbalance(obj=obj)
@@ -1870,7 +1870,7 @@ class  stockledgerbookserializer(serializers.ModelSerializer):
         startdate = self.context['request'].query_params.get('startdate')
         enddate = self.context['request'].query_params.get('enddate')
 
-        recieved = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate)).aggregate(Sum('recivedquantity'))['recivedquantity__sum']
+        recieved = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate),goodstransactiontype = 'M').aggregate(Sum('recivedquantity'))['recivedquantity__sum']
 
         if self.get_openingbalance(obj=obj) < 0:
             ob = self.get_openingbalance(obj=obj)
@@ -1929,7 +1929,7 @@ class  stockledgerbookserializer(serializers.ModelSerializer):
         startdate = self.context['request'].query_params.get('startdate')
         enddate = self.context['request'].query_params.get('enddate')
 
-        stock = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate)).values('stock','entry','transactiontype','transactionid','stockttype','desc').annotate(salequantity = Sum('salequantity'),purchasequantity = Sum('purchasequantity'),issuedquantity = Sum('issuedquantity'),recivedquantity = Sum('recivedquantity')).order_by('entry__entrydate1')
+        stock = obj.goods.filter(stock = obj.id,entry__entrydate1__range = (startdate,enddate),goodstransactiontype = 'M').values('stock','entry','transactiontype','transactionid','stockttype','desc').annotate(salequantity = Sum('salequantity'),purchasequantity = Sum('purchasequantity'),issuedquantity = Sum('issuedquantity'),recivedquantity = Sum('recivedquantity')).order_by('entry__entrydate1')
         #return account1Serializer(accounts,many=True).data
         #return account1Serializer(accounts,many=True).data
         #stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = False)
