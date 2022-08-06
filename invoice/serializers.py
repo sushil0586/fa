@@ -1503,6 +1503,25 @@ class  ledgersummaryserializer(serializers.ModelSerializer):
         #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
         return credit
 
+
+    def get_balancetotal(self,obj):
+        if not self.get_openingbalance(obj):
+            opening = 0
+        else:
+            opening = self.get_openingbalance(obj)
+
+        if not self.get_debit(obj):
+            debit = 0
+        else:
+            debit = self.get_debit(obj)
+
+        if not self.get_credit(obj):
+            credit = 0
+        else:
+            credit = self.get_credit(obj)
+        
+        return opening + debit - credit
+
     # def get_payment(self, obj):
     #     # fromDate = parse_datetime(self.context['request'].query_params.get(
     #     #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
