@@ -55,6 +55,9 @@ urlpatterns  = [
     path('ledgersummary',views.ledgersummaryapi.as_view(), name = 'Trialbalance'),
     path('stockledgersummary',views.stockledgersummaryapi.as_view(), name = 'Trialbalance'),
     path('stockledgerbook',views.stockledgerbookapi.as_view(), name = 'Trialbalance'),
+    path('Balancesheet',views.Balancesheetapi.as_view(), name = 'Trialbalance'),
+
+    
 
     
 

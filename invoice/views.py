@@ -6,7 +6,7 @@ from rest_framework.generics import CreateAPIView,ListAPIView,ListCreateAPIView,
 from invoice.models import salesOrderdetails,SalesOderHeader,purchaseorder,PurchaseOrderDetails,journal,salereturn,salereturnDetails,PurchaseReturn,Purchasereturndetails,StockTransactions,journalmain,entry,stockdetails,stockmain,goodstransaction
 from invoice.serializers import SalesOderHeaderSerializer,salesOrderdetailsSerializer,purchaseorderSerializer,PurchaseOrderDetailsSerializer,POSerializer,SOSerializer,journalSerializer,SRSerializer,salesreturnSerializer,salesreturnDetailsSerializer,JournalVSerializer,PurchasereturnSerializer,\
 purchasereturndetailsSerializer,PRSerializer,TrialbalanceSerializer,TrialbalanceSerializerbyaccounthead,TrialbalanceSerializerbyaccount,accountheadserializer,accountHead,accountserializer,accounthserializer, stocktranserilaizer,cashserializer,journalmainSerializer,stockdetailsSerializer,stockmainSerializer,\
-PRSerializer,SRSerializer,stockVSerializer,stockserializer,Purchasebyaccountserializer,Salebyaccountserializer,accounthead1Serializer,cbserializer,ledgerserializer,ledgersummaryserializer,stockledgersummaryserializer,stockledgerbookserializer
+PRSerializer,SRSerializer,stockVSerializer,stockserializer,Purchasebyaccountserializer,Salebyaccountserializer,accounthead1Serializer,cbserializer,ledgerserializer,ledgersummaryserializer,stockledgersummaryserializer,stockledgerbookserializer,balancesheetserializer
 from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db import DatabaseError, transaction
@@ -16,6 +16,7 @@ from django.db.models import Prefetch
 from financial.models import account
 from inventory.models import Product
 from django.db import connection
+from django.core import serializers
 
 
 class SalesOderHeaderApiView(ListCreateAPIView):
@@ -581,6 +582,40 @@ class Trialviewaccount(ListAPIView):
         queryset=account.objects.prefetch_related(Prefetch('accounttrans', queryset=queryset1,to_attr='account_transactions'))
 
         print(queryset.values())
+      #  print(connection.queries[])
+
+
+        
+
+        
+        #stk = account.objects.prefetch_related(Prefetch('accounthead_accounts', queryset=queryset1, to_attr='account_transactions')
+        
+     
+        return queryset
+
+
+
+
+
+class Balancesheetapi(ListAPIView):
+
+    serializer_class = balancesheetserializer
+  #  filter_class = accountheadFilter
+    permission_classes = (permissions.IsAuthenticated,)
+
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['id']
+    def get_queryset(self):
+        #account = self.request.query_params.get('account')
+
+        queryset = accountHead.objects.filter(balanceType = 'Credit').prefetch_related('accounthead_accounts__accounttrans')
+
+       # qs_json = serializers.serialize('json', queryset)
+       
+
+      #  queryset=account.objects.prefetch_related(Prefetch('accounttrans', queryset=queryset1,to_attr='account_transactions'))
+
+      #  print(qs_json)
       #  print(connection.queries[])
 
 

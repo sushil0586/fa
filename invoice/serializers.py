@@ -750,11 +750,11 @@ class TrialbalanceSerializer(serializers.ModelSerializer):
 
         if representation['debit'] and representation['credit']:
             if float(representation['debit']) - float(representation['credit']) > 0:
-                representation['debit'] = float(representation['debit']) - float(representation['credit'])
+                representation['debit'] = ("{:0.2f}".format(float(representation['debit']) - float(representation['credit'])))
                 representation['credit'] = ''
                 return representation
             else:
-                representation['credit'] = float(representation['credit']) - float(representation['debit'])
+                representation['credit'] = ("{:0.2f}".format(float(representation['credit']) - float(representation['debit'])))
                 representation['debit'] = ' '
                 return representation
         return representation
@@ -2091,6 +2091,46 @@ class accountheadserializer(serializers.ModelSerializer):
 
 
 
+        
+    
+    # def get_dateentry(self, obj):
+
+    #   #  print(obj)
+    #     # fromDate = parse_datetime(self.context['request'].query_params.get(
+    #     #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+    #     # toDate = parse_datetime(self.context['request'].query_params.get(
+    #     #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+    #    # aggregate(Sum('debitamount'))['debitamount__sum']
+    #     return obj.accounttrans.values('entrydate').annotate(debit = Sum('debitamount'),credit = Sum('creditamount') )
+
+
+    # def get_debit(self, obj):
+
+    #  #   print(obj)
+    #     # fromDate = parse_datetime(self.context['request'].query_params.get(
+    #     #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+    #     # toDate = parse_datetime(self.context['request'].query_params.get(
+    #     #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+    #     return obj.accounttrans.aggregate(Sum('debitamount'))['debitamount__sum']
+
+    # def get_credit(self, obj):
+    #     # fromDate = parse_datetime(self.context['request'].query_params.get(
+    #     #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+    #     # toDate = parse_datetime(self.context['request'].query_params.get(
+    #     #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
+    #     if not obj.accounttrans.aggregate(Sum('creditamount'))['creditamount__sum']:
+    #         return ''
+    #     return obj.accounttrans.aggregate(Sum('creditamount'))['creditamount__sum']
+
+    # def to_representation(self, instance):
+    #     representation = super().to_representation(instance)
+    #    # print(representation)
+    #     if not representation['accounttrans']:
+    #         return None
+    #     return representation
+
+
+
 class accountserializer(serializers.ModelSerializer):
     accounttrans = stocktranserilaizer(source = 'account_transactions', many=True, read_only=True)
 
@@ -2132,15 +2172,38 @@ class accountserializer(serializers.ModelSerializer):
             return ''
         return obj.accounttrans.aggregate(Sum('creditamount'))['creditamount__sum']
 
-    def to_representation(self, instance):
-        representation = super().to_representation(instance)
-       # print(representation)
-        if not representation['accounttrans']:
-            return None
-        return representation
+    # def to_representation(self, instance):
+    #     representation = super().to_representation(instance)
+    #    # print(representation)
+    #     if not representation['accounttrans']:
+    #         return None
+    #     return representation
 
-        # print(representation)
-        # return representation
+    #     # print(representation)
+    #     # return representation
+
+
+class balancesheetserializer(serializers.ModelSerializer):
+   # accounthead_accounts = accountserializer(many=True, read_only=True)
+   # accounttrans = stocktranserilaizer(many=True, read_only=True)
+    creditors = serializers.SerializerMethodField()
+
+    # debit  = serializers.SerializerMethodField()
+    # credit = serializers.SerializerMethodField()
+  #  dateentry = serializers.SerializerMethodField()
+
+    class Meta:
+        model = accountHead
+        fields = ['name','creditors']
+
+    def get_creditors(self, obj):
+
+        stock = obj.accounthead_accounts.filter()
+        #return account1Serializer(accounts,many=True).data
+        return accountserializer(stock, many=True).data
+
+    
+    
 
 
 class accounthserializer(serializers.ModelSerializer):
