@@ -85,7 +85,9 @@ class stocktransaction:
 
         entryid,created  = entry.objects.get_or_create(entrydate1 = self.order.billdate,entity=self.order.entity)
 
-        details = StockTransactions.objects.create(accounthead = detail.product.purchaseaccount.accounthead,account= detail.product.purchaseaccount,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,desc = self.description + ' '  + str(self.order.voucherno),stockttype = stocktype,purchasequantity = qty,drcr = self.debit,debitamount = detail.amount,cgstdr = detail.cgst,sgstdr= detail.sgst,igstdr = detail.igst,entrydate = self.order.billdate,entity = self.order.entity,createdby = self.order.createdby,entry = entryid,entrydatetime = self.order.billdate)
+        details = StockTransactions.objects.create(accounthead = detail.product.purchaseaccount.accounthead,account= detail.product.purchaseaccount,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,desc = self.description + ' '  + str(self.order.voucherno),stockttype = stocktype,purchasequantity = qty,drcr = self.debit,debitamount = detail.amount,cgstdr = detail.cgst,sgstdr= detail.sgst,igstdr = detail.igst,entrydate = self.order.billdate,entity = self.order.entity,createdby = self.order.createdby,entry = entryid,entrydatetime = self.order.billdate,accounttype = 'DD')
+        details1 = StockTransactions.objects.create(accounthead= self.order.account.accounthead,account= self.order.account,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,desc = self.description + ' '  + str(self.order.voucherno),stockttype = stocktype,purchasequantity = qty,drcr = self.debit,debitamount = detail.amount,cgstdr = detail.cgst,sgstdr= detail.sgst,igstdr = detail.igst,entrydate = self.order.billdate,entity = self.order.entity,createdby = self.order.createdby,entry = entryid,entrydatetime = self.order.billdate,accounttype = 'MD')
+        
         goodstransaction.objects.create(account= detail.product.purchaseaccount,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,stockttype = stocktype,purchasequantity = qty,entrydatetime = self.order.billdate,entity = self.order.entity,createdby = self.order.createdby,entry = entryid,goodstransactiontype = 'D')
         goodstransaction.objects.create(account= self.order.account,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,stockttype = stocktype,purchasequantity = qty,entrydatetime = self.order.billdate,entity = self.order.entity,createdby = self.order.createdby,entry = entryid,goodstransactiontype = 'M')
 
@@ -126,9 +128,9 @@ class stocktransactionsale:
         sgstid = account.objects.get(entity =pentity,accountcode = 6002)
         igstid = account.objects.get(entity =pentity,accountcode = 6003)
         entryid,created  = entry.objects.get_or_create(entrydate1 = self.order.sorderdate,entity=self.order.entity)
-        StockTransactions.objects.create(accounthead = cgstid.accounthead, account= cgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.credit,creditamount=cgst,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate)
-        StockTransactions.objects.create(accounthead = sgstid.accounthead,account= sgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.credit,creditamount=sgst,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate)
-        StockTransactions.objects.create(accounthead= self.order.accountid.accounthead,account= self.order.accountid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.debit,debitamount=gtotal,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate,cgstcr = cgst,sgstcr= sgst,igstcr = igst,accounttype = 'M',subtotal = subtotal)
+        StockTransactions.objects.create(accounthead = cgstid.accounthead, account= cgstid,transactiontype = self.transactiontype,transactionid = id,saleinvoice = self.order, desc = self.description + ' ' + str(self.order.billno),drcr=self.credit,creditamount=cgst,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate)
+        StockTransactions.objects.create(accounthead = sgstid.accounthead,account= sgstid,transactiontype = self.transactiontype,transactionid = id,saleinvoice = self.order,desc = self.description + ' ' + str(self.order.billno),drcr=self.credit,creditamount=sgst,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate)
+        StockTransactions.objects.create(accounthead= self.order.accountid.accounthead,account= self.order.accountid,transactiontype = self.transactiontype,transactionid = id,saleinvoice = self.order,desc = self.description + ' ' + str(self.order.billno),drcr=self.debit,debitamount=gtotal,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate,cgstcr = cgst,sgstcr= sgst,igstcr = igst,accounttype = 'M',subtotal = subtotal)
         return id
 
     def updateransaction(self):
@@ -152,9 +154,9 @@ class stocktransactionsale:
         sgstid = account.objects.get(entity =pentity,accountcode = 6002)
         igstid = account.objects.get(entity =pentity,accountcode = 6003)
         entryid,created  = entry.objects.get_or_create(entrydate1 = self.order.sorderdate,entity=self.order.entity)
-        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account = cgstid,entity = pentity).update(accounthead = cgstid.accounthead, account= cgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.credit,creditamount=cgst,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate)
-        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account = sgstid,entity = pentity).update(accounthead = sgstid.accounthead,account= sgstid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.credit,creditamount=sgst,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate)
-        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account = self.order.accountid,entity = pentity).update(accounthead= self.order.accountid.accounthead,account= self.order.accountid,transactiontype = self.transactiontype,transactionid = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.debit,debitamount=gtotal,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate,cgstcr = cgst,sgstcr= sgst,igstcr = igst,accounttype = 'M',subtotal = subtotal)
+        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account = cgstid,entity = pentity).update(accounthead = cgstid.accounthead, account= cgstid,transactiontype = self.transactiontype,transactionid = id,saleinvoice = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.credit,creditamount=cgst,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate)
+        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account = sgstid,entity = pentity).update(accounthead = sgstid.accounthead,account= sgstid,transactiontype = self.transactiontype,transactionid = id,saleinvoice = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.credit,creditamount=sgst,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate)
+        StockTransactions.objects.filter(transactionid = self.order.id,transactiontype = self.transactiontype,account = self.order.accountid,entity = pentity).update(accounthead= self.order.accountid.accounthead,account= self.order.accountid,transactiontype = self.transactiontype,transactionid = id,saleinvoice = id,desc = self.description + ' ' + str(self.order.billno),drcr=self.debit,debitamount=gtotal,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate,cgstcr = cgst,sgstcr= sgst,igstcr = igst,accounttype = 'M',subtotal = subtotal)
         
         return id
 
@@ -166,7 +168,8 @@ class stocktransactionsale:
         else:
                 qty = detail.orderqty
         entryid,created  = entry.objects.get_or_create(entrydate1 = self.order.sorderdate,entity=self.order.entity)
-        details = StockTransactions.objects.create(accounthead = detail.product.saleaccount.accounthead,account= detail.product.saleaccount,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,desc = self.description + ' ' + str(self.order.billno),stockttype = stocktype,salequantity = qty,drcr = self.credit,creditamount = detail.amount,cgstdr = detail.cgst,sgstdr= detail.sgst,igstdr = detail.igst,entrydate = self.order.sorderdate,entity = self.order.entity,createdby = self.order.owner,entry = entryid)
+        details = StockTransactions.objects.create(accounthead = detail.product.saleaccount.accounthead,account= detail.product.saleaccount,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,saleinvoice = self.order,desc = self.description + ' ' + str(self.order.billno),stockttype = stocktype,salequantity = qty,drcr = self.credit,creditamount = detail.amount,cgstdr = detail.cgst,sgstdr= detail.sgst,igstdr = detail.igst,entrydate = self.order.sorderdate,entity = self.order.entity,createdby = self.order.owner,entry = entryid,accounttype = 'DD')
+        details1 = StockTransactions.objects.create(accounthead = self.order.accountid.accounthead,account= self.order.accountid,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,saleinvoice = self.order,desc = self.description + ' ' + str(self.order.billno),stockttype = stocktype,salequantity = qty,drcr = self.credit,creditamount = detail.amount,cgstdr = detail.cgst,sgstdr= detail.sgst,igstdr = detail.igst,entrydate = self.order.sorderdate,entity = self.order.entity,createdby = self.order.owner,entry = entryid,accounttype = 'MD')
         goodstransaction.objects.create(account= detail.product.saleaccount,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,stockttype = stocktype,salequantity = qty,entrydatetime = self.order.sorderdate,entity = self.order.entity,createdby = self.order.owner,entry = entryid,goodstransactiontype = 'D')
         goodstransaction.objects.create(account= self.order.accountid,stock=detail.product,transactiontype = self.transactiontype,transactionid = self.order.id,stockttype = stocktype,salequantity = qty,entrydatetime = self.order.sorderdate,entity = self.order.entity,createdby = self.order.owner,entry = entryid,goodstransactiontype = 'M')
 
@@ -376,7 +379,7 @@ class stockmainSerializer(serializers.ModelSerializer):
      #   stk.updateransaction()
 
         journaldetails_data = validated_data.get('stockdetails')
-        entryid,created  = entry.objects.get_or_create(entrydate1 = instance.entrydate,entity=instance.order.entity)
+        entryid,created  = entry.objects.get_or_create(entrydate1 = instance.entrydate,entity=instance.entity)
 
         for journaldetail_data in journaldetails_data:
             detail = stockdetails.objects.create(stockmain = instance, **journaldetail_data)
@@ -778,6 +781,116 @@ class TrialbalanceSerializerbyaccounthead(serializers.ModelSerializer):
 
 
 
+class gstr1b2bserializer(serializers.ModelSerializer):
+
+
+  #  purchasequantity1 = serializers.DecimalField(max_digits=10,decimal_places=2)
+
+    #account = serializers.IntegerField()
+    # accountname = serializers.CharField(max_length=500,source = 'account__accountname')
+    # debit = serializers.DecimalField(max_digits=10,decimal_places=2)
+    # credit = serializers.DecimalField(max_digits=10,decimal_places=2)
+
+    gstin= serializers.SerializerMethodField()
+    receiver = serializers.SerializerMethodField()
+    invoiceno = serializers.SerializerMethodField()
+    invoicedate = serializers.SerializerMethodField()
+    invoicevalue = serializers.SerializerMethodField()
+    placeofsupply = serializers.SerializerMethodField()
+    reversechnarge = serializers.SerializerMethodField()
+    taxrate = serializers.SerializerMethodField()
+    invoicetype = serializers.SerializerMethodField()
+    rate = serializers.SerializerMethodField()
+    ecomgstin = serializers.SerializerMethodField()
+    taxableamount = serializers.SerializerMethodField()
+    cessamount = serializers.SerializerMethodField()
+   
+
+    class Meta:
+        model = StockTransactions
+        fields = ['gstin','receiver','invoiceno','invoicedate','invoicevalue','placeofsupply','reversechnarge','taxrate','invoicetype','rate','ecomgstin','taxableamount','cessamount']
+
+    def get_gstin(self, obj):
+         #print(obj)
+
+         return obj.account.gstno
+
+    def get_receiver(self, obj):
+         #print(obj)
+
+         return obj.account.accountname
+    
+    def get_invoiceno(self, obj):
+         #print(obj)
+
+         return obj.saleinvoice.billno
+
+    
+    def get_invoicedate(self, obj):
+         #print(obj)
+
+         return obj.saleinvoice.sorderdate
+
+    def get_invoicevalue(self, obj):
+         #print(obj)
+
+         return "5000.00"
+
+    def get_placeofsupply(self, obj):
+         #print(obj)
+
+         return "03-Punjab"
+
+    def get_reversechnarge(self, obj):
+         #print(obj)
+
+         return "N"
+
+    def get_taxrate(self, obj):
+         #print(obj)
+
+         return ""
+
+    
+    def get_invoicetype(self, obj):
+         #print(obj)
+
+         return "regular"
+
+    def get_rate(self, obj):
+         #print(obj)
+
+         return "18.00"
+
+    def get_ecomgstin(self, obj):
+         #print(obj)
+
+         return ""
+
+    def get_taxableamount(self, obj):
+         #print(obj)
+
+         return "1234.00"
+
+    def get_cessamount(self, obj):
+         #print(obj)
+
+         return ""
+
+
+         
+
+
+         
+
+
+         
+
+
+         
+
+
+
 
 
 
@@ -1004,14 +1117,14 @@ class cashserializer(serializers.ModelSerializer):
         #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
         # toDate = parse_datetime(self.context['request'].query_params.get(
         #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
-        return obj.cashtrans.aggregate(Sum('debitamount'))['debitamount__sum']
+        return obj.cashtrans.exclude(accounttype = 'MD').aggregate(Sum('debitamount'))['debitamount__sum']
 
     def get_credit(self, obj):
         # fromDate = parse_datetime(self.context['request'].query_params.get(
         #     'fromDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
         # toDate = parse_datetime(self.context['request'].query_params.get(
         #     'toDate') + ' ' + '00:00:00').strftime('%Y-%m-%d %H:%M:%S')
-        return obj.cashtrans.aggregate(Sum('creditamount'))['creditamount__sum']
+        return obj.cashtrans.exclude(accounttype = 'MD').aggregate(Sum('creditamount'))['creditamount__sum']
 
     def get_entrydate(self,obj):
         return obj.entrydate1
@@ -1021,11 +1134,11 @@ class cashserializer(serializers.ModelSerializer):
         #stock =  obj.cashtrans.filter(drcr = False).order_by('account')
        # print(stock)
 
-        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = False).values('account','entry','transactiontype','transactionid','drcr','desc').annotate(debitamount = Sum('debitamount'),creditamount = Sum('creditamount'))
+        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = False).exclude(accounttype = 'MD').values('account','entry','transactiontype','transactionid','drcr','desc').annotate(debitamount = Sum('debitamount'),creditamount = Sum('creditamount'))
         #return account1Serializer(accounts,many=True).data
         #stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = False)
 
-        stock = stock.annotate(accountname=F('account__accountname'))
+        stock = stock.annotate(accountname=F('account__accountname')).order_by('account__accountname')
 
         return stock
       #  return stocktranserilaizer(stock, many=True).data
@@ -1033,9 +1146,9 @@ class cashserializer(serializers.ModelSerializer):
     
     def get_dr(self,obj):
         #stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = True)
-        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = True).values('account','entry','transactiontype','transactionid','drcr','desc').annotate(debitamount = Sum('debitamount'),creditamount= Sum('creditamount'))
+        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = True).exclude(accounttype = 'MD').values('account','entry','transactiontype','transactionid','drcr','desc').annotate(debitamount = Sum('debitamount'),creditamount= Sum('creditamount'))
         #return account1Serializer(accounts,many=True).data
-        stock = stock.annotate(accountname=F('account__accountname'))
+        stock = stock.annotate(accountname=F('account__accountname')).order_by('account__accountname')
         return stock
        # return stocktranserilaizer(stock, many=True).data
 
@@ -1254,8 +1367,8 @@ class  ledgerserializer(serializers.ModelSerializer):
      
        
     
-        debit = obj.accounttrans.filter(account = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity).aggregate(Sum('debitamount'))['debitamount__sum']
-        credit = obj.accounttrans.filter(account = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity).aggregate(Sum('creditamount'))['creditamount__sum']
+        debit = obj.accounttrans.filter(account = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity).exclude(accounttype = 'MD').aggregate(Sum('debitamount'))['debitamount__sum']
+        credit = obj.accounttrans.filter(account = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity).exclude(accounttype = 'MD').aggregate(Sum('creditamount'))['creditamount__sum']
         # debit = obj.cashtrans.filter(accounttype = 'CIH').aggregate(Sum('debitamount'))['debitamount__sum']
         # credit = obj.cashtrans.filter(accounttype = 'CIH').aggregate(Sum('creditamount'))['creditamount__sum']
 
@@ -1280,7 +1393,7 @@ class  ledgerserializer(serializers.ModelSerializer):
         startdate = self.context['request'].query_params.get('startdate')
         enddate = self.context['request'].query_params.get('enddate')
 
-        debit = obj.accounttrans.filter(entry__entrydate1__range = (startdate,enddate)).aggregate(Sum('debitamount'))['debitamount__sum']
+        debit = obj.accounttrans.filter(entry__entrydate1__range = (startdate,enddate)).exclude(accounttype = 'MD').aggregate(Sum('debitamount'))['debitamount__sum']
 
     
 
@@ -1314,7 +1427,7 @@ class  ledgerserializer(serializers.ModelSerializer):
         startdate = self.context['request'].query_params.get('startdate')
         enddate = self.context['request'].query_params.get('enddate')
 
-        credit = obj.accounttrans.filter(entry__entrydate1__range = (startdate,enddate)).aggregate(Sum('creditamount'))['creditamount__sum']
+        credit = obj.accounttrans.filter(entry__entrydate1__range = (startdate,enddate)).exclude(accounttype = 'MD').aggregate(Sum('creditamount'))['creditamount__sum']
 
         if self.get_openingbalance(obj=obj) < 0:
             ob = self.get_openingbalance(obj=obj)
@@ -1380,7 +1493,7 @@ class  ledgerserializer(serializers.ModelSerializer):
         startdate = self.context['request'].query_params.get('startdate')
         enddate = self.context['request'].query_params.get('enddate')
 
-        stock = obj.accounttrans.filter(entry__entrydate1__range = (startdate,enddate)).values('account','entry','transactiontype','transactionid','drcr','desc').annotate(debitamount = Sum('debitamount'),creditamount = Sum('creditamount')).order_by('entry__entrydate1')
+        stock = obj.accounttrans.filter(entry__entrydate1__range = (startdate,enddate)).exclude(accounttype = 'MD').values('account','entry','transactiontype','transactionid','drcr','desc').annotate(debitamount = Sum('debitamount'),creditamount = Sum('creditamount')).order_by('entry__entrydate1')
         #return account1Serializer(accounts,many=True).data
         #return account1Serializer(accounts,many=True).data
         #stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = False)
@@ -1430,8 +1543,8 @@ class  ledgersummaryserializer(serializers.ModelSerializer):
      
        
     
-        debit = obj.accounttrans.filter(account = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity).aggregate(Sum('debitamount'))['debitamount__sum']
-        credit = obj.accounttrans.filter(account = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity).aggregate(Sum('creditamount'))['creditamount__sum']
+        debit = obj.accounttrans.filter(account = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity).exclude(accounttype = 'MD').aggregate(Sum('debitamount'))['debitamount__sum']
+        credit = obj.accounttrans.filter(account = obj.id,entry__entrydate1__range = (yesterday,startdate),entity = obj.entity).exclude(accounttype = 'MD').aggregate(Sum('creditamount'))['creditamount__sum']
         # debit = obj.cashtrans.filter(accounttype = 'CIH').aggregate(Sum('debitamount'))['debitamount__sum']
         # credit = obj.cashtrans.filter(accounttype = 'CIH').aggregate(Sum('creditamount'))['creditamount__sum']
 
@@ -1456,7 +1569,7 @@ class  ledgersummaryserializer(serializers.ModelSerializer):
         startdate = self.context['request'].query_params.get('startdate')
         enddate = self.context['request'].query_params.get('enddate')
 
-        debit = obj.accounttrans.filter(entry__entrydate1__range = (startdate,enddate)).aggregate(Sum('debitamount'))['debitamount__sum']
+        debit = obj.accounttrans.filter(entry__entrydate1__range = (startdate,enddate)).exclude(accounttype = 'MD').aggregate(Sum('debitamount'))['debitamount__sum']
 
         if self.get_openingbalance(obj=obj) > 0:
             ob = self.get_openingbalance(obj=obj)
@@ -1485,7 +1598,7 @@ class  ledgersummaryserializer(serializers.ModelSerializer):
         startdate = self.context['request'].query_params.get('startdate')
         enddate = self.context['request'].query_params.get('enddate')
 
-        credit = obj.accounttrans.filter(entry__entrydate1__range = (startdate,enddate)).aggregate(Sum('creditamount'))['creditamount__sum']
+        credit = obj.accounttrans.filter(entry__entrydate1__range = (startdate,enddate)).exclude(accounttype = 'MD').aggregate(Sum('creditamount'))['creditamount__sum']
 
         if self.get_openingbalance(obj=obj) < 0:
             ob = self.get_openingbalance(obj=obj)

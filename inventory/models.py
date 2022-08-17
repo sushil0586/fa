@@ -84,7 +84,7 @@ class gsttype(TrackingModel):
 
 
 class ProductCategory(TrackingModel):
-    pcategoryname = models.CharField(max_length= 255,verbose_name=_('Product Category'))
+    pcategoryname = models.CharField(max_length= 50,verbose_name=_('Product Category'))
     maincategory = models.ForeignKey("self",null=True,on_delete=models.CASCADE,verbose_name=_('Main category'),default=True,blank=True)
     entity = models.ForeignKey(entity,null=True,on_delete=models.CASCADE)
     createdby = models.ForeignKey(to= User, on_delete= models.CASCADE)
@@ -94,9 +94,9 @@ class ProductCategory(TrackingModel):
         return f'{self.pcategoryname} '
 
 class Product(TrackingModel):
-    productname = models.CharField(max_length= 255,verbose_name=_('Product Name'))
+    productname = models.CharField(max_length= 50,verbose_name=_('Product Name'))
     productcode = models.IntegerField(null = True,blank=True,verbose_name=_('Product Code'))
-    productdesc = models.CharField(max_length= 255,null = True,verbose_name=_('product desc'))
+    productdesc = models.CharField(max_length= 100,null = True,verbose_name=_('product desc'))
     is_pieces = models.BooleanField(default=True)
     openingstockqty = models.DecimalField(max_digits=10, decimal_places=2,blank=True,null=True)
     openingstockboxqty = models.IntegerField(blank=True,verbose_name=_('Box/Pcs'),null=True)
