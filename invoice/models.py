@@ -341,6 +341,7 @@ class StockTransactions(TrackingModel):
     accounthead = models.ForeignKey(to = accountHead, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Account Head',related_name='headtrans')
     account = models.ForeignKey(to = account, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Account Name',related_name='accounttrans')
     stock = models.ForeignKey(to = Product, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Product Name')
+    saleinvoice = models.ForeignKey(to = SalesOderHeader, on_delete= models.CASCADE,null=True,blank=True,verbose_name='sale invoice no')
     transactiontype = models.CharField(max_length=50, null=True,verbose_name='TransactionType')
     transactionid = models.IntegerField(verbose_name='Transaction id')
     desc = models.CharField(max_length=500, null=True,verbose_name='Description')
