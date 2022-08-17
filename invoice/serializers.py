@@ -226,48 +226,31 @@ class journalmainSerializer(serializers.ModelSerializer):
 
             accountentryid,accountentrycreated  = accountentry.objects.get_or_create(entrydate2 = order.entrydate,account =detail.account,  entity = order.entity)
 
+
+            print(detail.drcr)
+            print(detail)
+
             
 
            
-            if accountentrycreated == True:
-                openingbalance =   accountentry.objects.filter(entrydate2__lt = accountentryid.entrydate2,entity = order.entity,account =detail.account).last()
-                print(openingbalance)
-                if not openingbalance:
-                    ob = 0
-                    if detail.drcr == 1:
-                        cb = detail.debitamount
-                        accountentry.objects.filter(id = accountentryid.id).update(openingbalance = ob,closingbalance = cb)
-                    else:
-                        cb =  -(detail.creditamount)
-                        accountentry.objects.filter(id = accountentryid.id).update(openingbalance = ob,closingbalance = cb)
+            if order.vouchertype == 'C':
+                cash = account.objects.get(entity =order.entity,accountcode = 4000)
+                if detail.drcr == 1:
+                    StockTransactions.objects.create(accounthead= cash.accounthead,account= cash,transactiontype = order.vouchertype,transactionid = order.id,desc = 'Journal V.No' + str(order.voucherno),drcr=0,creditamount=detail.debitamount,debitamount=detail.creditamount,entity=order.entity,createdby= order.createdby,entrydate = order.entrydate,entry =id,entrydatetime = order.entrydate,accounttype='CIH')
+                else:
+                    StockTransactions.objects.create(accounthead= cash.accounthead,account= cash,transactiontype = order.vouchertype,transactionid = order.id,desc = 'Journal V.No' + str(order.voucherno),drcr=1,creditamount=detail.debitamount,debitamount=detail.creditamount,entity=order.entity,createdby= order.createdby,entrydate = order.entrydate,entry =id,entrydatetime = order.entrydate,accounttype='CIH')
 
-                                    
+                
+            if order.vouchertype == 'B':
+                cash = account.objects.get(id = order.mainaccountid)
+                if detail.drcr == 1:
+                    StockTransactions.objects.create(accounthead= cash.accounthead,account= cash,transactiontype = order.vouchertype,transactionid = order.id,desc = 'Journal V.No' + str(order.voucherno),drcr=0,creditamount=detail.debitamount,debitamount=detail.creditamount,entity=order.entity,createdby= order.createdby,entrydate = order.entrydate,entry =id,entrydatetime = order.entrydate,accounttype='M')
                 else:
-                    ob = openingbalance.closingbalance
-                    if detail.drcr == 1:
-                        cb = ob + detail.debitamount
-                        accountentry.objects.filter(id = accountentryid.id).update(openingbalance = ob,closingbalance = cb)
-                    else:
-                        cb = ob - detail.creditamount
-                        accountentry.objects.filter(id = accountentryid.id).update(openingbalance = ob,closingbalance = cb)
-                    
-            else:
-                ob = accountentryid.closingbalance
-                if not ob:
-                    ob = 0
-                    if detail.drcr == 1:
-                        cb = ob + detail.debitamount
-                        accountentry.objects.filter(id = accountentryid.id).update(closingbalance = cb)
-                    else:
-                        cb = ob - detail.creditamount
-                        accountentry.objects.filter(id = accountentryid.id).update(closingbalance = cb)
-                else:
-                    if detail.drcr == 1:
-                        cb = ob + detail.debitamount
-                        accountentry.objects.filter(id = accountentryid.id).update(closingbalance = cb)
-                    else:
-                        cb = ob - detail.creditamount
-                        accountentry.objects.filter(id = accountentryid.id).update(closingbalance = cb)
+                    StockTransactions.objects.create(accounthead= cash.accounthead,account= cash,transactiontype = order.vouchertype,transactionid = order.id,desc = 'Journal V.No' + str(order.voucherno),drcr=1,creditamount=detail.debitamount,debitamount=detail.creditamount,entity=order.entity,createdby= order.createdby,entrydate = order.entrydate,entry =id,entrydatetime = order.entrydate,accounttype='M')
+
+
+
+
 
 
                 
@@ -313,8 +296,24 @@ class journalmainSerializer(serializers.ModelSerializer):
 
         for journaldetail_data in journaldetails_data:
             detail = journaldetails.objects.create(Journalmain = instance, **journaldetail_data)
-            StockTransactions.objects.create(accounthead= detail.account.accounthead,account= detail.account,transactiontype = instance.vouchertype,transactionid = instance.id,desc = 'Journal V.No' + str(instance.voucherno),drcr=detail.drcr,creditamount=detail.creditamount,debitamount=detail.debitamount,entity=instance.entity,createdby= instance.createdby,entrydate = instance.entrydate,entrydatetime = instance.entrydate)
+            id,created  = entry.objects.get_or_create(entrydate1 = instance.entrydate,entity = instance.entity)
+            StockTransactions.objects.create(accounthead= detail.account.accounthead,account= detail.account,transactiontype = instance.vouchertype,transactionid = instance.id,desc = 'Journal V.No' + str(instance.voucherno),drcr=detail.drcr,creditamount=detail.creditamount,debitamount=detail.debitamount,entity=instance.entity,createdby= instance.createdby,entrydate = instance.entrydate,entry =id,entrydatetime = instance.entrydate,accounttype='M')
             #stk.createtransactiondetails(detail=detail,stocktype='S')
+
+            if instance.vouchertype == 'C':
+                cash = account.objects.get(entity =instance.entity,accountcode = 4000)
+                if detail.drcr == 1:
+                    StockTransactions.objects.create(accounthead= cash.accounthead,account= cash,transactiontype = instance.vouchertype,transactionid = instance.id,desc = 'Journal V.No' + str(instance.voucherno),drcr=0,creditamount=detail.debitamount,debitamount=detail.creditamount,entity=instance.entity,createdby= instance.createdby,entrydate = instance.entrydate,entry =id,entrydatetime = instance.entrydate,accounttype='CIH')
+                else:
+                    StockTransactions.objects.create(accounthead= cash.accounthead,account= cash,transactiontype = instance.vouchertype,transactionid = instance.id,desc = 'Journal V.No' + str(instance.voucherno),drcr=1,creditamount=detail.debitamount,debitamount=detail.creditamount,entity=instance.entity,createdby= instance.createdby,entrydate = instance.entrydate,entry =id,entrydatetime = instance.entrydate,accounttype='CIH')
+
+                
+            if instance.vouchertype == 'B':
+                cash = account.objects.get(id = instance.mainaccountid)
+                if detail.drcr == 1:
+                    StockTransactions.objects.create(accounthead= cash.accounthead,account= cash,transactiontype = instance.vouchertype,transactionid = instance.id,desc = 'Journal V.No' + str(instance.voucherno),drcr=0,creditamount=detail.debitamount,debitamount=detail.creditamount,entity=instance.entity,createdby= instance.createdby,entrydate = instance.entrydate,entry =id,entrydatetime = instance.entrydate,accounttype='M')
+                else:
+                    StockTransactions.objects.create(accounthead= cash.accounthead,account= cash,transactiontype = instance.vouchertype,transactionid = instance.id,desc = 'Journal V.No' + str(instance.voucherno),drcr=1,creditamount=detail.debitamount,debitamount=detail.creditamount,entity=instance.entity,createdby= instance.createdby,entrydate = instance.entrydate,entry =id,entrydatetime = instance.entrydate,accounttype='M')
 
         
         return instance
@@ -1134,7 +1133,7 @@ class cashserializer(serializers.ModelSerializer):
         #stock =  obj.cashtrans.filter(drcr = False).order_by('account')
        # print(stock)
 
-        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = False).exclude(accounttype = 'MD').values('account','entry','transactiontype','transactionid','drcr','desc').annotate(debitamount = Sum('debitamount'),creditamount = Sum('creditamount'))
+        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = True).exclude(accounttype = 'MD').values('account','entry','transactiontype','transactionid','drcr','desc').annotate(debitamount = Sum('debitamount'),creditamount = Sum('creditamount'))
         #return account1Serializer(accounts,many=True).data
         #stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = False)
 
@@ -1146,7 +1145,7 @@ class cashserializer(serializers.ModelSerializer):
     
     def get_dr(self,obj):
         #stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = True)
-        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = True).exclude(accounttype = 'MD').values('account','entry','transactiontype','transactionid','drcr','desc').annotate(debitamount = Sum('debitamount'),creditamount= Sum('creditamount'))
+        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = False).exclude(accounttype = 'MD').values('account','entry','transactiontype','transactionid','drcr','desc').annotate(debitamount = Sum('debitamount'),creditamount= Sum('creditamount'))
         #return account1Serializer(accounts,many=True).data
         stock = stock.annotate(accountname=F('account__accountname')).order_by('account__accountname')
         return stock
@@ -1313,13 +1312,13 @@ class cbserializer(serializers.ModelSerializer):
         #stock =  obj.cashtrans.filter(drcr = False).order_by('account')
        # print(stock)
 
-        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = False,accounttype = 'M',transactiontype = 'C')
+        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = True,accounttype = 'M',transactiontype = 'C')
         #return account1Serializer(accounts,many=True).data
         return stocktranserilaizer(stock, many=True).data
 
     
     def get_payments(self,obj):
-        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = True,accounttype = 'M',transactiontype = 'C')
+        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = False,accounttype = 'M',transactiontype = 'C')
         #return account1Serializer(accounts,many=True).data
         return stocktranserilaizer(stock, many=True).data
 
