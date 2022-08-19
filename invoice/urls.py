@@ -57,6 +57,7 @@ urlpatterns  = [
     path('stockledgerbook',views.stockledgerbookapi.as_view(), name = 'Trialbalance'),
     path('Balancesheet',views.Balancesheetapi.as_view(), name = 'Trialbalance'),
     path('gstr1b2bapi',views.gstr1b2bapi.as_view(), name = 'Trialbalance'),
+     path('gstr1hsnapi',views.gstr1hsnapi.as_view(), name = 'Trialbalance'),
 
 
     

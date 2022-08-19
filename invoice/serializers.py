@@ -786,14 +786,14 @@ class gstr1b2bserializer(serializers.ModelSerializer):
   #  purchasequantity1 = serializers.DecimalField(max_digits=10,decimal_places=2)
 
     #account = serializers.IntegerField()
-    # accountname = serializers.CharField(max_length=500,source = 'account__accountname')
-    # debit = serializers.DecimalField(max_digits=10,decimal_places=2)
-    # credit = serializers.DecimalField(max_digits=10,decimal_places=2)
+    gstin = serializers.CharField(max_length=500,source = 'account__gstno')
+    receiver = serializers.CharField(max_length=500,source = 'account__accountname')
+    invoiceno = serializers.CharField(max_length=500,source = 'saleinvoice__billno')
+    invoicedate = serializers.CharField(max_length=500,source = 'saleinvoice__sorderdate')
 
-    gstin= serializers.SerializerMethodField()
-    receiver = serializers.SerializerMethodField()
-    invoiceno = serializers.SerializerMethodField()
-    invoicedate = serializers.SerializerMethodField()
+
+    
+   
     invoicevalue = serializers.SerializerMethodField()
     placeofsupply = serializers.SerializerMethodField()
     reversechnarge = serializers.SerializerMethodField()
@@ -809,10 +809,10 @@ class gstr1b2bserializer(serializers.ModelSerializer):
         model = StockTransactions
         fields = ['gstin','receiver','invoiceno','invoicedate','invoicevalue','placeofsupply','reversechnarge','taxrate','invoicetype','rate','ecomgstin','taxableamount','cessamount']
 
-    def get_gstin(self, obj):
-         #print(obj)
+    # def get_gstin(self, obj):
+    #      #print(obj)
 
-         return obj.account.gstno
+    #      return obj.account.gstno
 
     def get_receiver(self, obj):
          #print(obj)
@@ -877,6 +877,47 @@ class gstr1b2bserializer(serializers.ModelSerializer):
          return ""
 
 
+class gstr1hsnserializer(serializers.ModelSerializer):
+
+
+  #  purchasequantity1 = serializers.DecimalField(max_digits=10,decimal_places=2)
+
+    #account = serializers.IntegerField()
+    hsn = serializers.CharField(max_length=500,source = 'stock__hsn')
+    description = serializers.CharField(max_length=500,source = 'stock__productdesc')
+    uom = serializers.CharField(max_length=500,source = 'stock__unitofmeasurement__unitname')
+    totalweight = serializers.CharField(max_length=500,source = 'salequantity')
+    taxablevalue = serializers.CharField(max_length=500,source = 'credit')
+    #taxrate = serializers.CharField(max_length=500,source = 'stock__totalgst')
+    centraltax = serializers.CharField(max_length=500,source = 'cgstdr')
+    statetax = serializers.CharField(max_length=500,source = 'sgstdr')
+    igst = serializers.CharField(max_length=500,source = 'igstdr')
+    # totalvalue= serializers.SerializerMethodField()
+
+
+    # def get_totalvalue(self, obj):
+    #      #print(obj)
+
+    #      return obj.credit
+
+    
+
+    
+
+    
+
+      
+   
+   
+   
+
+    class Meta:
+        model = StockTransactions
+        fields = ['hsn','description','uom','totalweight','taxablevalue','centraltax','statetax','igst']
+
+    
+
+    
          
 
 
