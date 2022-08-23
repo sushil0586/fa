@@ -886,12 +886,12 @@ class gstr1hsnserializer(serializers.ModelSerializer):
     hsn = serializers.CharField(max_length=500,source = 'stock__hsn')
     description = serializers.CharField(max_length=500,source = 'stock__productdesc')
     uom = serializers.CharField(max_length=500,source = 'stock__unitofmeasurement__unitname')
-    totalweight = serializers.CharField(max_length=500,source = 'salequantity')
-    taxablevalue = serializers.CharField(max_length=500,source = 'credit')
+    totalweight = serializers.DecimalField(max_digits=10,decimal_places=2,source = 'salequantity')
+    taxablevalue = serializers.DecimalField(max_digits=10,decimal_places=2,source = 'credit')
     #taxrate = serializers.CharField(max_length=500,source = 'stock__totalgst')
-    centraltax = serializers.CharField(max_length=500,source = 'cgstdr')
-    statetax = serializers.CharField(max_length=500,source = 'sgstdr')
-    igst = serializers.CharField(max_length=500,source = 'igstdr')
+    centraltax = serializers.DecimalField(max_digits=10,decimal_places=2,source = 'cgstdr')
+    statetax = serializers.DecimalField(max_digits=10,decimal_places=2,source = 'sgstdr')
+    igst = serializers.DecimalField(max_digits=10,decimal_places=2,source = 'igstdr')
     # totalvalue= serializers.SerializerMethodField()
 
 
