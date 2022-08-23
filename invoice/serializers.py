@@ -1054,10 +1054,10 @@ class Salebyaccountserializer(serializers.ModelSerializer):
     accountcode = serializers.SerializerMethodField()
     city = serializers.SerializerMethodField()
     entrydate = serializers.SerializerMethodField()
-    cgst = serializers.DecimalField(max_digits=13, decimal_places=3,source = 'cgstcr')
-    sgst = serializers.DecimalField(max_digits=13,decimal_places=3,source = 'sgstcr')
-    igst = serializers.DecimalField(max_digits=13,decimal_places=3,source = 'igstcr')
-    gtotal = serializers.DecimalField(max_digits=13,decimal_places=3,source = 'debitamount')
+    cgst = serializers.DecimalField(max_digits=10, decimal_places=2,source = 'cgstcr')
+    sgst = serializers.DecimalField(max_digits=10,decimal_places=2,source = 'sgstcr')
+    igst = serializers.DecimalField(max_digits=10,decimal_places=2,source = 'igstcr')
+    gtotal = serializers.DecimalField(max_digits=10,decimal_places=2,source = 'debitamount')
 
     def get_accountname(self, obj):
         return obj.account.accountname
@@ -1090,10 +1090,10 @@ class Purchasebyaccountserializer(serializers.ModelSerializer):
     accountcode = serializers.SerializerMethodField()
     city = serializers.SerializerMethodField()
     entrydate = serializers.SerializerMethodField()
-    cgst = serializers.DecimalField(max_digits=13,decimal_places=3,source = 'cgstdr')
-    sgst = serializers.DecimalField(max_digits=13,decimal_places=3,source = 'sgstdr')
-    igst = serializers.DecimalField(max_digits=13,decimal_places=3,source = 'igstdr')
-    gtotal = serializers.DecimalField(max_digits=13,decimal_places=3,source = 'creditamount')
+    cgst = serializers.DecimalField(max_digits=10,decimal_places=2,source = 'cgstdr')
+    sgst = serializers.DecimalField(max_digits=10,decimal_places=2,source = 'sgstdr')
+    igst = serializers.DecimalField(max_digits=10,decimal_places=2,source = 'igstdr')
+    gtotal = serializers.DecimalField(max_digits=10,decimal_places=2,source = 'creditamount')
 
     
 
