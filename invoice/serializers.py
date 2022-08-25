@@ -886,12 +886,12 @@ class gstr1hsnserializer(serializers.ModelSerializer):
     hsn = serializers.CharField(max_length=500,source = 'stock__hsn')
     description = serializers.CharField(max_length=500,source = 'stock__productdesc')
     uom = serializers.CharField(max_length=500,source = 'stock__unitofmeasurement__unitname')
-    totalweight = serializers.CharField(max_length=500,source = 'salequantity')
-    taxablevalue = serializers.CharField(max_length=500,source = 'credit')
+    totalweight = serializers.DecimalField(max_digits=10,decimal_places=2,source = 'salequantity')
+    taxablevalue = serializers.DecimalField(max_digits=10,decimal_places=2,source = 'credit')
     #taxrate = serializers.CharField(max_length=500,source = 'stock__totalgst')
-    centraltax = serializers.CharField(max_length=500,source = 'cgstdr')
-    statetax = serializers.CharField(max_length=500,source = 'sgstdr')
-    igst = serializers.CharField(max_length=500,source = 'igstdr')
+    centraltax = serializers.DecimalField(max_digits=10,decimal_places=2,source = 'cgstdr')
+    statetax = serializers.DecimalField(max_digits=10,decimal_places=2,source = 'sgstdr')
+    igst = serializers.DecimalField(max_digits=10,decimal_places=2,source = 'igstdr')
     # totalvalue= serializers.SerializerMethodField()
 
 
@@ -1054,10 +1054,10 @@ class Salebyaccountserializer(serializers.ModelSerializer):
     accountcode = serializers.SerializerMethodField()
     city = serializers.SerializerMethodField()
     entrydate = serializers.SerializerMethodField()
-    cgst = serializers.DecimalField(max_digits=13, decimal_places=3,source = 'cgstcr')
-    sgst = serializers.DecimalField(max_digits=13,decimal_places=3,source = 'sgstcr')
-    igst = serializers.DecimalField(max_digits=13,decimal_places=3,source = 'igstcr')
-    gtotal = serializers.DecimalField(max_digits=13,decimal_places=3,source = 'debitamount')
+    cgst = serializers.DecimalField(max_digits=10, decimal_places=2,source = 'cgstcr')
+    sgst = serializers.DecimalField(max_digits=10,decimal_places=2,source = 'sgstcr')
+    igst = serializers.DecimalField(max_digits=10,decimal_places=2,source = 'igstcr')
+    gtotal = serializers.DecimalField(max_digits=10,decimal_places=2,source = 'debitamount')
 
     def get_accountname(self, obj):
         return obj.account.accountname
@@ -1090,10 +1090,10 @@ class Purchasebyaccountserializer(serializers.ModelSerializer):
     accountcode = serializers.SerializerMethodField()
     city = serializers.SerializerMethodField()
     entrydate = serializers.SerializerMethodField()
-    cgst = serializers.DecimalField(max_digits=13,decimal_places=3,source = 'cgstdr')
-    sgst = serializers.DecimalField(max_digits=13,decimal_places=3,source = 'sgstdr')
-    igst = serializers.DecimalField(max_digits=13,decimal_places=3,source = 'igstdr')
-    gtotal = serializers.DecimalField(max_digits=13,decimal_places=3,source = 'creditamount')
+    cgst = serializers.DecimalField(max_digits=10,decimal_places=2,source = 'cgstdr')
+    sgst = serializers.DecimalField(max_digits=10,decimal_places=2,source = 'sgstdr')
+    igst = serializers.DecimalField(max_digits=10,decimal_places=2,source = 'igstdr')
+    gtotal = serializers.DecimalField(max_digits=10,decimal_places=2,source = 'creditamount')
 
     
 
@@ -1174,7 +1174,7 @@ class cashserializer(serializers.ModelSerializer):
         #stock =  obj.cashtrans.filter(drcr = False).order_by('account')
        # print(stock)
 
-        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = True).exclude(accounttype = 'MD').values('account','entry','transactiontype','transactionid','drcr','desc').annotate(debitamount = Sum('debitamount'),creditamount = Sum('creditamount'))
+        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = False).exclude(accounttype = 'MD').values('account','entry','transactiontype','transactionid','drcr','desc').annotate(debitamount = Sum('debitamount'),creditamount = Sum('creditamount'))
         #return account1Serializer(accounts,many=True).data
         #stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = False)
 
@@ -1186,7 +1186,7 @@ class cashserializer(serializers.ModelSerializer):
     
     def get_dr(self,obj):
         #stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = True)
-        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = False).exclude(accounttype = 'MD').values('account','entry','transactiontype','transactionid','drcr','desc').annotate(debitamount = Sum('debitamount'),creditamount= Sum('creditamount'))
+        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = True).exclude(accounttype = 'MD').values('account','entry','transactiontype','transactionid','drcr','desc').annotate(debitamount = Sum('debitamount'),creditamount= Sum('creditamount'))
         #return account1Serializer(accounts,many=True).data
         stock = stock.annotate(accountname=F('account__accountname')).order_by('account__accountname')
         return stock
@@ -1196,7 +1196,7 @@ class cashserializer(serializers.ModelSerializer):
 
 
 
-class cbserializer(serializers.ModelSerializer):
+class   cbserializer(serializers.ModelSerializer):
 
 
    # cashtrans = stocktranserilaizer(source = 'account_transactions', many=True, read_only=True)
