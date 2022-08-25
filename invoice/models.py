@@ -27,6 +27,7 @@ class SalesOderHeader(TrackingModel):
     supply = models.IntegerField(verbose_name='Supply')
     totalpieces = models.IntegerField(verbose_name='pieces',default=0,blank = True)
     totalweight =  models.DecimalField(max_digits=10, decimal_places=2,default=0 ,blank = True,verbose_name= 'totalweight')
+    shippedto =  models.ForeignKey(to = account, on_delete= models.CASCADE,null=True,related_name='shippedto')
     remarks = models.CharField(max_length=500, null=True,verbose_name= 'Remarks')
     transport =  models.ForeignKey(to = account, on_delete= models.CASCADE,null=True,related_name='transport')
     broker =  models.ForeignKey(to = account, on_delete= models.CASCADE,null=True,related_name='broker')
