@@ -1174,7 +1174,7 @@ class cashserializer(serializers.ModelSerializer):
         #stock =  obj.cashtrans.filter(drcr = False).order_by('account')
        # print(stock)
 
-        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = True).exclude(accounttype = 'MD').values('account','entry','transactiontype','transactionid','drcr','desc').annotate(debitamount = Sum('debitamount'),creditamount = Sum('creditamount'))
+        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = False).exclude(accounttype = 'MD').values('account','entry','transactiontype','transactionid','drcr','desc').annotate(debitamount = Sum('debitamount'),creditamount = Sum('creditamount'))
         #return account1Serializer(accounts,many=True).data
         #stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = False)
 
@@ -1186,7 +1186,7 @@ class cashserializer(serializers.ModelSerializer):
     
     def get_dr(self,obj):
         #stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = True)
-        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = False).exclude(accounttype = 'MD').values('account','entry','transactiontype','transactionid','drcr','desc').annotate(debitamount = Sum('debitamount'),creditamount= Sum('creditamount'))
+        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = True).exclude(accounttype = 'MD').values('account','entry','transactiontype','transactionid','drcr','desc').annotate(debitamount = Sum('debitamount'),creditamount= Sum('creditamount'))
         #return account1Serializer(accounts,many=True).data
         stock = stock.annotate(accountname=F('account__accountname')).order_by('account__accountname')
         return stock
@@ -1196,7 +1196,7 @@ class cashserializer(serializers.ModelSerializer):
 
 
 
-class cbserializer(serializers.ModelSerializer):
+class   cbserializer(serializers.ModelSerializer):
 
 
    # cashtrans = stocktranserilaizer(source = 'account_transactions', many=True, read_only=True)
