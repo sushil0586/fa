@@ -121,15 +121,27 @@ class stocktransactionsale:
         cgst = self.order.cgst
         sgst = self.order.sgst
         igst = self.order.igst
+        tcs206c1ch2 = self.order.tcs206c1ch2
+        tcs206C2 = self.order.tcs206C2
         gtotal = self.order.gtotal
         pentity = self.order.entity
         purchaseid = account.objects.get(entity =pentity,accountcode = 3000)
         cgstid = account.objects.get(entity =pentity,accountcode = 6001)
         sgstid = account.objects.get(entity =pentity,accountcode = 6002)
         igstid = account.objects.get(entity =pentity,accountcode = 6003)
+        tcs206c1ch2id = account.objects.get(entity =pentity,accountcode = 8050)
+        tcs206C2id = account.objects.get(entity =pentity,accountcode = 8051)
         entryid,created  = entry.objects.get_or_create(entrydate1 = self.order.sorderdate,entity=self.order.entity)
+
+        if tcs206C2 > 0:
+            StockTransactions.objects.create(accounthead = tcs206C2id.accounthead,account= tcs206C2id,transactiontype = self.transactiontype,transactionid = id,saleinvoice = self.order,desc = self.description + ' ' + str(self.order.billno),drcr=self.credit,creditamount=tcs206C2,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate)
+        if tcs206c1ch2 > 0:
+            StockTransactions.objects.create(accounthead = tcs206c1ch2id.accounthead,account= tcs206c1ch2id,transactiontype = self.transactiontype,transactionid = id,saleinvoice = self.order,desc = self.description + ' ' + str(self.order.billno),drcr=self.credit,creditamount=tcs206c1ch2,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate)
+
         StockTransactions.objects.create(accounthead = cgstid.accounthead, account= cgstid,transactiontype = self.transactiontype,transactionid = id,saleinvoice = self.order, desc = self.description + ' ' + str(self.order.billno),drcr=self.credit,creditamount=cgst,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate)
         StockTransactions.objects.create(accounthead = sgstid.accounthead,account= sgstid,transactiontype = self.transactiontype,transactionid = id,saleinvoice = self.order,desc = self.description + ' ' + str(self.order.billno),drcr=self.credit,creditamount=sgst,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate)
+        
+        
         StockTransactions.objects.create(accounthead= self.order.accountid.accounthead,account= self.order.accountid,transactiontype = self.transactiontype,transactionid = id,saleinvoice = self.order,desc = self.description + ' ' + str(self.order.billno),drcr=self.debit,debitamount=gtotal,entity=self.order.entity,createdby= self.order.owner,entry = entryid,entrydatetime = self.order.sorderdate,cgstcr = cgst,sgstcr= sgst,igstcr = igst,accounttype = 'M',subtotal = subtotal)
         return id
 
@@ -414,7 +426,7 @@ class SalesOderHeaderSerializer(serializers.ModelSerializer):
     salesorderdetails = salesOrderdetailsSerializer(many=True)
     class Meta:
         model = SalesOderHeader
-        fields = ('id','sorderdate','billno','accountid','latepaymentalert','grno','vehicle','taxtype','billcash','supply','shippedto','remarks','transport','broker','tds194q','tcs206c1ch1','tcs206c1ch2','tcs206c1ch3','tcs206C1','tcs206C2','duedate','subtotal','subtotal','cgst','sgst','igst','expenses','gtotal','entity','owner','salesorderdetails',)
+        fields = ('id','sorderdate','billno','accountid','latepaymentalert','grno','terms','vehicle','taxtype','billcash','supply','shippedto','remarks','transport','broker','tds194q','tcs206c1ch1','tcs206c1ch2','tcs206c1ch3','tcs206C1','tcs206C2','duedate','subtotal','subtotal','cgst','sgst','igst','expenses','gtotal','entity','owner','salesorderdetails',)
 
 
     
@@ -1353,13 +1365,13 @@ class   cbserializer(serializers.ModelSerializer):
         #stock =  obj.cashtrans.filter(drcr = False).order_by('account')
        # print(stock)
 
-        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = True,accounttype = 'M',transactiontype = 'C')
+        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = False,accounttype = 'M',transactiontype = 'C')
         #return account1Serializer(accounts,many=True).data
         return stocktranserilaizer(stock, many=True).data
 
     
     def get_payments(self,obj):
-        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = False,accounttype = 'M',transactiontype = 'C')
+        stock = obj.cashtrans.filter(account__in = obj.cashtrans.values('account'),drcr = True,accounttype = 'M',transactiontype = 'C')
         #return account1Serializer(accounts,many=True).data
         return stocktranserilaizer(stock, many=True).data
 
