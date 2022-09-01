@@ -85,7 +85,7 @@ class PurchaseReturn(TrackingModel):
     sorderdate = models.DateField(verbose_name='Sales Order date',auto_now_add=True)
     billno = models.IntegerField(verbose_name='Bill No')
     accountid = models.ForeignKey(to = account, on_delete= models.CASCADE,blank=True)
-    latepaymentalert = models.IntegerField(verbose_name='Late Payment Alert')
+    latepaymentalert = models.BooleanField(verbose_name='Late Payment Alert',default = True,null = True)
     grno = models.CharField(max_length=50,verbose_name='GR No')
     terms = models.IntegerField(verbose_name='Terms',default = 1)
     vehicle = models.CharField(max_length=50, null=True,verbose_name='Vehicle')
@@ -99,6 +99,7 @@ class PurchaseReturn(TrackingModel):
     remarks = models.CharField(max_length=500, null=True,verbose_name= 'Remarks')
     transport =  models.ForeignKey(to = account, on_delete= models.CASCADE,null=True,related_name='transport1')
     broker =  models.ForeignKey(to = account, on_delete= models.CASCADE,null=True,related_name='broker1')
+    taxid = models.IntegerField(verbose_name='Terms',default = 0)
     tds194q =  models.DecimalField(max_digits=10, decimal_places=2,default=0, verbose_name= 'TDS 194 @')
     tds194q1 =  models.DecimalField(max_digits=10, decimal_places=2,default=0, verbose_name= 'TDS 194 @')
     tcs206c1ch1 =  models.DecimalField(max_digits=10, decimal_places=2,default=0 ,verbose_name= 'Tcs 206C1cH1')
@@ -334,16 +335,16 @@ class Transactions(TrackingModel):
 class entry(TrackingModel):
     entrydate1 = models.DateField()
     account = models.ForeignKey(to = account, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Account Name',related_name='accountentryrans')
-    openingbalance =  models.DecimalField(max_digits=10,null = True,decimal_places=3,verbose_name= 'Opening Amount')
-    closingbalance =  models.DecimalField(max_digits=10,null = True,decimal_places=3,verbose_name= 'closing Amount')
+    openingbalance =  models.DecimalField(max_digits=10,null = True,decimal_places=2,verbose_name= 'Opening Amount')
+    closingbalance =  models.DecimalField(max_digits=10,null = True,decimal_places=2,verbose_name= 'closing Amount')
     entity = models.ForeignKey(entity,null=True,on_delete=models.CASCADE,verbose_name= 'entity')
  
 
 class accountentry(TrackingModel):
     entrydate2 = models.DateField()
     account = models.ForeignKey(to = account, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Account Name',related_name='accountentryrans1')
-    openingbalance =  models.DecimalField(max_digits=10,null = True,decimal_places=3,verbose_name= 'Opening Amount')
-    closingbalance =  models.DecimalField(max_digits=10,null = True,decimal_places=3,verbose_name= 'closing Amount')
+    openingbalance =  models.DecimalField(max_digits=10,null = True,decimal_places=2,verbose_name= 'Opening Amount')
+    closingbalance =  models.DecimalField(max_digits=10,null = True,decimal_places=2,verbose_name= 'closing Amount')
     entity = models.ForeignKey(entity,null=True,on_delete=models.CASCADE,verbose_name= 'entity')
 
 
