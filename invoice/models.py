@@ -119,8 +119,8 @@ class PurchaseReturn(TrackingModel):
     entity = models.ForeignKey(entity,on_delete=models.CASCADE,verbose_name= 'entity',null= True)
     owner = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
 
-    class Meta:
-        unique_together = ('billno', 'entity',)
+    # class Meta:
+    #     #unique_together = ('billno', 'entity',)
 
 
     def __str__(self):
