@@ -700,7 +700,7 @@ class PurchaseOrderDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PurchaseOrderDetails
-        fields = ('id','voucherdate','voucherno','account','billno','billdate','terms','taxtype','billcash','totalpieces','totalquanity','advance','remarks','transport','broker','taxid','tds194q','tds194q1','tcs206c1ch1','tcs206c1ch2','tcs206c1ch3','tcs206C1','tcs206C2','duedate','inputdate','vehicle','grno','gstr2astatus','subtotal','cgst','sgst','igst','cgstcess','sgstcess','igstcess','expenses','gtotal','entity',)
+        fields = ('id','voucherdate','voucherno','account','hsn','billno','mrp','billdate','terms','taxtype','billcash','totalpieces','totalquanity','advance','remarks','transport','broker','taxid','tds194q','tds194q1','tcs206c1ch1','tcs206c1ch2','tcs206c1ch3','tcs206C1','tcs206C2','duedate','inputdate','vehicle','grno','gstr2astatus','subtotal','cgst','sgst','igst','cgstcess','sgstcess','igstcess','expenses','gtotal','entity',)
     
     def get_productname(self,obj):
         return obj.product.productname
