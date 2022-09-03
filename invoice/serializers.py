@@ -572,7 +572,7 @@ class purchasereturndetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Purchasereturndetails
-        fields =  ('id','product','productname','productdesc','orderqty','pieces','rate','amount','cgst','sgst','igst','linetotal','entity',)
+        fields =  ('id','product','productname','productdesc','hsn','mrp','orderqty','pieces','rate','amount','cgst','sgst','igst','linetotal','entity',)
 
     def get_productname(self,obj):
         return obj.product.productname
@@ -700,16 +700,18 @@ class PurchaseOrderDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PurchaseOrderDetails
-        fields = ('id','voucherdate','voucherno','account','productname','hsn','billno','mrp','billdate','terms','taxtype','billcash','totalpieces','totalquanity','advance','remarks','transport','broker','taxid','tds194q','tds194q1','tcs206c1ch1','tcs206c1ch2','tcs206c1ch3','tcs206C1','tcs206C2','duedate','inputdate','vehicle','grno','gstr2astatus','subtotal','cgst','sgst','igst','cgstcess','sgstcess','igstcess','expenses','gtotal','entity',)
+        fields = ('id','product','productname','productdesc','hsn','mrp','orderqty','pieces','rate','amount','cgst','sgst','igst','linetotal','entity',)
     
     def get_productname(self,obj):
         return obj.product.productname
-
+    
     def get_hsn(self,obj):
         return obj.product.hsn
-    
+
     def get_mrp(self,obj):
         return obj.product.mrp
+
+    
 
 
 
@@ -747,7 +749,7 @@ class purchaseorderSerializer(serializers.ModelSerializer):
         return order
 
     def update(self, instance, validated_data):
-        fields = ['voucherdate','voucherno','account','billno','billdate','terms','taxtype','billcash','subtotal','cgst','sgst','igst','expenses','gtotal','entity']
+        fields = ['voucherdate','voucherno','account','billno','billdate','terms','taxtype','billcash','totalpieces','totalquanity','advance','remarks','transport','broker','taxid','tds194q','tds194q1','tcs206c1ch1','tcs206c1ch2','tcs206c1ch3','tcs206C1','tcs206C2','duedate','inputdate','vehicle','grno','gstr2astatus','subtotal','cgst','sgst','igst','cgstcess','sgstcess','igstcess','expenses','gtotal','entity']
         for field in fields:
             try:
                 setattr(instance, field, validated_data[field])
