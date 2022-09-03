@@ -286,8 +286,8 @@ class journalmainSerializer(serializers.ModelSerializer):
             accountentryid,accountentrycreated  = accountentry.objects.get_or_create(entrydate2 = order.entrydate,account =detail.account,  entity = order.entity)
 
 
-            print(detail.drcr)
-            print(detail)
+            # print(detail.drcr)
+            # print(detail)
 
             
 
@@ -567,6 +567,8 @@ class purchasereturndetailsSerializer(serializers.ModelSerializer):
     #entityUser = entityUserSerializer(many=True)
     id = serializers.IntegerField(required=False)
     productname = serializers.SerializerMethodField()
+    hsn = serializers.SerializerMethodField()
+    mrp = serializers.SerializerMethodField()
 
     class Meta:
         model = Purchasereturndetails
@@ -574,6 +576,12 @@ class purchasereturndetailsSerializer(serializers.ModelSerializer):
 
     def get_productname(self,obj):
         return obj.product.productname
+
+    def get_hsn(self,obj):
+        return obj.product.hsn
+    
+    def get_mrp(self,obj):
+        return obj.product.mrp
 
 
 class PurchasereturnSerializer(serializers.ModelSerializer):
@@ -685,15 +693,23 @@ class SRSerializer(serializers.ModelSerializer):
 class PurchaseOrderDetailsSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
     productname = serializers.SerializerMethodField()
+    hsn = serializers.SerializerMethodField()
+    mrp = serializers.SerializerMethodField()
    # productdesc1 = serializers.SerializerMethodField()
     #entityUser = entityUserSerializer(many=True)
 
     class Meta:
         model = PurchaseOrderDetails
-        fields = ('id','product','productname','productdesc','orderqty','pieces','rate','amount','cgst','sgst','igst','linetotal','entity',)
+        fields = ('id','voucherdate','voucherno','account','billno','billdate','terms','taxtype','billcash','totalpieces','totalquanity','advance','remarks','transport','broker','taxid','tds194q','tds194q1','tcs206c1ch1','tcs206c1ch2','tcs206c1ch3','tcs206C1','tcs206C2','duedate','inputdate','vehicle','grno','gstr2astatus','subtotal','cgst','sgst','igst','cgstcess','sgstcess','igstcess','expenses','gtotal','entity',)
     
     def get_productname(self,obj):
         return obj.product.productname
+
+    def get_hsn(self,obj):
+        return obj.product.hsn
+    
+    def get_mrp(self,obj):
+        return obj.product.mrp
 
 
 
@@ -707,7 +723,7 @@ class purchaseorderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = purchaseorder
-        fields = ('id','voucherdate','voucherno','account','billno','billdate','terms','taxtype','billcash','subtotal','cgst','sgst','igst','expenses','gtotal','entity','purchaseorderdetails',)
+        fields = ('id','voucherdate','voucherno','account','billno','billdate','terms','taxtype','billcash','totalpieces','totalquanity','advance','remarks','transport','broker','taxid','tds194q','tds194q1','tcs206c1ch1','tcs206c1ch2','tcs206c1ch3','tcs206C1','tcs206C2','duedate','inputdate','vehicle','grno','gstr2astatus','subtotal','cgst','sgst','igst','cgstcess','sgstcess','igstcess','expenses','gtotal','entity','purchaseorderdetails',)
 
 
     
