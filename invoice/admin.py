@@ -1,5 +1,5 @@
 from django.contrib import admin
-from invoice.models import SalesOderHeader,salesOrderdetails,purchaseorder,PurchaseOrderDetails,journal,salereturn,salereturnDetails,Transactions,StockTransactions,Purchasereturndetails,PurchaseReturn,journalmain,journaldetails,entry,stockdetails,stockmain,goodstransaction
+from invoice.models import SalesOderHeader,salesOrderdetails,purchaseorder,PurchaseOrderDetails,journal,salereturn,salereturnDetails,Transactions,StockTransactions,Purchasereturndetails,PurchaseReturn,journalmain,journaldetails,entry,stockdetails,stockmain,goodstransaction,purchasetaxtype
 
 class TransactionsAdmin(admin.ModelAdmin):
     list_display = ['account','transactiontype','desc','drcr','amount','entity','createdby']
@@ -31,3 +31,5 @@ admin.site.register(entry)
 admin.site.register(stockmain)
 admin.site.register(stockdetails)
 admin.site.register(goodstransaction)
+admin.site.register(purchasetaxtype)
+

@@ -1006,6 +1006,70 @@
                 "gsttypecode": "1005"
                 
             }
+        ],
+        "PurchaseType": [
+
+            
+            {
+               
+                "taxtypename": "Taxable Purchase ",
+                "taxtypecode": "10001"
+                
+            },
+            {
+               
+                "taxtypename": "Out of State",
+                "taxtypecode": "1002"
+                
+            },
+            {
+               
+                "taxtypename": "NON taxable",
+                "taxtypecode": "1003"
+                
+            },
+            {
+               
+                "taxtypename": "Exempted Purchase",
+                "taxtypecode": "1004"
+                
+            },
+            {
+               
+                "taxtypename": "Tax Free Purchase",
+                "taxtypecode": "1005"
+                
+            },
+            {
+               
+                "taxtypename": "Import",
+                "taxtypecode": "1006"
+                
+            },
+            {
+               
+                "taxtypename": "Import(Accounts)",
+                "taxtypecode": "1007"
+                
+            },
+            {
+               
+                "taxtypename": "Capital Goods",
+                "taxtypecode": "1008"
+                
+            },
+            {
+               
+                "taxtypename": "Consignment",
+                "taxtypecode": "1009"
+                
+            },
+            {
+               
+                "taxtypename": "Not applicable",
+                "taxtypecode": "1010"
+                
+            }
         ]
 
         }

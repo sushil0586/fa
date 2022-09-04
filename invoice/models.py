@@ -14,6 +14,16 @@ import datetime
 
 # Create your models here.
 
+class purchasetaxtype(TrackingModel):
+    taxtypename = models.CharField(max_length= 255,verbose_name= 'Purchase tax type')
+    taxtypecode = models.CharField(max_length= 255,verbose_name= 'Purchase tax Code')
+    entity = models.ForeignKey(entity,null=True,on_delete=models.CASCADE)
+    createdby = models.ForeignKey(to= User, on_delete= models.CASCADE)
+
+
+    def __str__(self):
+        return f'{self.taxtypename} '
+
 class SalesOderHeader(TrackingModel):
     #RevisonNumber =models.IntegerFieldverbose_name=_('Main category'))
     sorderdate = models.DateField(verbose_name='Sales Order date',auto_now_add=True)
