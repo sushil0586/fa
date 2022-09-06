@@ -5,11 +5,37 @@ from os import device_encoding
 from select import select
 from rest_framework import serializers
 from invoice.models import SalesOderHeader,salesOrderdetails,purchaseorder,PurchaseOrderDetails,\
-    journal,salereturn,salereturnDetails,Transactions,StockTransactions,PurchaseReturn,Purchasereturndetails,journalmain,journaldetails,entry,goodstransaction,stockdetails,stockmain,accountentry,purchasetaxtype
+    journal,salereturn,salereturnDetails,Transactions,StockTransactions,PurchaseReturn,Purchasereturndetails,journalmain,journaldetails,entry,goodstransaction,stockdetails,stockmain,accountentry,purchasetaxtype,tdsmain,tdstype
 from financial.models import account,accountHead
 from inventory.models import Product
 from django.db.models import Sum,Count,F
 from datetime import timedelta,date,datetime
+
+
+
+class tdsmainSerializer(serializers.ModelSerializer):
+
+
+   # pcategoryname = serializers.SerializerMethodField()
+
+    class Meta:
+        model = tdsmain
+        fields ='__all__'
+
+
+
+class tdstypeSerializer(serializers.ModelSerializer):
+
+
+   # pcategoryname = serializers.SerializerMethodField()
+
+    class Meta:
+        model = tdstype
+        fields =('id','tdstypename','tdstypecode')
+
+
+
+
 
 
 
@@ -100,7 +126,7 @@ class stocktransaction:
             goodstransaction.objects.filter(entity = pentity,stockttype = 'P',transactionid= id).delete()
         
         if self.transactiontype == 'SR':
-            StockTransactions.objects.filter(entity = pentity,stockttype = 'SR',transactionid= id).delete()
+            StockTransactions.objects.filter(entity = pentity,transactiontype = 'SR',transactionid= id).delete()
             goodstransaction.objects.filter(entity = pentity,stockttype = 'SR',transactionid= id).delete()
 
         #print(self.order.id)
@@ -799,7 +825,7 @@ class purchaseorderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = purchaseorder
-        fields = ('id','voucherdate','voucherno','account','billno','billdate','terms','showledgeraccount','taxtype','billcash','totalpieces','totalquanity','advance','remarks','transport','broker','taxid','tds194q','tds194q1','tcs206c1ch1','tcs206c1ch2','tcs206c1ch3','tcs206C1','tcs206C2','duedate','inputdate','vehicle','grno','gstr2astatus','subtotal','cgst','sgst','igst','cgstcess','sgstcess','igstcess','expenses','gtotal','entity','purchaseorderdetails',)
+        fields = ('id','voucherdate','voucherno','account','billno','billdate','terms','showledgeraccount','taxtype','billcash','totalpieces','totalquanity','advance','remarks','transport','broker','taxid','tds194q','tds194q1','tcs206c1ch1','tcs206c1ch2','tcs206c1ch3','tcs206C1','tcs206C2','duedate','inputdate','vehicle','grno','gstr2astatus','subtotal','addless','cgst','sgst','igst','cgstcess','sgstcess','igstcess','expenses','gtotal','entity','purchaseorderdetails',)
 
 
     
@@ -823,7 +849,7 @@ class purchaseorderSerializer(serializers.ModelSerializer):
         return order
 
     def update(self, instance, validated_data):
-        fields = ['voucherdate','voucherno','account','billno','billdate','showledgeraccount','terms','taxtype','billcash','totalpieces','totalquanity','advance','remarks','transport','broker','taxid','tds194q','tds194q1','tcs206c1ch1','tcs206c1ch2','tcs206c1ch3','tcs206C1','tcs206C2','duedate','inputdate','vehicle','grno','gstr2astatus','subtotal','cgst','sgst','igst','cgstcess','sgstcess','igstcess','expenses','gtotal','entity']
+        fields = ['voucherdate','voucherno','account','billno','billdate','showledgeraccount','terms','taxtype','billcash','totalpieces','totalquanity','advance','remarks','transport','broker','taxid','tds194q','tds194q1','tcs206c1ch1','tcs206c1ch2','tcs206c1ch3','tcs206C1','tcs206C2','duedate','inputdate','vehicle','grno','gstr2astatus','subtotal','addless','cgst','sgst','igst','cgstcess','sgstcess','igstcess','expenses','gtotal','entity']
         for field in fields:
             try:
                 setattr(instance, field, validated_data[field])
@@ -2647,14 +2673,22 @@ class SRSerializer(serializers.ModelSerializer):
 class salesreturnDetailsSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
     productname = serializers.SerializerMethodField()
+    hsn = serializers.SerializerMethodField()
+    mrp = serializers.SerializerMethodField()
     #entityUser = entityUserSerializer(many=True)
 
     class Meta:
         model = salereturnDetails
-        fields = ('id','product','productname','productdesc','orderqty','pieces','rate','amount','cgst','sgst','igst','linetotal','entity',)
+        fields = ('id','product','productname','hsn','mrp','productdesc','orderqty','pieces','rate','amount','cgst','sgst','igst','linetotal','entity',)
 
     def get_productname(self,obj):
         return obj.product.productname
+
+    def get_hsn(self,obj):
+        return obj.product.hsn
+
+    def get_mrp(self,obj):
+        return obj.product.mrp
 
 
 
@@ -2664,7 +2698,7 @@ class salesreturnSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = salereturn
-        fields = ('id','voucherdate','voucherno','account','billno','billdate','terms','taxtype','billcash','subtotal','cgst','sgst','igst','expenses','gtotal','entity','salereturndetails',)
+        fields = ('id','voucherdate','voucherno','account','billno','billdate','terms','showledgeraccount','taxtype','billcash','totalpieces','totalquanity','advance','remarks','transport','broker','taxid','tds194q','tds194q1','tcs206c1ch1','tcs206c1ch2','tcs206c1ch3','tcs206C1','tcs206C2','duedate','inputdate','vehicle','grno','gstr2astatus','subtotal','addless','cgst','sgst','igst','cgstcess','sgstcess','igstcess','expenses','gtotal','entity','salereturndetails',)
 
     
     
@@ -2687,7 +2721,7 @@ class salesreturnSerializer(serializers.ModelSerializer):
         return order
 
     def update(self, instance, validated_data):
-        fields = ['voucherdate','voucherno','account','billno','billdate','terms','taxtype','billcash','subtotal','cgst','sgst','igst','expenses','gtotal','entity']
+        fields = ['voucherdate','voucherno','account','billno','billdate','terms','showledgeraccount','taxtype','billcash','totalpieces','totalquanity','advance','remarks','transport','broker','taxid','tds194q','tds194q1','tcs206c1ch1','tcs206c1ch2','tcs206c1ch3','tcs206C1','tcs206C2','duedate','inputdate','vehicle','grno','gstr2astatus','subtotal','addless','cgst','sgst','igst','cgstcess','sgstcess','igstcess','expenses','gtotal','entity']
         for field in fields:
             try:
                 setattr(instance, field, validated_data[field])
@@ -2709,6 +2743,23 @@ class salesreturnSerializer(serializers.ModelSerializer):
 
         
         return instance
+
+
+class tdsVSerializer(serializers.ModelSerializer):
+    #entityUser = entityUserSerializer(many=True)
+  #  id = serializers.IntegerField(required=False)
+
+    newvoucher = serializers.SerializerMethodField()
+
+    def get_newvoucher(self, obj):
+        if not obj.voucherno:
+            return 1
+        else:
+            return obj.voucherno + 1
+
+    class Meta:
+        model = journalmain
+        fields =  ['newvoucher']
 
   
 
