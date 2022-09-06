@@ -3,11 +3,11 @@ from django.http import request
 from django.shortcuts import render
 
 from rest_framework.generics import CreateAPIView,ListAPIView,ListCreateAPIView,RetrieveUpdateDestroyAPIView,GenericAPIView,RetrieveAPIView
-from invoice.models import salesOrderdetails,SalesOderHeader,purchaseorder,PurchaseOrderDetails,journal,salereturn,salereturnDetails,PurchaseReturn,Purchasereturndetails,StockTransactions,journalmain,entry,stockdetails,stockmain,goodstransaction,purchasetaxtype
+from invoice.models import salesOrderdetails,SalesOderHeader,purchaseorder,PurchaseOrderDetails,journal,salereturn,salereturnDetails,PurchaseReturn,Purchasereturndetails,StockTransactions,journalmain,entry,stockdetails,stockmain,goodstransaction,purchasetaxtype,tdsmain,tdstype
 from invoice.serializers import SalesOderHeaderSerializer,salesOrderdetailsSerializer,purchaseorderSerializer,PurchaseOrderDetailsSerializer,POSerializer,SOSerializer,journalSerializer,SRSerializer,salesreturnSerializer,salesreturnDetailsSerializer,JournalVSerializer,PurchasereturnSerializer,\
 purchasereturndetailsSerializer,PRSerializer,TrialbalanceSerializer,TrialbalanceSerializerbyaccounthead,TrialbalanceSerializerbyaccount,accountheadserializer,accountHead,accountserializer,accounthserializer, stocktranserilaizer,cashserializer,journalmainSerializer,stockdetailsSerializer,stockmainSerializer,\
 PRSerializer,SRSerializer,stockVSerializer,stockserializer,Purchasebyaccountserializer,Salebyaccountserializer,accounthead1Serializer,cbserializer,ledgerserializer,ledgersummaryserializer,stockledgersummaryserializer,stockledgerbookserializer,balancesheetserializer,gstr1b2bserializer,gstr1hsnserializer,\
-purchasetaxtypeserializer
+purchasetaxtypeserializer,tdsmainSerializer,tdsVSerializer,tdstypeSerializer
 from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db import DatabaseError, transaction
@@ -18,6 +18,81 @@ from financial.models import account
 from inventory.models import Product
 from django.db import connection
 from django.core import serializers
+
+
+
+
+class tdsordelatestview(ListCreateAPIView):
+
+    serializer_class = tdsVSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    filter_backends = [DjangoFilterBackend]
+    def get(self,request):
+        entity = self.request.query_params.get('entity')
+        id = tdsmain.objects.filter(entity= entity).last()
+        serializer = tdsVSerializer(id)
+        return Response(serializer.data)
+
+
+class tdstypeApiView(ListCreateAPIView):
+
+    serializer_class = tdstypeSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    filter_backends = [DjangoFilterBackend]
+   # filterset_fields = ['id','ProductName','is_stockable']
+
+    def perform_create(self, serializer):
+        return serializer.save(createdby = self.request.user)
+    
+    def get_queryset(self):
+
+        entity = self.request.query_params.get('entity')
+        return tdstype.objects.filter(entity = entity)
+
+
+
+
+class tdsmainApiView(ListCreateAPIView):
+
+    serializer_class = tdsmainSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    filter_backends = [DjangoFilterBackend]
+   # filterset_fields = ['id','ProductName','is_stockable']
+
+    def perform_create(self, serializer):
+        return serializer.save(createdby = self.request.user)
+    
+    def get_queryset(self):
+
+        entity = self.request.query_params.get('entity')
+        return tdsmain.objects.filter(entity = entity)
+
+
+
+class tdsmainupdatedel(RetrieveUpdateDestroyAPIView):
+
+    serializer_class = tdsmainSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+    lookup_field = "id"
+
+    def get_queryset(self):
+        entity = self.request.query_params.get('entity')
+        return tdsmain.objects.filter(entity = entity)
+
+
+class tdsmainpreviousapiview(RetrieveUpdateDestroyAPIView):
+
+    serializer_class = tdsmainSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+    lookup_field = "voucherno"
+
+    def get_queryset(self):
+        entity = self.request.query_params.get('entity')
+        #vouchertype = self.request.query_params.get('vouchertype')
+        return tdsmain.objects.filter(entity = entity)
 
 
 

@@ -462,6 +462,58 @@ class goodstransaction(TrackingModel):
     createdby = models.ForeignKey(to= User, on_delete= models.CASCADE,null=True)
 
 
+class tdstype(TrackingModel):
+    tdstypename = models.CharField(max_length= 255,verbose_name= 'Tds Type')
+    tdstypecode = models.CharField(max_length= 255,verbose_name= 'Tds Type Code')
+    entity = models.ForeignKey(entity,null=True,on_delete=models.CASCADE)
+    createdby = models.ForeignKey(to= User, on_delete= models.CASCADE)
+
+
+    def __str__(self):
+        return f'{self.tdstypename}'
+
+
+
+class tdsmain(TrackingModel):
+    voucherdate = models.DateField(verbose_name='Vocucher Date',auto_now_add=True)
+    voucherno = models.IntegerField(verbose_name='Voucher No')
+    creditaccount = models.ForeignKey(to = account, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Credit Account Name',related_name='tdscreditaccount')
+    creditdesc = models.CharField(max_length= 255,verbose_name= 'Credit Acc desc')
+    debitaccount = models.ForeignKey(to = account, on_delete= models.CASCADE,null=True,blank=True,verbose_name='debit Account Name',related_name='tdsdebitaccount')
+    debitdesc = models.CharField(max_length= 255,verbose_name= 'Debit Acc desc')
+    tdsaccount = models.ForeignKey(to = account, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Tds Account Name',related_name='tdsaccount1')
+    tdsdesc = models.CharField(max_length= 255,verbose_name= 'Tds Acc desc')
+    tdsreturnccount = models.ForeignKey(to = account, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Tds Account Name',related_name='tdsreturnaccount1')
+    tdsreturndesc = models.CharField(max_length= 255,verbose_name= 'tds return Acc desc')
+    tdstype = models.ForeignKey(to = tdstype, on_delete= models.CASCADE,null=True,blank=True,verbose_name='Tds Type',related_name='tdstype')
+    creditamount = models.DecimalField(max_digits=10,null = True,decimal_places=2,verbose_name= 'Credit Amount')
+    debitamount = models.DecimalField(max_digits=10,null = True,decimal_places=2,verbose_name= 'debit Amount')
+    otherexpenses = models.DecimalField(max_digits=10,null = True,decimal_places=2,verbose_name= 'other expenses')
+    tdsrate = models.DecimalField(max_digits=10,null = True,decimal_places=2,verbose_name= 'tds rate')
+    tdsvalue = models.DecimalField(max_digits=10,null = True,decimal_places=2,verbose_name= 'tds Value')
+    surchargerate = models.DecimalField(max_digits=10,null = True,decimal_places=2,verbose_name= 'Surcharge rate')
+    surchargevalue = models.DecimalField(max_digits=10,null = True,decimal_places=2,verbose_name= 'Surcharge Value')
+    cessrate = models.DecimalField(max_digits=10,null = True,decimal_places=2,verbose_name= 'Cess rate')
+    cessvalue = models.DecimalField(max_digits=10,null = True,decimal_places=2,verbose_name= 'Cess Value')
+    hecessrate = models.DecimalField(max_digits=10,null = True,decimal_places=2,verbose_name= 'HE Cess rate')
+    hecessvalue = models.DecimalField(max_digits=10,null = True,decimal_places=2,verbose_name= 'HE Cess Value')
+    grandttal = models.DecimalField(max_digits=10,null = True,decimal_places=2,verbose_name= 'Grand Total')
+    tdsreturndesc = models.CharField(max_length= 255,verbose_name= 'tds return Acc desc')
+    vehicleno = models.CharField(max_length= 20,verbose_name= 'vehicle no')
+    grno = models.CharField(max_length= 20,verbose_name= 'GR No')
+    invoiceno = models.CharField(max_length= 20,verbose_name= 'Invoice No')
+    grdate = models.DateField(verbose_name='GR Date',auto_now_add=True)
+    invoicedate = models.DateField(verbose_name='Invoice Date',auto_now_add=True)
+    weight = models.DecimalField(max_digits=10,null = True,decimal_places=2,verbose_name= 'weight')
+    entity = models.ForeignKey(entity,null=True,on_delete=models.CASCADE)
+    createdby = models.ForeignKey(to= User, on_delete= models.CASCADE)
+
+
+    def __str__(self):
+        return f'{self.voucherno}'
+
+
+
 
 
     
