@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-(zyb)qx!o_p@$vjqscb=p+)8&-(tj(v*ne_=qc(r@7f(%%a5ey
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['146.190.28.215']
+ALLOWED_HOSTS = ['127.0.0.1']
 
 AUTH_USER_MODEL = "Authentication.User"
 
@@ -49,9 +49,12 @@ INSTALLED_APPS = [
     'financial',
     'corsheaders',
     'invoice',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -87,8 +90,8 @@ WSGI_APPLICATION = 'FA.wsgi.application'
 DATABASES = {
    'default': {
        'ENGINE': 'django.db.backends.postgresql',
-       'NAME': 'accounts',
-       'USER': 'accountuser',
+       'NAME': 'accountsNew',
+       'USER': 'postgres',
        'PASSWORD': 'ansh@1789',
        'HOST': 'localhost',
        'PORT': '',
@@ -169,8 +172,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+#INTERNAL_IPS = ['127.0.0.1',]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEBUG_TOOLBAR_CONFIG = {
+    "SHOW_TOOLBAR_CALLBACK": lambda request: True,
+}
+INTERNAL_IPS = ['127.0.0.1',]
